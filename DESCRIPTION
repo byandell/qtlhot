@@ -1,0 +1,12 @@
+Package: qtlhot
+Version: 0.1.6
+Date: 2011-05-25
+Author: Elias Chaibub Neto <echaibub@hotmail.com>
+Title: Inference for QTL Hotspots
+Description: Functions to Determine significance of co-mapping trait hotspots
+Maintainer: Brian S. Yandell <yandell@stat.wisc.edu>
+Depends: qtl
+LazyLoad: yes
+LazyData: yes
+License: GPL (>= 2)
+URL: http://www.stat.wisc.edu/~yandell/sysgen
