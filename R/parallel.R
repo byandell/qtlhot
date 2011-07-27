@@ -50,7 +50,7 @@ parallel.message <- function(num)
   dimnames(msg)[[1]] <- seq(0, nrow(msg) - 1)
   if(missing(num))
     write.table(msg, file = "errorcodes.txt",
-              quote = FALSE, col.names = FALSE)
+                quote = FALSE, col.names = FALSE)
   else
     msg[as.character(num), 1]
 }
@@ -69,7 +69,7 @@ qtlhot.phase0 <- function(dirpath, init.seed = 92387475,
   mymap <- sim.map(len = len, n.mar = n.mar, include.x = FALSE, eq.spacing = TRUE)
   cross <- sim.cross(map = mymap, n.ind = n.ind, type = "bc")
   cross <- calc.genoprob(cross, step=0)
-    
+  
   ## Simulate new phenotypes.
   cross <- sim.null.pheno.data(cross, n.phe, latent.eff, res.var)
   
@@ -90,6 +90,8 @@ qtlhot.phase1 <- function(dirpath, index = 0,
                           res.var = 1, ## Residual variance.
                           n.phe = nphe(cross), ## Number of traits.
                           nruns = 1,
+                          big = FALSE,
+                          droptrait.names = character(0),
                           ...)
 {
   ## PHASE 1: Set up cross object. Needed in phases 2.
@@ -105,6 +107,11 @@ qtlhot.phase1 <- function(dirpath, index = 0,
   ## Get any parameters in file. These will overwrite passed arguments.
   eval(parse(file.path(dirpath, params.file)))
 
+  n.perm <- ceiling(n.perm / n.split)
+
+  ## cross.index is used when multiple phase1 jobs are spawned.
+  cross.index <- as.numeric(index)
+  
   ## Cross object. Load if not done already.
   if(!exists(cross.name))
     load(file.path(dirpath, cross.file))
@@ -113,28 +120,37 @@ qtlhot.phase1 <- function(dirpath, index = 0,
   if(cross.name != "cross")
     cross <- get(cross.name)
 
-  if(index > 0 & nruns > 1) {
-    ## Keep markers but re-simulate genotypes each time.
-    mymap <- pull.map(cross)
-    cross <- sim.cross(map = mymap, n.ind = n.ind, type = class(cross)[1])
-    cross <- calc.genoprob(cross, step=0)
+  if(big) {
+    ## Used for big data run.
+    big.phase1(dirpath, cross.index, params.file, nruns, cross,
+               lod.thrs, Nmax, n.perm, droptrait.names = droptrait.names, ...)
+    n.split <- n.perm
+  }
+  else {
+    ## Used for studying properties of qtlhot.
+    if(cross.index > 0 & nruns > 1) {
+      ## Keep markers but re-simulate genotypes each time.
+      mymap <- pull.map(cross)
+      cross <- sim.cross(map = mymap, n.ind = n.ind, type = class(cross)[1])
+      cross <- calc.genoprob(cross, step=0)
+      
+      ## Simulate new phenotypes.
+      cross <- sim.null.pheno.data(cross, n.phe, latent.eff, res.var)
+    }
+    else
+      cross.index <- 0
+
+    Nmax <- min(Nmax, n.phe)
     
-    ## Simulate new phenotypes.
-    cross <- sim.null.pheno.data(cross, n.phe, latent.eff, res.var)
+    ## Save all relevant objects for later phases.
+    save(cross, n.phe, latent.eff, res.var, Nmax, n.perm, n.split,
+         alpha.levels, lod.thrs, cross.index, big,
+         file = file.path(dirpath, "Phase1.RData"),
+         compress = TRUE)
   }
 
-  n.perm <- ceiling(n.perm / n.split)
-  cross.index <- as.numeric(index)
-
-  Nmax <- min(Nmax, n.phe)
-  
-  ## Save all relevant objects for later phases.
-  save(cross, n.phe, latent.eff, res.var, Nmax, n.perm, n.split,
-       alpha.levels, lod.thrs, cross.index,
-       file = file.path(dirpath, "Phase1.RData"),
-       compress = TRUE)
-  
   ## Need to write a file with n.groups lines and group.size columns.
+  ## The file groups.txt is examined by parallelizer (SOAR).
   write.table(c(cross.index, n.split),
               file = file.path(dirpath, "groups.txt"),
               row.names = FALSE, col.names = FALSE, quote = FALSE)
@@ -153,13 +169,6 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., verbose = FALSE)
   ##       permi.RData
   ##
 
-  cross.index <- scan("groups.txt", 0)[1]
-
-  infile <- paste("Phase1_", cross.index, ".RData", sep = "")
-
-  ## Load Phase 1 computations.
-  load(file.path(dirpath, infile))
-
   ## Quality check of index.
   if(missing(index))
     parallel.error(2, 2, index)
@@ -168,6 +177,15 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., verbose = FALSE)
     parallel.error(3, 2, index)
   if(index < 1 | index > n.split)
     parallel.error(4, 2, index)
+
+  if(big)
+    return(big.phase2(dirpath, index))
+
+  cross.index <- scan("groups.txt", 0)[1]
+
+  ## Load Phase 1 computations.
+  infile <- "Phase1.RData"
+  load(file.path(dirpath, infile))
 
   outfile <- paste("perm", ".", cross.index, "_", index, ".RData", sep = "")
 
@@ -178,7 +196,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., verbose = FALSE)
   ## Creates max.N of size n.perm x n.lod and max.lod.quant of size n.perm x Nmax.
   ## Size of n.perm determines the run time.
   NLN <- NL.N.perm(cross, Nmax, n.perm, lod.thrs, drop = drop,
-                    verbose = verbose)
+                   verbose = verbose)
 
   mycat("scanone", verbose)
   scanmat <- scanone(cross, pheno.col = seq(n.phe), method = "hk")
@@ -256,7 +274,7 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
                            verbose)
 
   outfile <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")
-    
+  
   save(latent.eff, Nmax, out.sim, 
        file = file.path(dirpath.save, outfile),
        compress = TRUE)
