@@ -28,14 +28,20 @@ pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5)
   cbind.data.frame(row = rr, phenos = pheno.col[cc], lod = lod)
 }
 
-sexbatch.covar <- function(cross, batch.effect)
+sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
 {
   ic <- getsex(cross)$sex
   
   if(!is.null(batch.effect)){
     batch <- cross$pheno[,batch.effect, drop = FALSE]
     tmp <- formula(paste("~ factor(", batch.effect, ")"))
+    if(verbose)
+      cat("sexbatch.covar", names(tmp), levels(factor(batch[[1]])), "\n")
+    if(verbose)
+      cat("sexbatch.covar", dim(batch), "\n")
     batch <- model.matrix(tmp,batch)[,-1, drop = FALSE]
+    if(verbose)
+      cat("sexbatch.covar", dim(batch), "\n")
     ac <- cbind(batch,ic)
   }
   else
@@ -131,7 +137,8 @@ lod.quantile.permutation <- function(cat.scan.hl,N,lod.thr,window,chr.pos,n.phe)
   for(j in 1:l.lod.thr){
     XX <- cat.scan.hl$lod >= lod.thr[j]
     max.N$max.N[j] <- max(tapply(XX, cat.scan.hl$row,sum,na.rm=T),na.rm=T)
-    
+
+    ## Is this working properly?
     neqtl.pos <- smooth.neqtl(cat.scan.hl, chr.pos, max.hl, lod.thr[j], window)
     
     max.N$max.N.win[j] <- max(neqtl.pos[,3])

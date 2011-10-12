@@ -91,7 +91,6 @@ qtlhot.phase1 <- function(dirpath, index = 0,
                           n.phe = nphe(cross), ## Number of traits.
                           nruns = 1,
                           big = FALSE,
-                          droptrait.names = character(0),
                           ...)
 {
   ## PHASE 1: Set up cross object. Needed in phases 2.
@@ -107,27 +106,30 @@ qtlhot.phase1 <- function(dirpath, index = 0,
   ## Get any parameters in file. These will overwrite passed arguments.
   eval(parse(file.path(dirpath, params.file)))
 
-  n.perm <- ceiling(n.perm / n.split)
-
-  ## cross.index is used when multiple phase1 jobs are spawned.
-  cross.index <- as.numeric(index)
-  
   ## Cross object. Load if not done already.
   if(!exists(cross.name))
     load(file.path(dirpath, cross.file))
-
+  
   ## Change name of cross object to "cross" for internal use.
   if(cross.name != "cross")
     cross <- get(cross.name)
 
+  ## cross.index is used when multiple phase1 jobs are spawned.
+  cross.index <- as.numeric(index)
+
   if(big) {
     ## Used for big data run.
-    big.phase1(dirpath, cross.index, params.file, nruns, cross,
-               lod.thrs, Nmax, n.perm, droptrait.names = droptrait.names, ...)
+    ## Each run is separate permutation.
+    ## Make sure n.split is equal to n.perm. n.perm set to 1 in big.phase1.
     n.split <- n.perm
+    big.phase1(dirpath, cross.index, params.file, cross, lod.thrs, Nmax, n.perm,
+               n.split, ...)
   }
   else {
     ## Used for studying properties of qtlhot.
+
+    n.perm <- ceiling(n.perm / n.split)
+      
     if(cross.index > 0 & nruns > 1) {
       ## Keep markers but re-simulate genotypes each time.
       mymap <- pull.map(cross)
@@ -156,7 +158,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
               row.names = FALSE, col.names = FALSE, quote = FALSE)
 }
 ####################################################################################
-qtlhot.phase2 <- function(dirpath, index = NULL, ..., verbose = FALSE)
+qtlhot.phase2 <- function(dirpath, index = NULL, ..., big = FALSE, verbose = FALSE)
 {
   ## PHASE 2: NL,N and WW permutations. 
   ##          Slow. Run on condor nodes. Sized by n.perm.
@@ -169,6 +171,12 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., verbose = FALSE)
   ##       permi.RData
   ##
 
+  cross.index <- scan("groups.txt", 0)[1]
+
+  ## Load Phase 1 computations.
+  infile <- "Phase1.RData"
+  load(file.path(dirpath, infile))
+
   ## Quality check of index.
   if(missing(index))
     parallel.error(2, 2, index)
@@ -180,12 +188,6 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., verbose = FALSE)
 
   if(big)
     return(big.phase2(dirpath, index))
-
-  cross.index <- scan("groups.txt", 0)[1]
-
-  ## Load Phase 1 computations.
-  infile <- "Phase1.RData"
-  load(file.path(dirpath, infile))
 
   outfile <- paste("perm", ".", cross.index, "_", index, ".RData", sep = "")
 
@@ -214,7 +216,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., verbose = FALSE)
 }
 ####################################################################################
 qtlhot.phase3 <- function(dirpath, index = NULL, ...,
-                          dirpath.save = dirpath, verbose = FALSE)
+                          dirpath.save = dirpath, big = FALSE, verbose = FALSE)
 {
   ## PHASE 3: Sample Markov chain (MCMC). Parallelize.
   ##          Fast: Run on scheduler.
@@ -233,6 +235,9 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
 
   ## Load Phase 1 computations.
   load(file.path(dirpath, "Phase1.RData"))
+
+  if(big)
+    return(big.phase3(dirpath, index, cross.index))
 
   ## This could be done once, but it would require splitting this phase in two.
   ## Besides, it is quite fast.
