@@ -16,8 +16,8 @@ pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5)
   ## Find which are within drop.lod of max lod per chr.
   lod <- x[wh]
   chr <- scans$chr[rr]
-  maxlod <- tapply(lod, chr, max)
-  wh <- which(maxlod[chr] <= lod + drop.lod)
+  maxlod <- tapply(lod, list(chr, chr), max)
+  wh <- which(maxlod[cbind(cc,as.character(chr))] <= lod + drop.lod)
 
   ## Reget values.
   rr <- rr[wh]
@@ -138,7 +138,6 @@ lod.quantile.permutation <- function(cat.scan.hl,N,lod.thr,window,chr.pos,n.phe)
     XX <- cat.scan.hl$lod >= lod.thr[j]
     max.N$max.N[j] <- max(tapply(XX, cat.scan.hl$row,sum,na.rm=T),na.rm=T)
 
-    ## Is this working properly?
     neqtl.pos <- smooth.neqtl(cat.scan.hl, chr.pos, max.hl, lod.thr[j], window)
     
     max.N$max.N.win[j] <- max(neqtl.pos[,3])
@@ -157,21 +156,27 @@ make.maxlod <- function(cat.scan.hl, chr.pos)
     else
       max(x, na.rm = TRUE)
   }
-  tmpfn2 <- function(a,b) {
-    if(is.null(a))
+  tmpfn2 <- function(x) {
+    if(is.null(x))
       NA
     else
-      mean(b[!is.nan(a) & a==max(a, na.rm=TRUE)])
+      mean(x, na.rm=TRUE)
+  }
+  tmpfn3 <- function(a) {
+    is.nan(a) | a==max(a, na.rm=TRUE)
   }
   
   maxlod.hl <- maxlod.pos.hl <- vector("list", length(n.chr))
   names(maxlod.pos.hl) <- n.chr
   for(k in seq(along=n.chr)) {
     scan.out.bychr <- cat.scan.hl[cat.scan.hl$chr==n.chr[k],]
-    scan.out.bychr$phenos <- factor(scan.out.bychr$phenos)
+    scan.out.bychr$phenos <- ordered(scan.out.bychr$phenos, unique(scan.out.bychr$phenos))
+    ## Find high lod.
     maxlod.hl[[k]] <- tapply(scan.out.bychr$lod,scan.out.bychr$phenos, tmpfn)
-    maxlod.pos.hl[[k]] <- tapply(scan.out.bychr$lod, scan.out.bychr$phenos, tmpfn2,
-                                 scan.out.bychr$pos)
+    ## Find position of high lod.
+    tmp <- tapply(scan.out.bychr$lod, scan.out.bychr$phenos, tmpfn3)
+    scan.out.bychr <- scan.out.bychr[unlist(tmp),]
+    maxlod.pos.hl[[k]] <- tapply(scan.out.bychr$pos, scan.out.bychr$phenos, tmpfn2)
   }
   list(lod = maxlod.hl, pos = maxlod.pos.hl)
 }

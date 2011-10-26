@@ -98,7 +98,7 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
     seeds <- 0
 
   ## Big assumes n.split is n.perm and does one perm each run.
-  n.split <- n.perm
+  n.split <- max(1, n.perm)
   
   save(cross, n.perm, seeds, Nmax, drop.lod, lod.thrs, lod.min, batch.effect,
        trait.index, trait.names, all.traits, size.set, ## From Trait.0.RData
@@ -112,6 +112,9 @@ big.phase2 <- function(dirpath = ".", index, ..., remove.files = TRUE, verbose =
   ## Phase 2.
   ## Loop on sets of phenotypes, adding only what is needed.
   ## Loop on permutations internal to scanone.permutations.
+
+  ## Right now to get raw data, you have to set n.perm=1.
+  ## Would be nice to get raw data created when index=1 regardles of n.perm.
   
   load(file.path(dirpath, "Phase1.RData"))
 
@@ -119,21 +122,32 @@ big.phase2 <- function(dirpath = ".", index, ..., remove.files = TRUE, verbose =
     cat("compute covariates\n")
   covars <- sexbatch.covar(cross, batch.effect, verbose = TRUE)
 
-  n.ind <- nind(cross)
-  n.phe <- nphe(cross)
   n.traits <- length(all.traits)
+  perms <- NULL
 
-  if(n.perm > 1) {
+  if(index <= 1) {
+    ## Original data.
+    do.big.phase2(dirpath, cross, covars, perms, 0, trait.data, trait.index,
+                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, verbose)
+  }
+  else {
     ## Random permutation. Use preset seed if provided.
     seed <- seeds[index]
     if(seed > 0)
       set.seed(seed[1])
     if(verbose)
       cat("sample permutation", seed[1], "\n")
+    n.ind <- nind(cross)
     perms <- sample(seq(n.ind), n.ind, replace = FALSE)
     cross$pheno <- cross$pheno[perms,]
-  }
 
+    do.big.phase2(dirpath, cross, covars, perms, index, trait.data, trait.index,
+                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, verbose)
+  }
+}
+do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.data, trait.index,
+                          lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, verbose)
+{
   ## Cycle through all the phenotypes in sets of size size.set. Keeps R object smaller.
   ## Assume large trait matrix has been broken into Trait.i.RData, each with trait.data.
 
@@ -188,8 +202,11 @@ big.phase3 <- function(dirpath = ".", index, cross.index, ..., verbose = FALSE)
   
   max.lod.quant <- matrix(NA, n.perm, Nmax)
   max.N <- max.N.window <- matrix(NA, n.perm, n.thrs)
-  
-  for(i.perm in seq(n.perm)) {
+
+  ## First set is original data.
+  if(n.perm > 1) for(i.perm in seq(2, n.perm)) {
+    if(verbose)
+      cat(i.perm, "\n")
     attach(file.path(dirpath, paste("perm", ".", cross.index, "_", i.perm, ".RData", sep = "")))
     n.quant <- length(lod.sums$max.lod.quant)
     max.lod.quant[i.perm, seq(n.quant)] <- lod.sums$max.lod.quant
