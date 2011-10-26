@@ -16,8 +16,10 @@ pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5)
   ## Find which are within drop.lod of max lod per chr.
   lod <- x[wh]
   chr <- scans$chr[rr]
-  maxlod <- tapply(lod, list(chr, chr), max)
-  wh <- which(maxlod[cbind(cc,as.character(chr))] <= lod + drop.lod)
+  tmp <- interaction(cc, chr, drop = TRUE)
+  maxlod <- tapply(lod, tmp, max)
+  ## Is not adding name properly here.
+  wh <- which(maxlod[tmp] <= lod + drop.lod)
 
   ## Reget values.
   rr <- rr[wh]
