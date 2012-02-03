@@ -3,6 +3,7 @@ big.phase0 <- function(dirpath, cross, trait.file, trait.matrix,
                        keeptrait.names = NULL,
                        lod.thrs,
                        sex = "Sex", trait.index, batch.effect = NULL, size.set = 250,
+                       offset = 0,
                        verbose = TRUE)
 {
   ## Set up cross object and trait.data objects.
@@ -48,10 +49,10 @@ big.phase0 <- function(dirpath, cross, trait.file, trait.matrix,
     
     trait.data <- get(trait.matrix)[, trait.names[traits], drop = FALSE]
 
-    tmp <- paste("Trait", pheno.set, "RData", sep = ".")
+    tmp <- paste("Trait", offset + pheno.set, "RData", sep = ".")
     if(verbose)
-      cat("Saving", length(traits), "trait data as set", pheno.set, "in", tmp, "\n")
-    save(trait.data, pheno.set, file = tmp, compress = TRUE)
+      cat("Saving", length(traits), "trait data as set", offset + pheno.set, "in", tmp, "\n")
+    save(trait.data, offset, pheno.set, file = tmp, compress = TRUE)
 
     ## Get next size.set traits.
     trait.nums <- trait.nums + size.set
@@ -113,9 +114,7 @@ big.phase2 <- function(dirpath = ".", index, ..., remove.files = TRUE, verbose =
   ## Loop on sets of phenotypes, adding only what is needed.
   ## Loop on permutations internal to scanone.permutations.
 
-  ## Right now to get raw data, you have to set n.perm=1.
-  ## Would be nice to get raw data created when index=1 regardles of n.perm.
-  
+  ## This loads cross object and many other things from phase1.
   load(file.path(dirpath, "Phase1.RData"))
 
   if(verbose)
@@ -127,8 +126,8 @@ big.phase2 <- function(dirpath = ".", index, ..., remove.files = TRUE, verbose =
 
   if(index <= 1) {
     ## Original data.
-    do.big.phase2(dirpath, cross, covars, perms, 0, trait.data, trait.index,
-                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, verbose)
+    do.big.phase2(dirpath, cross, covars, perms, 1, trait.index,
+                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index, verbose)
   }
   else {
     ## Random permutation. Use preset seed if provided.
@@ -141,12 +140,12 @@ big.phase2 <- function(dirpath = ".", index, ..., remove.files = TRUE, verbose =
     perms <- sample(seq(n.ind), n.ind, replace = FALSE)
     cross$pheno <- cross$pheno[perms,]
 
-    do.big.phase2(dirpath, cross, covars, perms, index, trait.data, trait.index,
-                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, verbose)
+    do.big.phase2(dirpath, cross, covars, perms, index, trait.index,
+                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index, verbose)
   }
 }
-do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.data, trait.index,
-                          lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, verbose)
+do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
+                          lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index, verbose)
 {
   ## Cycle through all the phenotypes in sets of size size.set. Keeps R object smaller.
   ## Assume large trait matrix has been broken into Trait.i.RData, each with trait.data.
@@ -155,12 +154,12 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.data, trai
   if(!length(filenames))
     parallel.error(5, 5, index)
   
-  for(pheno.set in seq(length(filenames))) {
+  for(pheno.index in seq(length(filenames))) {
     if(verbose)
-      cat(pheno.set, "\n")
+      cat(pheno.index, "\n")
 
     ## This is not working correctly. Either Trait.n.RData are all the same or ??.
-    attach(file.path(dirpath, filenames[pheno.set]))
+    attach(file.path(dirpath, filenames[pheno.index]))
     perm.cross <- add.phenos(cross, trait.data, index = trait.index)
     pheno.col <- find.pheno(perm.cross, dimnames(trait.data)[[2]])
     detach()
@@ -171,7 +170,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.data, trai
     per.scan.hl <- pull.highlods(per.scan, lod = lod.min, drop.lod = drop.lod)
 
     save(per.scan.hl, perms,
-         file=file.path(dirpath, paste("per.scan",pheno.set, index,"RData",sep=".")))
+         file=file.path(dirpath, paste("per.scan",pheno.index, index,"RData",sep=".")))
   }
 
   chr.pos <- per.scan[,1:2]
@@ -192,29 +191,43 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.data, trai
        file = paste("perm", ".", cross.index, "_", index, ".RData", sep = ""))
 }
 #############################################################################################
-big.phase3 <- function(dirpath = ".", index, cross.index, ..., verbose = FALSE)
+big.phase3 <- function(dirpath = ".", index, cross.index, ...,
+                       outfile = phase3name, verbose = FALSE)
 {
   ## Phase 3. Merge back together.
 
   load(file.path(dirpath, "Phase1.RData"))
 
+  filenames <- list.files(dirpath, paste("perm.", cross.index, "_[0-9][0-9]*.RData", sep = ""))
+  n.file <- length(filenames)
+  if(n.file != n.perm)
+    warning(paste("Number of perm files", n.file, "does not match number of permutations", n.perm))
+  ## First filename perm.*_1.RData is raw data. Drop it.
+  tmp <- paste("perm.", cross.index, "_1.RData", sep = "")
+  tmp <- match(tmp, filenames)
+  if(is.na(tmp)) stop("perm run 1 with raw data not present")
+  filenames <- filenames[-tmp]
+  n.file <- length(filenames)
+
+  if(n.file == 0)
+    return(NULL)
+  
   n.thrs <- length(lod.thrs)
   
-  max.lod.quant <- matrix(NA, n.perm, Nmax)
-  max.N <- max.N.window <- matrix(NA, n.perm, n.thrs)
+  max.lod.quant <- matrix(NA, n.file, Nmax)
+  max.N <- max.N.window <- matrix(NA, n.file, n.thrs)
 
-  ## First set is original data.
-  if(n.perm > 1) for(i.perm in seq(2, n.perm)) {
+  for(i.perm in seq(n.file)) {
     if(verbose)
       cat(i.perm, "\n")
-    attach(file.path(dirpath, paste("perm", ".", cross.index, "_", i.perm, ".RData", sep = "")))
+    attach(file.path(dirpath, filenames[i.perm]), warn.conflicts = FALSE)
     n.quant <- length(lod.sums$max.lod.quant)
     max.lod.quant[i.perm, seq(n.quant)] <- lod.sums$max.lod.quant
     max.N[i.perm,] <- lod.sums$max.N$max.N
     max.N.window[i.perm,] <- lod.sums$max.N$max.N.win
     detach()
   }
-  outfile <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")
+  phase3name <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")
 
   save(max.lod.quant, max.N, max.N.window, file = outfile, compress = TRUE)
 }

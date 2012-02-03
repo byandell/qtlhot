@@ -121,8 +121,6 @@ qtlhot.phase1 <- function(dirpath, index = 0,
     ## Used for big data run.
     ## Each run is separate permutation.
     ## Make sure n.split is equal to n.perm. n.perm set to 1 in big.phase1.
-    if(n.perm > 1)
-      n.perm <- 1 + n.perm
     n.split <- max(1, n.perm)
     big.phase1(dirpath, cross.index, params.file, cross, lod.thrs, Nmax, n.perm,
                n.split, ...)
