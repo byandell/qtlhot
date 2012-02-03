@@ -3,7 +3,7 @@ big.phase0 <- function(dirpath, cross, trait.file, trait.matrix,
                        keeptrait.names = NULL,
                        lod.thrs,
                        sex = "Sex", trait.index, batch.effect = NULL, size.set = 250,
-                       offset = 0,
+                       offset = 0, subset.sex = NULL,
                        verbose = TRUE)
 {
   ## Set up cross object and trait.data objects.
@@ -16,6 +16,10 @@ big.phase0 <- function(dirpath, cross, trait.file, trait.matrix,
   if(!is.null(batch.effect))
     cross <- subset(cross, ind = !is.na(cross$pheno[[batch.effect]]))
 
+  ## Subset to individuals with sex if desired.
+  if(!is.null(subset.sex))
+    cross <- subset(cross, ind = (cross$pheno[[sex]] %in% subset.sex))
+  
   ## Save cross object and other pertinent information.
   if(verbose)
     cat("Saving cross object in cross.RData\n")
