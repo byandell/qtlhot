@@ -1,12 +1,13 @@
-\name{sum.threshold}
-\alias{sum.threshold}
+\name{filter.threshold}
+\alias{filter.threshold}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Summary of threshold results}
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-sum.threshold(cross, nT, latent.eff, res.var, lod.thrs, drop = 1.5, Ns, n.perm, alpha.levels, verbose = FALSE)
+filter.threshold(cross, nT, latent.eff, res.var, lod.thrs, drop = 1.5,
+Ns, n.perm, alpha.levels, NL.N.thrs, WW.thrs, verbose = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,6 +37,12 @@ sum.threshold(cross, nT, latent.eff, res.var, lod.thrs, drop = 1.5, Ns, n.perm, 
 }
   \item{alpha.levels}{
 %%     ~~Describe \code{alpha.levels} here~~
+}
+  \item{NL.N.thrs}{
+Results of call to NL.N.permutations.
+}
+  \item{WW.thrs}{
+Results of call to WW.permutations.
 }
   \item{verbose}{
 %%     ~~Describe \code{verbose} here~~

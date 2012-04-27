@@ -1,0 +1,23 @@
+############################################################################
+# Export directives.  These directives export functions.  S3 methods for
+# classes declared in the package should be declared with the "S3method"
+# directive.
+#
+
+export(add.phenos)
+
+export(qtlhot.phase0)
+export(parallel.qtlhot)
+
+export(sim.null.pheno.data)
+export(set.to.zero.beyond.drop.int)
+export(filter.threshold)
+export(pull.highlods)
+export(lod.quantile.permutation)
+
+export(NL.N.permutations)
+export(NL.N.perm)
+export(NL.N.summary)
+export(WW.permutations)
+export(WW.perm)
+export(WW.summary)

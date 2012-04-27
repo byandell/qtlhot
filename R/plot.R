@@ -1,3 +1,23 @@
+######################################################################
+# plot.R
+#
+# Brian S Yandell
+#
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License,
+#     version 3, as published by the Free Software Foundation.
+# 
+#     This program is distributed in the hope that it will be useful,
+#     but without any warranty; without even the implied warranty of
+#     merchantability or fitness for a particular purpose.  See the GNU
+#     General Public License, version 3, for more details.
+# 
+#     A copy of the GNU General Public License, version 3, is available
+#     at http://www.r-project.org/Licenses/GPL-3
+#
+# Contains: pull.hotspots, quant.sum, quant.plot, hotspot.scan, scan.hl.plot, hotspot.plot
+######################################################################
+
 ## Routines to show hotspots. None here yet.
 pull.hotspots <- function(cross, scan.hl, chr.pos = NULL, lod.thr = 5, slide.thr = NULL, verbose = FALSE)
 {
@@ -197,7 +217,7 @@ hotspot.plot <- function(hot.scan, quant.thr = NULL, maps = NULL, main = "")
     plot(hot.scan, lodcolumn=2, chr = i, col = "blue", add = TRUE)
 
     if(!is.null(maps))
-      qtlview:::add.rug(i, "", maps, use.cM = TRUE)
+      add.rug(i, "", maps, use.cM = TRUE)
 
     if(!is.null(quant.thr))
       abline(h = quant.thr, lwd = 2, lty = 2, col = "red")

@@ -19,7 +19,6 @@
 # Part of the R/qtlhot package
 # Contains: get.hotsize, get.hotscan,
 #           ravel.scan,ravel.filter,get.hotravel
-#           [See ]
 #
 ######################################################################
 ## Code from ~/p/private/diabetes1/diabetes10/Rcode/byandell/peaks/routines.R

@@ -1,3 +1,25 @@
+######################################################################
+# parallel.R
+#
+# Brian S Yandell
+#
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License,
+#     version 3, as published by the Free Software Foundation.
+# 
+#     This program is distributed in the hope that it will be useful,
+#     but without any warranty; without even the implied warranty of
+#     merchantability or fitness for a particular purpose.  See the GNU
+#     General Public License, version 3, for more details.
+# 
+#     A copy of the GNU General Public License, version 3, is available
+#     at http://www.r-project.org/Licenses/GPL-3
+#
+# Contains: parallel.qtlhot, parallel.error, parallel.message,
+#           qtlhot.phase0, qtlhot.phase1, qtlhot.phase2, qtlhot.phase3
+######################################################################
+
+######################################################################
 ## Directory path is indicated with "dirpath" character string
 ##
 ## I/O files are in internal R format (RData) using load/save commands
@@ -192,7 +214,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., big = FALSE, verbose = FAL
   outfile <- paste("perm", ".", cross.index, "_", index, ".RData", sep = "")
 
   ## Following is in NL.N.perm stuff.
-  ## sum.threshold is big loop. Have perm loop within it. n.phe*n.perm runs of scanone per dataset.
+  ## filter.threshold is big loop. Have perm loop within it. n.phe*n.perm runs of scanone per dataset.
   ## For simulation study, have many datasets!
 
   ## Creates max.N of size n.perm x n.lod and max.lod.quant of size n.perm x Nmax.
@@ -273,10 +295,10 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
 
   ## Now compare permutations to original cross object from Phase1.
 
-  out.sim <- sum.threshold(cross, n.phe, latent.eff, res.var,
-                           lod.thrs, drop, seq(Nmax), n.perms, alpha.levels,
-                           NL.N.thrs, WW.thrs,
-                           verbose)
+  out.sim <- filter.threshold(cross, n.phe, latent.eff, res.var,
+                              lod.thrs, drop, seq(Nmax), n.perms, alpha.levels,
+                              NL.N.thrs, WW.thrs,
+                              verbose)
 
   outfile <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")
   

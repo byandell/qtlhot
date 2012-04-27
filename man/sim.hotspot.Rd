@@ -1,6 +1,8 @@
 \name{sim.hotspot}
 \alias{sim.hotspot}
 \alias{mySimulations}
+\alias{sim.null.cross}
+\alias{sim.null.pheno.data}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Wrapper routine for simulations.}
 \description{
@@ -10,6 +12,8 @@
 sim.hotspot(nSim, cross, nT, latent.eff, res.var = 1, Ns, n.perm,
   alpha.levels, lod.thrs, drop = 1.5, verbose = FALSE)
 mySimulations(\dots)
+sim.null.cross(chr.len = rep(400, 16), n.mar = 185, n.ind = 112, type = "bc", n.pheno = 6000, latent.eff = 1.5, res.var = 1, init.seed = 92387475)
+sim.null.pheno.data(cross, n.pheno, latent.eff, res.var)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -47,6 +51,14 @@ permutation thresholds for various significance levels.
 Drop in LOD score examined. LODs below this drop from the maximum for a
 chromosome will not be scored.
 }
+\item{init.seed}{}
+\item{len}{}
+\item{n.mar}{}
+\item{n.ind}{}
+\item{n.phe}{}
+\item{latent.eff}{}
+\item{res.var}{}
+\item{lod.thrs}{}
   \item{verbose}{
 Verbose output if \code{TRUE}. More detailed output if \code{2}.
 }

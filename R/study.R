@@ -1,3 +1,24 @@
+######################################################################
+# study.R
+#
+# Brian S Yandell
+#
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License,
+#     version 3, as published by the Free Software Foundation.
+# 
+#     This program is distributed in the hope that it will be useful,
+#     but without any warranty; without even the implied warranty of
+#     merchantability or fitness for a particular purpose.  See the GNU
+#     General Public License, version 3, for more details.
+# 
+#     A copy of the GNU General Public License, version 3, is available
+#     at http://www.r-project.org/Licenses/GPL-3
+#
+# Contains: mySimulations, get.hotspot, sim.hotspot, filter.threshold,
+#           NL.counts, N.WW.counts, mycat
+######################################################################
+
 ## This function computes the error rates for the NL-, N- and West/Wu methods
 ## out of nSim simulations. (It also returns the method's thresholds).
 ## At each simulation iteration this function: (1) generates a null dataset 
@@ -95,7 +116,7 @@ sim.hotspot <- function(nSim,
     ncross <- sim.null.pheno.data(cross, nT, latent.eff, res.var)
   
     ## Simulate correlated phenotypes and create threshold summaries.
-    out.sim <- sum.threshold(ncross, nT, latent.eff[k], res.var,
+    out.sim <- filter.threshold(ncross, nT, latent.eff[k], res.var,
                              lod.thrs, drop,
                              Ns, n.perm, alpha.levels,
                              verbose)
@@ -119,13 +140,13 @@ sim.hotspot <- function(nSim,
        thrWW=thrWW)  
 }
 ########################################################################################
-sum.threshold <- function(cross, nT, latent.eff, res.var,
-                          lod.thrs, drop = 1.5,
-                          Ns, n.perm, alpha.levels,
-                          NL.N.thrs = NL.N.permutations(cross, Ns, n.perm, alpha.levels,
-                            lod.thrs, verbose = verbose),
-                          WW.thrs = WW.permutations(scan.drop, lod.thrs, alpha.levels, n.perm),
-                          verbose = FALSE)
+filter.threshold <- function(cross, nT, latent.eff, res.var,
+                             lod.thrs, drop = 1.5,
+                             Ns, n.perm, alpha.levels,
+                             NL.N.thrs = NL.N.permutations(cross, Ns, n.perm, alpha.levels,
+                               lod.thrs, verbose = verbose),
+                             WW.thrs = WW.permutations(scan.drop, lod.thrs, alpha.levels, n.perm),
+                             verbose = FALSE)
 {
   mycat("scanone", verbose)
   scanmat <- scanone(cross, pheno.col=c(1:nT), method="hk")

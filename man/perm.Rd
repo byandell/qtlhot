@@ -1,12 +1,24 @@
 \name{NL.N.permutations}
 \alias{NL.N.permutations}
+\alias{NL.N.perm}
+\alias{NL.N.summary}
+\alias{WW.permutations}
+\alias{WW.perm}
+\alias{WW.summary}
+\alias{set.to.zero.beyond.drop.int}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Conduct NL and N permutation tests}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Conduct NL and N permutation tests.
 }
 \usage{
 NL.N.permutations(cross, Ns, n.perm, alpha.levels, lod.thrs, drop = 1.5, verbose = FALSE)
+NL.N.perm(cross, Nmax, n.perm, lod.thrs, drop = 1.5, verbose = FALSE, init.seed = 0)
+NL.N.summary(max.lod.quant, max.N, alpha.levels)
+WW.permutations(scanmat, lod.thrs, alpha.levels, n.perm, verbose = FALSE)
+WW.perm(scanmat, lod.thrs, n.perm, verbose = FALSE)
+WW.summary(max.WW, alpha.levels)
+set.to.zero.beyond.drop.int(chr, scanmat, thr, drop = 1.5)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,9 +44,6 @@ NL.N.permutations(cross, Ns, n.perm, alpha.levels, lod.thrs, drop = 1.5, verbose
 %%     ~~Describe \code{verbose} here~~
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
 \value{
 %%  ~Describe the value returned
 %%  If it is a LIST, use
@@ -42,34 +51,13 @@ NL.N.permutations(cross, Ns, n.perm, alpha.levels, lod.thrs, drop = 1.5, verbose
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
 \author{
-%%  ~~who you are~~
+Elias Chaibub Neto and Brian S Yandell
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (cross, Ns, n.perm, alpha.levels, lod.thrs, drop = 1.5, 
-    verbose = FALSE) 
-{
-    mats <- NL.N.perm(cross, Ns, n.perm, lod.thrs, drop = drop, 
-        verbose = verbose)
-    NL.N.summary(mats$max.lod.quant, mats$max.N, alpha.levels)
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

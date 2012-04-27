@@ -1,3 +1,27 @@
+######################################################################
+# neqtl.R
+#
+# Elias Chaibub Neto
+# Brian S Yandell
+# Aimee Teo Broman
+#
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License,
+#     version 3, as published by the Free Software Foundation.
+# 
+#     This program is distributed in the hope that it will be useful,
+#     but without any warranty; without even the implied warranty of
+#     merchantability or fitness for a particular purpose.  See the GNU
+#     General Public License, version 3, for more details.
+# 
+#     A copy of the GNU General Public License, version 3, is available
+#     at http://www.r-project.org/Licenses/GPL-3
+#
+# Contains: pull.highlods, sexbatch.covar, scanone.permutations,
+#           cat.scanone, get.tails, lod.quantile.permutation,
+#           make.max.N, make.maxlod, smooth.neqtl, lod.quantile.permutations.2
+######################################################################
+
 ## see  ~/p/private/diabetes1/diabetes10/scan.perm/Rcode files
 pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5)
 {
@@ -130,7 +154,7 @@ lod.quantile.permutation <- function(cat.scan.hl,N,lod.thr,window,chr.pos,n.phe)
   ## Elias quantiles.
   quant <- get.tails(cat.scan.hl, n.quant = N)
   N <- ncol(quant)
-  max.lod.quant <- apply(quant,2,max,na.rm=T)
+  max.lod.quant <- apply(quant,2,max,na.rm=TRUE)
   names(max.lod.quant) <- paste(paste(round(1-as.numeric(dimnames(quant)[[2]])/n.phe,4)*100,
                                       "%", sep=""),1:N, sep="_")
 
@@ -145,7 +169,7 @@ make.max.N <- function(cat.scan.hl, lod.thr, chr.pos, window,
 {
   l.lod.thr <- length(lod.thr)
   max.N <- data.frame(max.N = vector(length = l.lod.thr), max.N.win = vector(length = l.lod.thr),
-                      row.names = lod.thr, check.names = T)
+                      row.names = lod.thr, check.names = TRUE)
   for(j in 1:l.lod.thr){
     XX <- cat.scan.hl$lod >= lod.thr[j]
     max.N$max.N[j] <- max(tapply(XX, cat.scan.hl$row, sum, na.rm = TRUE), na.rm = TRUE)
@@ -223,9 +247,9 @@ lod.quantile.permutations.2 <- function(cross, pheno.col, N, n.perm, lod.thr,
   all.seeds <- sample(c(98765:987654), n.perm, replace=FALSE)
 
   ## Set up matrices to record values.
-  T <- nphe(cross)
-  N <- N[N <= T]
-  quants <- 1 - (N - 1)/T
+  nphe.cross <- nphe(cross)
+  N <- N[N <= nphe.cross]
+  quants <- 1 - (N - 1)/nphe.cross
   l.N <- length(N)
   max.lod.quant <- matrix(NA, n.perm, l.N)
   dimnames(max.lod.quant)[[2]] <- paste(paste(round(quants,4)*100, "%", sep=""), 
