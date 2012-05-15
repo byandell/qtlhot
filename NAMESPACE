@@ -3,11 +3,15 @@
 # classes declared in the package should be declared with the "S3method"
 # directive.
 #
-
+useDynLib(qtlhot)
 export(add.phenos)
 
+export(big.phase0)
 export(qtlhot.phase0)
 export(parallel.qtlhot)
+export(quant.plot)
+export(hotspot.scan)
+export(hotspot.plot)
 
 export(sim.null.pheno.data)
 export(set.to.zero.beyond.drop.int)

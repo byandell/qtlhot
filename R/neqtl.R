@@ -20,10 +20,9 @@
 ######################################################################
 
 neqtl <- function(sigpos.out,chr,pos,win=5)
-     smoothall(sigpos.out,chr,pos,window=5)
+     smoothall(sigpos.out,chr,pos,window=win)
 
-smoothall <-
-function(themax, thechr, thepos, window=5)
+smoothall <- function(themax, thechr, thepos, window=5)
 {
   thesmooth <- vector("list", length(themax))
   names(thesmooth) <- names(themax)
@@ -35,6 +34,8 @@ function(themax, thechr, thepos, window=5)
                     pos=thesmooth[[i]][,1], nqtl=thesmooth[[i]][,2]))
   class(out) <- c("scanone", "data.frame")
 
+  ## This chokes right here!
+
   rownames(out) <- paste("c", out[,1], ".loc", 1:nrow(out), sep="")
 
   out
@@ -42,10 +43,11 @@ function(themax, thechr, thepos, window=5)
 
 ## Uses postions from thepos for smoothing: ATB 9/10/09 ##
 ## In theloc by=0.2 was outside the seq() function--moved it inside  ATB 12/15/09 ##
-smoothchr <-
-function(themax, thepos, window=5)
+smoothchr <- function(themax, thepos, window=5)
 {
-  theloc <- sort(unique(c(thepos, seq(0, max(thepos), by=0.2))))
+  ## This line was commented out...
+  ## theloc <- sort(unique(c(thepos, seq(0, max(thepos), by=0.2))))
+  theloc <- sort(thepos)
 
   temploc <- c(themax, theloc)
   tempval <- c(rep(1, length(themax)), rep(0, length(theloc)))
@@ -53,6 +55,8 @@ function(themax, thepos, window=5)
   temploc <- temploc[o]
   tempval <- tempval[o]
   smoothed <- runningmean(temploc, tempval, at=theloc, window=window, what="sum") 
-  u <- unique(theloc)
-  return(cbind(pos=u, smoothed[match(u, theloc)]))
+  u <- tempval == 0
+  return(cbind(pos=temploc[u], smoothed[u]))
+#  u <- unique(theloc)
+#  return(cbind(pos=u, smoothed[match(u, theloc)]))
 }

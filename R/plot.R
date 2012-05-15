@@ -190,6 +190,7 @@ hotspot.scan <- function(cross, scan.hl, lod.thr, quant.level, window = 5, verbo
   max.hl <- make.maxlod(scan.hl, chr.pos)
 
   if(verbose) cat(paste("smoth.neqtl", window, "\n"))
+  ## Some problem here in smooth.neqtl.
   neqtl.pos <- smooth.neqtl(scan.hl, chr.pos, max.hl, lod.thr, window)
   hot.scan$max.N.window <- neqtl.pos$nqtl
 
