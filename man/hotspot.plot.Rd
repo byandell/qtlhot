@@ -5,7 +5,7 @@
 \alias{sliding.bar.plot}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Plot routines for hotspots.
 }
 \description{
 Plot hotspots across genome.
