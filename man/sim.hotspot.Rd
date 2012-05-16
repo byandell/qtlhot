@@ -3,6 +3,7 @@
 \alias{mySimulations}
 \alias{sim.null.cross}
 \alias{sim.null.pheno.data}
+\alias{include.hotspots}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Wrapper routine for simulations.}
 \description{
@@ -14,6 +15,8 @@ sim.hotspot(nSim, cross, nT, latent.eff, res.var = 1, Ns, n.perm,
 mySimulations(\dots)
 sim.null.cross(chr.len = rep(400, 16), n.mar = 185, n.ind = 112, type = "bc", n.pheno = 6000, latent.eff = 1.5, res.var = 1, init.seed = 92387475)
 sim.null.pheno.data(cross, n.pheno, latent.eff, res.var)
+include.hotspots(cross, hchr, hpos, hsize, Q.eff, latent.eff,
+  lod.range.1, lod.range.2, lod.range.3, res.var=1, nT, init.seed)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

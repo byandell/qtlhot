@@ -6,6 +6,7 @@
 \alias{WW.perm}
 \alias{WW.summary}
 \alias{set.to.zero.beyond.drop.int}
+\alias{count.thr}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Conduct NL and N permutation tests}
 \description{
@@ -19,6 +20,7 @@ WW.permutations(scanmat, lod.thrs, alpha.levels, n.perm, verbose = FALSE)
 WW.perm(scanmat, lod.thrs, n.perm, verbose = FALSE)
 WW.summary(max.WW, alpha.levels)
 set.to.zero.beyond.drop.int(chr, scanmat, thr, drop = 1.5)
+count.thr(scan, lod.thrs, droptwo = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
