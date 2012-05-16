@@ -41,13 +41,11 @@ smoothall <- function(themax, thechr, thepos, window=5)
   out
 }
 
-## Uses postions from thepos for smoothing: ATB 9/10/09 ##
+## Uses positions from thepos for smoothing: ATB 9/10/09 ##
 ## In theloc by=0.2 was outside the seq() function--moved it inside  ATB 12/15/09 ##
 smoothchr <- function(themax, thepos, window=5)
 {
-  ## This line was commented out...
-  ## theloc <- sort(unique(c(thepos, seq(0, max(thepos), by=0.2))))
-  theloc <- sort(thepos)
+  theloc <- sort(unique(c(thepos, seq(0, max(thepos), by=0.2))))
 
   temploc <- c(themax, theloc)
   tempval <- c(rep(1, length(themax)), rep(0, length(theloc)))
@@ -55,8 +53,6 @@ smoothchr <- function(themax, thepos, window=5)
   temploc <- temploc[o]
   tempval <- tempval[o]
   smoothed <- runningmean(temploc, tempval, at=theloc, window=window, what="sum") 
-  u <- tempval == 0
-  return(cbind(pos=temploc[u], smoothed[u]))
-#  u <- unique(theloc)
-#  return(cbind(pos=u, smoothed[match(u, theloc)]))
+  u <- match(thepos, theloc)
+  cbind(thepos, smoothed[u])
 }

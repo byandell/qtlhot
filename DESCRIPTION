@@ -1,6 +1,6 @@
 Package: qtlhot
-Version: 0.4.3
-Date: 2012-02-03
+Version: 0.4.4
+Date: 2012-05-16
 Author: Elias Chaibub Neto <echaibub@hotmail.com> and Brian S Yandell <byandell@wisc.edu>
 Title: Inference for QTL Hotspots
 Description: Functions to Determine significance of co-mapping trait hotspots

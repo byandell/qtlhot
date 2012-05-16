@@ -36,8 +36,8 @@ set.to.zero.beyond.drop.int <- function(chr, scanmat, thr, drop = 1.5)
   }
 
   mychr <- levels(chr)
-  for(i in mychr){
-    pointer <- which(scanmat[,1] == i)
+  for(i in mychr) {
+    pointer <- which(chr == i)
     if(length(pointer)) {
       if(max(scanmat[pointer,]) < thr)
         ## Zero out if no peak above threshold.
