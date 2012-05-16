@@ -61,7 +61,8 @@ include.hotspots <- function(cross,
   {
     ## map <- attributes(cross$geno[[chr]]$prob)$map
     ## This can be simplified.
-    map <- pull.map(cross, chr)
+    map <- attributes(cross$geno[[chr]]$prob)$map
+    ## map <- pull.map(cross, chr)
     q.nms <- names(map)
     map.pos <- as.numeric(map)
     tmp <- which.min(abs(map.pos-pos))
