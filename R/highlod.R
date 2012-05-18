@@ -114,13 +114,15 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
 cat.scanone <- function(dirpath = ".", filenames = permfiles, chr.pos)
 {
   permfiles <- list.files(dirpath, paste("per.scan", "*", "RData", sep = "."))
+
+  ## Make and remove per.scan.hl. Below use version from attached files.
+  per.scan.hl <- NULL
+  rm(per.scan.hl)
   
-  if(exists("per.scan.hl"))
-    rm(per.scan.hl)
   for(i in 1:length(filenames)){
     attach(filenames[i], warn.conflicts = FALSE)
     if(i==1)  cat.scan.hl <- per.scan.hl else
-    cat.scan.hl <- rbind.data.frame(cat.scan.hl,per.scan.hl)
+    cat.scan.hl <- rbind.data.frame(cat.scan.hl, per.scan.hl)
     detach()
   }
   cbind.data.frame(chr.pos[cat.scan.hl$row,],cat.scan.hl)

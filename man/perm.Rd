@@ -24,44 +24,27 @@ count.thr(scan, lod.thrs, droptwo = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cross}{
-%%     ~~Describe \code{cross} here~~
-}
-  \item{Ns}{
-%%     ~~Describe \code{Ns} here~~
-}
-  \item{n.perm}{
-%%     ~~Describe \code{n.perm} here~~
-}
-  \item{alpha.levels}{
-%%     ~~Describe \code{alpha.levels} here~~
-}
-  \item{lod.thrs}{
-%%     ~~Describe \code{lod.thrs} here~~
-}
-  \item{drop}{
-%%     ~~Describe \code{drop} here~~
-}
-  \item{verbose}{
-%%     ~~Describe \code{verbose} here~~
-}
-}
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  \item{cross}{}
+  \item{Ns}{}
+  \item{Nmax}{}
+  \item{n.perm}{}
+  \item{alpha.levels}{}
+  \item{lod.thrs}{}
+  \item{drop}{}
+  \item{init.seed}{}
+  \item{max.lod.quant}{}
+  \item{max.N}{}
+  \item{scanmat}{}
+  \item{max.WW}{}
+  \item{chr}{}
+  \item{thr}{}
+  \item{droptwo}{}
+  \item{scan}{}
+  \item{verbose}{verbose output if \code{TRUE}}
 }
 \author{
 Elias Chaibub Neto and Brian S Yandell
 }
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}

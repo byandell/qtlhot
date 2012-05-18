@@ -180,7 +180,11 @@ qtlhot.phase1 <- function(dirpath, index = 0,
               row.names = FALSE, col.names = FALSE, quote = FALSE)
 }
 ####################################################################################
-qtlhot.phase2 <- function(dirpath, index = NULL, ..., big = FALSE, verbose = FALSE)
+qtlhot.phase2 <- function(dirpath, index = NULL, ...,
+                          ## Following are loaded with Phase1.RData created in big.phase1.
+                          n.split, cross, Nmax, n.perm, lod.thrs, n.phe, alpha.levels,
+                          ##
+                          big = FALSE, verbose = FALSE)
 {
   ## PHASE 2: NL,N and WW permutations. 
   ##          Slow. Run on condor nodes. Sized by n.perm.
@@ -238,6 +242,10 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ..., big = FALSE, verbose = FAL
 }
 ####################################################################################
 qtlhot.phase3 <- function(dirpath, index = NULL, ...,
+                          ## Following are loaded with Phase1.RData created in big.phase1.
+                          cross.index, n.split, n.perm, lod.thrs, Nmax, NLN, WW,
+                          alpha.levels, cross, n.phe, latent.eff, res.var,
+                          ##
                           dirpath.save = dirpath, big = FALSE, verbose = FALSE)
 {
   ## PHASE 3: Sample Markov chain (MCMC). Parallelize.
@@ -264,7 +272,7 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
   ## This could be done once, but it would require splitting this phase in two.
   ## Besides, it is quite fast.
   ## Read in saved BIC scores and combine into one object.
-  outfile <- paste("perm", ".", cross.index, "_", ".*RData", sep = "")
+  outfile <- paste("perm", ".", cross.index, "_", "*.RData", sep = "")
   filenames <- list.files(dirpath, outfile)
   if(!length(filenames))
     parallel.error(5, 3, index)

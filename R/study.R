@@ -30,7 +30,9 @@
 ## the genome.  
 ##
 mySimulations <- function(...) sim.hotspot(...)
-get.hotspot <- function(filenames)
+get.hotspot <- function(filenames,
+                        ## Following supplied in filenames[1].
+                        Nmax, out.sim)
 {
   ## filenames = list.files(".", paste(prefix, latent.eff, sets, "RData", sep = "."))
   ## latent.eff = 0, prefix = "Pilot", sets = "[0-9][0-9]*"

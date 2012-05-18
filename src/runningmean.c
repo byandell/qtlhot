@@ -61,8 +61,8 @@ void runningmean(int n, double *pos, double *value,
   int lo, ns;
   int i, j;
   double *work3, work4;
-  
-  
+
+  work3 = 0;
   if(method==3)
     work3 = (double *)R_alloc(n, sizeof(double));
 

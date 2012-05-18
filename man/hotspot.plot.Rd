@@ -16,72 +16,45 @@ hotspot.scan(cross, scan.hl, lod.thr, quant.level, window = 5, verbose = FALSE)
 hotspot.plot(hot.scan, quant.thr = NULL, maps = NULL, main = "")
 sliding.bar.plot(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{hot.scan}{
-%%     ~~Describe \code{hot.scan} here~~
-}
-  \item{quant.thr}{
-%%     ~~Describe \code{quant.thr} here~~
-}
-  \item{maps}{
-%%     ~~Describe \code{maps} here~~
-}
-  \item{main}{
-%%     ~~Describe \code{main} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{max.lod.quant}{}
+  \item{max.N}{}
+  \item{max.N.window}{}
+  \item{lod.thrs}{}
+  \item{probs}{}
+  \item{level}{}
+  \item{cross}{}
+  \item{scan.hl}{}
+  \item{lod.thr}{}
+  \item{quant.level}{}
+  \item{window}{}
+  \item{verbose}{verbose output if \code{TRUE}}
+  \item{hot.scan}{}
+  \item{quant.thr}{}
+  \item{maps}{}
+  \item{main}{}
+  \item{scan}{}
+  \item{size.thr}{}
+  \item{gap}{}
+  \item{y.axes}{}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+The hotspot.scan() result is an object of class \code{scanone}.
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+\seealso{\code{\link{lod.quantile.permutation}}, \code{\link[qtl]{plot.scanone}}}
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\dontrun{
+## See parallel folder in installed package for details.
+## scan.hl is created from multiple permutations.
+## max.lod.quant, max.N and max.N.window are elements of lod.sums.
+## lod.sums is created by call to lod.quantile.permutation in Phase2 (big=TRUE).
+## lod.thrs supplied from earlier calculations; probs correspond to these.
+load("Phase3.RData")
+out <- quant.plot(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.95)
 
-## The function is currently defined as
-function (hot.scan, quant.thr = NULL, maps = NULL, main = "") 
-{
-    for (i in levels(hot.scan$chr)) {
-        ylims <- range(c(hot.scan[hot.scan$chr == i, -(1:2)]))
-        plot(hot.scan, lodcolumn = 1, chr = i, col = "black", 
-            ylab = "hotspot size", ylim = ylims)
-        mtext(paste(main, "raw (black) smoothed (red) sliding (blue)"), 
-            3, 3)
-        plot(hot.scan, lodcolumn = 3, chr = i, col = "red", add = TRUE)
-        plot(hot.scan, lodcolumn = 2, chr = i, col = "blue", 
-            add = TRUE)
-        if (!is.null(maps)) 
-            add.rug(i, "", maps, use.cM = TRUE)
-        if (!is.null(quant.thr)) 
-            abline(h = quant.thr, lwd = 2, lty = 2, col = "red")
-    }
-    invisible(hot.scan)
-  }
+hot.scan <- hotspot.scan(cross, scan.hl, out$lod.thr, out$quant.level)
+hotspot.plot(hot.scan)
+sliding.bar.plot(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+\keyword{plot}

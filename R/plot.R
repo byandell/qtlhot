@@ -22,7 +22,6 @@
 pull.hotspots <- function(cross, scan.hl, chr.pos = NULL, lod.thr = 5, slide.thr = NULL, verbose = FALSE)
 {
   if(is.null(chr.pos)) {
-    n.traits <- length(all.traits)
     cross$pheno$trait <- rnorm(nind(cross))
     chr.pos <- scanone(cross, pheno.col= find.pheno(cross, "trait"))[,1:2]
   }
@@ -179,7 +178,7 @@ hotspot.scan <- function(cross, scan.hl, lod.thr, quant.level, window = 5, verbo
   ## Kludge to get chr and pos[
   cross$pheno$trait <- rnorm(nind(cross))
   if(is.null(cross$geno[[1]]$prob))
-    cross <- calc.genoprob(cross, step=0.5, err = 0.002,
+    cross <- calc.genoprob(cross, step=0.5, error.prob = 0.002,
                            map.function = "c-f", stepwidth = "max")
   
   chr.pos <- scanone(cross, pheno.col = find.pheno(cross, "trait"))[,1:2]
@@ -200,6 +199,7 @@ hotspot.scan <- function(cross, scan.hl, lod.thr, quant.level, window = 5, verbo
 
   hot.scan
 }
+#############################################################################################################
 scan.hl.plot <- function(scan.hl)
 {
   for(i in levels(scan.hl$chr)) {
@@ -208,6 +208,7 @@ scan.hl.plot <- function(scan.hl)
   }
   invisible()
 }
+#############################################################################################################
 hotspot.plot <- function(hot.scan, quant.thr = NULL, maps = NULL, main = "")
 {
   for(i in levels(hot.scan$chr)) {

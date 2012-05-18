@@ -89,6 +89,9 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
                        batch.effect = NULL,
                        drop.lod = 1.5, lod.min = min(lod.thrs),
                        window = 5, seed = 0, big = TRUE, ...,
+                       ## Following are loaded with Trait0.RData created in big.phase0. 
+                       trait.index, trait.names, all.traits, size.set, seeds, lod.sums,
+                       ##
                        verbose = FALSE)
 {
   ## Want this to depend on parallel.phase1 as much as possible.
@@ -101,7 +104,7 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
   eval(parse(file.path(dirpath, params.file)))
   
   ## Calculate genotype probabilities.
-  cross <- calc.genoprob(cross, step=0.5, err = 0.002,
+  cross <- calc.genoprob(cross, step=0.5, error.prob = 0.002,
                          map.function = "c-f", stepwidth = "max")
   
   ## Subset to individuals with batch if used.
@@ -132,7 +135,12 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
   invisible()
 }
 #############################################################################################
-big.phase2 <- function(dirpath = ".", index, ..., remove.files = TRUE, verbose = FALSE)
+big.phase2 <- function(dirpath = ".", index, ...,
+                       ## Following are loaded with Phase1.RData created in big.phase1.
+                       batch.effect, all.traits, trait.index, lod.min,
+                       drop.lod, Nmax, lod.thrs, cross.index, seeds,
+                       ##
+                       remove.files = TRUE, verbose = FALSE)
 {
   ## Phase 2.
   ## Loop on sets of phenotypes, adding only what is needed.
@@ -169,7 +177,10 @@ big.phase2 <- function(dirpath = ".", index, ..., remove.files = TRUE, verbose =
   }
 }
 do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
-                          lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index, verbose)
+                          lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index,
+                          verbose,
+                          ## Following supplied by Trait.*.RData created in big.phase0.
+                          trait.data, offset, pheno.set)
 {
   ## Cycle through all the phenotypes in sets of size size.set. Keeps R object smaller.
   ## Assume large trait matrix has been broken into Trait.i.RData, each with trait.data.
@@ -182,7 +193,8 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
     if(verbose)
       cat(pheno.index, "\n")
 
-    ## This is not working correctly. Either Trait.n.RData are all the same or ??.
+    if(exists("trait.data"))
+      rm("trait.data")
     attach(file.path(dirpath, filenames[pheno.index]))
     perm.cross <- add.phenos(cross, trait.data, index = trait.index)
     pheno.col <- find.pheno(perm.cross, dimnames(trait.data)[[2]])
@@ -216,6 +228,9 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
 }
 #############################################################################################
 big.phase3 <- function(dirpath = ".", index, cross.index, ...,
+                       ## Following are loaded with Phase1.RData created in big.phase1.
+                       n.perm, lod.thrs, Nmax, lod.sums,
+                       ##
                        outfile = phase3name, verbose = FALSE)
 {
   ## Phase 3. Merge back together.
@@ -244,6 +259,8 @@ big.phase3 <- function(dirpath = ".", index, cross.index, ...,
   for(i.perm in seq(n.file)) {
     if(verbose)
       cat(i.perm, "\n")
+    if(exists("lod.sums"))
+      rm("lod.sums")
     attach(file.path(dirpath, filenames[i.perm]), warn.conflicts = FALSE)
     n.quant <- length(lod.sums$max.lod.quant)
     max.lod.quant[i.perm, seq(n.quant)] <- lod.sums$max.lod.quant

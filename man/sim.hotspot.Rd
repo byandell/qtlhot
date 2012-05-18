@@ -4,10 +4,9 @@
 \alias{sim.null.cross}
 \alias{sim.null.pheno.data}
 \alias{include.hotspots}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{Wrapper routine for simulations.}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Wrapper routine for simulations
 }
 \usage{
 sim.hotspot(nSim, cross, nT, latent.eff, res.var = 1, Ns, n.perm,
@@ -18,56 +17,33 @@ sim.null.pheno.data(cross, n.pheno, latent.eff, res.var)
 include.hotspots(cross, hchr, hpos, hsize, Q.eff, latent.eff,
   lod.range.1, lod.range.2, lod.range.3, res.var=1, nT, init.seed)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{nSim}{
-    Number of simulated sets of phenotypes to create. See details.
-}
-  \item{cross}{
-Object of class \code{cross}. See \code{\link[qtl]{read.cross}}.
-}
-  \item{nT}{
-Number of traits to simulate for cross object.
-}
-  \item{latent.eff}{
-Strength of latent effect, which is included in all traits. See \code{\link{sim.null.cross}}.
-}
-  \item{res.var}{
-Residual variance for traits. Should not affect results.
-}
-  \item{Ns}{
-Vector of sizes of hotspots, typically \code{1:Nmax}, with \code{Nmax}
-determined to be large enough to exceed the largest Breitling alpha critical value.
-}
-  \item{n.perm}{
-Number of permutations to perform per realization. Good idea to do 1000,
-but this takes time.
-}
-  \item{alpha.levels}{
-Vector of significance levels.
-}
-  \item{lod.thrs}{
-Vector of LOD thresholds, typically single-trait
-permutation thresholds for various significance levels.
-}
-  \item{drop}{
-Drop in LOD score examined. LODs below this drop from the maximum for a
-chromosome will not be scored.
-}
-\item{init.seed}{}
-\item{len}{}
-\item{n.mar}{}
-\item{n.ind}{}
-\item{n.phe}{}
-\item{latent.eff}{}
-\item{res.var}{}
-\item{lod.thrs}{}
-  \item{verbose}{
-Verbose output if \code{TRUE}. More detailed output if \code{2}.
-}
-  \item{\dots}{
-Arguments passed directly to \code{sim.hotspot}.
-}
+  \item{nSim}{Number of simulated sets of phenotypes to create. See details.}
+  \item{cross}{Object of class \code{cross}. See \code{\link[qtl]{read.cross}}.}
+  \item{nT}{Number of traits to simulate for cross object.}
+  \item{latent.eff}{Strength of latent effect, which is included in all traits. See \code{\link{sim.null.cross}}.}
+  \item{res.var}{Residual variance for traits. Should not affect results.}
+  \item{Ns}{Vector of sizes of hotspots, typically \code{1:Nmax}, with \code{Nmax}
+    determined to be large enough to exceed the largest Breitling alpha critical value.}
+  \item{n.perm}{Number of permutations to perform per realization. Good idea to do 1000,
+    but this takes time.}
+  \item{alpha.levels}{Vector of significance levels.}
+  \item{lod.thrs}{Vector of LOD thresholds, typically single-trait
+    permutation thresholds for various significance levels.}
+  \item{drop}{Drop in LOD score examined. LODs below this drop from the maximum for a
+    chromosome will not be scored.}
+  \item{init.seed}{}
+  \item{len}{}
+  \item{n.mar}{}
+  \item{n.ind}{}
+  \item{chr.len}{}
+  \item{type}{}
+  \item{n.pheno}{}
+  \item{hchr,hpos,hsize}{}
+  \item{Q.eff}{}
+  \item{lod.range.1,lod.range.2,lod.range.3}{}
+  \item{verbose}{Verbose output if \code{TRUE}. More detailed output if \code{2}.}
+  \item{\dots}{Arguments passed directly to \code{sim.hotspot}.}
 }
 \details{
 Simulate \code{nSim} realizations of cross object with \code{nT} phenotypes with correlation
@@ -75,19 +51,14 @@ Simulate \code{nSim} realizations of cross object with \code{nT} phenotypes with
 \code{cross} object.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+  \code{sim.null.cross} simulates an object of class \code{cross}.
+  \code{sim.null.pheno.data} simulates a data frame of phenotypes.
+  \code{sim.hotspot} uses these other routines to simulate a hotspot,
+  returning an list object.
 }
 \author{
 Elias Chaibub Neto and Brian S. Yandell
 }
-
 \seealso{
 \code{\link{sim.null.cross}}, \code{\link[qtl]{read.cross}}.
 }
@@ -102,7 +73,4 @@ out <- sim.hotspot(100, cross, nT, latent.eff = 1, res.var = 1,
   verbose = TRUE)
 }
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}

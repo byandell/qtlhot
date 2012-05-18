@@ -1,3 +1,6 @@
+%\VignetteIndexEntry{Qtlhot Tutorial}
+%\VignetteKeywords{permutation,threshold,QTL}
+
 \documentclass[11pt]{article}
 
 \usepackage{epsf}
@@ -168,7 +171,7 @@ counts1[52:56,]
 \label{plotex1counts}
 \end{figure}
 
-We plot the hotspot architecture inferred using the single trait permutation threshold 2.44 ($\alpha = 0.05$). Figure \ref{plotex1counts} shows the counts across the genome. Recall that in the call of function \texttt{include.hotspots} we set to simulate 3 hotspots: (1) a hotspot of size 100 at position 25cM of chromosome 2 with LOD scores around 2.5; (2) a hotspot of size 50 at position 75cM of chromosome 3 with LOD scores ranging from 5 to 8; and (3) a hotspot of size 20 at position 50cM of chromosome 4 with LOD scores ranging from 10 to 15. Nonetheless, Figure \ref{plotex1counts} shows several spurious peaks on chromosome 1, that arise because of the high correlation of the phenotypes.
+We plot the hotspot architecture inferred using the single trait permutation threshold \Sexpr{round(spt[5,], 2)} ($\alpha = 0.05$). Figure \ref{plotex1counts} shows the counts across the genome. Recall that in the call of function \texttt{include.hotspots} we set to simulate 3 hotspots: (1) a hotspot of size 100 at position 25cM of chromosome 2 with LOD scores around 2.5; (2) a hotspot of size 50 at position 75cM of chromosome 3 with LOD scores ranging from 5 to 8; and (3) a hotspot of size 20 at position 50cM of chromosome 4 with LOD scores ranging from 10 to 15. Nonetheless, Figure \ref{plotex1counts} shows several spurious peaks on chromosome 1, that arise because of the high correlation of the phenotypes.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -296,12 +299,12 @@ To visualize these results, we plot on Figure \ref{plotex1slidingbar} the hotspo
 
 \begin{Schunk}
 \begin{Sinput}
-N.1 <- round(N.1.thr[5, 5])
-sliding.bar.plot(scan = data.frame(scan1[, 1:2], scandrop1),
-                 lod.thr = NL.1.thr[1:N.1, 5],
-                 size.thr = 1:N.1,
-                 gap = 50,
-                 y.axes = seq(1, N.1, by = 10))
+> N.1 <- round(N.1.thr[5, 5])
+. sliding.bar.plot(scan = data.frame(scan1[, 1:2], scandrop1),
++                 lod.thr = NL.1.thr[1:N.1, 5],
++                 size.thr = 1:N.1,
++                 gap = 50,
++                 y.axes = seq(1, N.1, by = 10))
 \end{Sinput}
 \end{Schunk}
 

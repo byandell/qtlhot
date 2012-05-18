@@ -12,69 +12,32 @@ lod.quantile.permutation(cat.scan.hl, N, lod.thr, window, chr.pos, n.phe)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cat.scan.hl}{
-%%     ~~Describe \code{cat.scan.hl} here~~
-}
-  \item{N}{
-%%     ~~Describe \code{N} here~~
-}
-  \item{lod.thr}{
-%%     ~~Describe \code{lod.thr} here~~
-}
-  \item{window}{
-%%     ~~Describe \code{window} here~~
-}
-  \item{chr.pos}{
-%%     ~~Describe \code{chr.pos} here~~
-}
-  \item{n.phe}{
-%%     ~~Describe \code{n.phe} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{cat.scan.hl}{}
+  \item{N}{}
+  \item{lod.thr}{}
+  \item{window}{}
+  \item{chr.pos}{}
+  \item{n.phe}{}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  List with items
+  \item{max.lod.quant}{}
+  \item{max.N}{list containing \code{max.N} and \code{max.N.window}}
 }
 \references{
-%% ~put references to the literature/web site here ~
+Chaibub Neto E, Keller MP, Broman AF, Attie AD, Jansen RC, Broman KW,
+Yandell BS (2012) Quantile-based permutation thresholds for QTL hotspots.
+\emph{Genetics 00}: 000-000.
 }
 \author{
-%%  ~~who you are~~
+Brian S Yandell and Elias Chaibub Neto
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\seealso{\code{\link{hotspot.plot}}
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (cat.scan.hl, N, lod.thr, window, chr.pos, n.phe) 
-{
-    n.chr <- levels(chr.pos$chr)
-    quant <- get.tails(cat.scan.hl, n.quant = N)
-    N <- ncol(quant)
-    max.lod.quant <- apply(quant, 2, max, na.rm = T)
-    names(max.lod.quant) <- paste(paste(round(1 - as.numeric(dimnames(quant)[[2]])/n.phe, 
-        4) * 100, "\%", sep = ""), 1:N, sep = "_")
-    max.N <- make.max.N(cat.scan.hl, lod.thr, chr.pos, window)
-    list(max.lod.quant = max.lod.quant, max.N = max.N)
-  }
+\dontrun{
+lod.sums <- lod.quantile.permutation(scan.hl, Nmax, lod.thr, window,
+  chr.pos, n.phe)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+}
+\keyword{utilities}

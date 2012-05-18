@@ -20,59 +20,32 @@ big.phase0(dirpath, cross, trait.file, trait.matrix, droptrait.names = NULL,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{phase}{
-%%     ~~Describe \code{phase} here~~
-}
-  \item{index}{
-%%     ~~Describe \code{index} here~~
-}
-  \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
-}
-  \item{dirpath}{
-%%     ~~Describe \code{dirpath} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
-\value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+  \item{phase}{}
+  \item{index}{}
+  \item{\dots}{}
+  \item{dirpath}{}
+  \item{init.seed}{}
+  \item{len}{}
+  \item{n.mar}{}
+  \item{n.ind}{}
+  \item{n.phe}{}
+  \item{latent.eff}{}
+  \item{res.var}{}
+  \item{lod.thrs}{}
+  \item{cross}{}
+  \item{trait.file}{}
+  \item{trait.matrix}{}
+  \item{droptrait.names}{}
+  \item{keeptrait.names}{}
+  \item{sex}{}
+  \item{trait.index}{}
+  \item{batch.effect}{}
+  \item{size.set}{}
+  \item{offset}{}
+  \item{subset.sex}{}
+  \item{verbose}{verbose output if \code{TRUE}}
 }
 \author{
-%%  ~~who you are~~
+Brian S Yandell and Elias Chaibub Neto
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (phase, index = 1, ..., dirpath = ".") 
-{
-    switch(phase, qtlhot.phase1(dirpath, index, ...), qtlhot.phase2(dirpath, 
-        index, ...), qtlhot.phase3(dirpath, index, ...), parallel.error(1, 
-        phase, index))
-    parallel.error(0, phase, index)
-  }
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{utilities}
