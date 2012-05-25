@@ -32,16 +32,17 @@ include.hotspots(cross, hchr, hpos, hsize, Q.eff, latent.eff,
     permutation thresholds for various significance levels.}
   \item{drop}{Drop in LOD score examined. LODs below this drop from the maximum for a
     chromosome will not be scored.}
-  \item{init.seed}{}
-  \item{len}{}
-  \item{n.mar}{}
-  \item{n.ind}{}
-  \item{chr.len}{}
-  \item{type}{}
-  \item{n.pheno}{}
-  \item{hchr,hpos,hsize}{}
-  \item{Q.eff}{}
-  \item{lod.range.1,lod.range.2,lod.range.3}{}
+  \item{init.seed}{initial seed for pseudo-random number generation}
+  \item{chr.len}{vector of chromosome lengths}
+  \item{n.mar}{number of markers}
+  \item{n.ind}{number of individuals}
+  \item{type}{type of cross}
+  \item{n.pheno}{number of phenotypes}
+  \item{hchr,hpos,hsize}{vectors for hotspot chromosomes, positions, and
+  sizes}
+  \item{Q.eff}{QTL effect}
+  \item{lod.range.1,lod.range.2,lod.range.3}{2-vectors of LOD ranges for
+  multiple purposes}
   \item{verbose}{Verbose output if \code{TRUE}. More detailed output if \code{2}.}
   \item{\dots}{Arguments passed directly to \code{sim.hotspot}.}
 }

@@ -17,31 +17,34 @@ hotspot.plot(hot.scan, quant.thr = NULL, maps = NULL, main = "")
 sliding.bar.plot(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
 }
 \arguments{
-  \item{max.lod.quant}{}
-  \item{max.N}{}
-  \item{max.N.window}{}
-  \item{lod.thrs}{}
-  \item{probs}{}
-  \item{level}{}
-  \item{cross}{}
-  \item{scan.hl}{}
-  \item{lod.thr}{}
-  \item{quant.level}{}
-  \item{window}{}
+  \item{max.lod.quant}{matrix of max LOD (permutation by hotspot size)}
+  \item{max.N}{matrix of max count (permutation by LOD threshold)}
+  \item{max.N.window}{matrix of max count (permutation by LOD threshold)
+  for smoothed counts over \code{window}}
+  \item{lod.thrs}{vector of LOD thresholds}
+  \item{probs}{vector ov significance levels for \code{lod.thrs}}
+  \item{level}{significance level}
+  \item{cross}{object of class \code{cross}}
+  \item{scan.hl}{data frame with \code{row} index and high LOD interval
+    retained by \code{\link{pull.highlods}}}
+  \item{lod.thr}{see \code{lod.thrs}}
+  \item{quant.level}{LOD quantiles at significance level?}
+  \item{window}{size of window (in cM) for running mean}
   \item{verbose}{verbose output if \code{TRUE}}
-  \item{hot.scan}{}
-  \item{quant.thr}{}
-  \item{maps}{}
-  \item{main}{}
-  \item{scan}{}
-  \item{size.thr}{}
-  \item{gap}{}
-  \item{y.axes}{}
+  \item{hot.scan}{object returned by \code{hotspot.scan}}
+  \item{quant.thr}{quantiles at threshold levels}
+  \item{maps}{list of objects of class \code{map}}
+  \item{main}{character string as title for plot}
+  \item{scan}{object of class \code{scanone}}
+  \item{size.thr}{vector of hotspot size thresholds}
+  \item{gap}{gap between chromosomes for plot (see \code{\link[qtl]{plot.scanone}})}
+  \item{y.axes}{values to plot on Y axis}
 }
 \value{
 The hotspot.scan() result is an object of class \code{scanone}.
 }
-\seealso{\code{\link{lod.quantile.permutation}}, \code{\link[qtl]{plot.scanone}}}
+\seealso{\code{\link{lod.quantile.permutation}},
+  \code{\link[qtl]{pull.highlods}}, \code{\link[qtl]{plot.scanone}}} 
 \examples{
 \dontrun{
 ## See parallel folder in installed package for details.

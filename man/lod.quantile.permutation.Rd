@@ -12,12 +12,13 @@ lod.quantile.permutation(cat.scan.hl, N, lod.thr, window, chr.pos, n.phe)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cat.scan.hl}{}
-  \item{N}{}
-  \item{lod.thr}{}
-  \item{window}{}
-  \item{chr.pos}{}
-  \item{n.phe}{}
+  \item{cat.scan.hl}{data frame with \code{row} index and high LOD interval
+    retained by \code{\link{pull.highlods}}}
+  \item{N}{maximum size of hotspot examined (Nmax elsewhere)}
+  \item{lod.thr}{vector of LOD thresholds}
+  \item{window}{size of window (in cM) for running mean}
+  \item{chr.pos}{data frame with \code{chr} and \code{pos} including pseudo-markers}
+  \item{n.phe}{number of phenotypes}
 }
 \value{
   List with items
@@ -32,7 +33,7 @@ Yandell BS (2012) Quantile-based permutation thresholds for QTL hotspots.
 \author{
 Brian S Yandell and Elias Chaibub Neto
 }
-\seealso{\code{\link{hotspot.plot}}
+\seealso{\code{\link{hotspot.plot}}, \code{\link{pull.highlods}}
 }
 \examples{
 \dontrun{

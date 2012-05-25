@@ -24,27 +24,38 @@ count.thr(scan, lod.thrs, droptwo = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cross}{}
-  \item{Ns}{}
-  \item{Nmax}{}
-  \item{n.perm}{}
-  \item{alpha.levels}{}
-  \item{lod.thrs}{}
-  \item{drop}{}
-  \item{init.seed}{}
-  \item{max.lod.quant}{}
-  \item{max.N}{}
-  \item{scanmat}{}
-  \item{max.WW}{}
-  \item{chr}{}
-  \item{thr}{}
-  \item{droptwo}{}
-  \item{scan}{}
+  \item{cross}{object of class \code{cross}}
+  \item{Ns}{vector of possible hotspot sizes}
+  \item{Nmax}{maximum of \code{Ns}}
+  \item{n.perm}{number of permutations}
+  \item{alpha.levels}{vector of significance levels}
+  \item{lod.thrs}{vector of LOD thresholds}
+  \item{drop}{LOD drop amount for support intervals}
+  \item{init.seed}{initial seed for pseudo-random number generation}
+  \item{max.lod.quant}{matrix of max LOD (permutation by hotspot size)}
+  \item{max.N}{matrix of max count (permutation by LOD threshold)}
+  \item{scanmat}{matrix from \code{\link[qtl]{scanone}} without
+    \code{chr} and \code{pos} columns}
+  \item{max.WW}{matrix of max count (permutation by LOD threshold)}
+  \item{chr}{chromosomes identified with rows of \code{scanmat}}
+  \item{thr}{LOD threshold}
+  \item{droptwo}{drop \code{chr} and \code{pos} if \code{TRUE}}
+  \item{scan}{object of class \code{\link[qtl]{scanone}}}
   \item{verbose}{verbose output if \code{TRUE}}
 }
 \author{
 Elias Chaibub Neto and Brian S Yandell
 }
 \examples{
+\dontrun{
+NL.N.permutations(cross, Ns, n.perm, alpha.levels, lod.thrs, drop = 1.5, verbose = FALSE)
+NL.N.perm(cross, Nmax, n.perm, lod.thrs, drop = 1.5, verbose = FALSE, init.seed = 0)
+NL.N.summary(max.lod.quant, max.N, alpha.levels)
+WW.permutations(scanmat, lod.thrs, alpha.levels, n.perm, verbose = FALSE)
+WW.perm(scanmat, lod.thrs, n.perm, verbose = FALSE)
+WW.summary(max.WW, alpha.levels)
+set.to.zero.beyond.drop.int(chr, scanmat, thr, drop = 1.5)
+count.thr(scan, lod.thrs, droptwo = TRUE)
+}
 }
 \keyword{utilities}

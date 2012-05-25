@@ -31,15 +31,15 @@
 ## http://www.stat.wisc.edu/~yandell/sysgen/qtlhot/condor
 ##
 ####################################################################################
-parallel.qtlhot <- function(phase, index = 1, ..., dirpath = ".")
+parallel.qtlhot <- function(x, data = 1, ..., dirpath = ".")
 {
-  switch(phase,
-         qtlhot.phase1(dirpath, index, ...),
-         qtlhot.phase2(dirpath, index, ...),
-         qtlhot.phase3(dirpath, index, ...),
-         parallel.error(1, phase, index))
+  switch(x,
+         qtlhot.phase1(dirpath, data, ...),
+         qtlhot.phase2(dirpath, data, ...),
+         qtlhot.phase3(dirpath, data, ...),
+         parallel.error(1, x, data))
   
-  parallel.error(0, phase, index)
+  parallel.error(0, x, data)
 }
 parallel.error <- function(num, phase = 0, index = 1)
 {

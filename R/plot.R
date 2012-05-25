@@ -202,6 +202,10 @@ hotspot.scan <- function(cross, scan.hl, lod.thr, quant.level, window = 5, verbo
 #############################################################################################################
 scan.hl.plot <- function(scan.hl)
 {
+  ## satisfy R check.
+  phenos <- 0
+  rm(phenos)
+  
   for(i in levels(scan.hl$chr)) {
     print(xyplot(lod~pos, scan.hl[scan.hl$chr == i,], group = phenos, type = "l",
                  main = paste("chromosome", i)))

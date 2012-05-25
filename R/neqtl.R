@@ -52,7 +52,7 @@ smoothchr <- function(themax, thepos, window=5)
   o <- order(temploc)
   temploc <- temploc[o]
   tempval <- tempval[o]
-  smoothed <- runningmean(temploc, tempval, at=theloc, window=window, what="sum") 
-  u <- match(thepos, theloc)
-  cbind(thepos, smoothed[u])
+  smoothed <- runningmean(temploc, tempval, at=thepos, window=window, what="sum")
+  ## NB: This differs from R/neqtl, where at=theloc.
+  cbind(thepos, smoothed)
 }
