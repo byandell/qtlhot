@@ -44,7 +44,7 @@ sliding.bar.plot(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
 The hotspot.scan() result is an object of class \code{scanone}.
 }
 \seealso{\code{\link{lod.quantile.permutation}},
-  \code{\link[qtl]{pull.highlods}}, \code{\link[qtl]{plot.scanone}}} 
+  \code{\link{pull.highlods}}, \code{\link[qtl]{plot.scanone}}} 
 \examples{
 \dontrun{
 ## See parallel folder in installed package for details.
