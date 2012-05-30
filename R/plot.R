@@ -15,10 +15,22 @@
 #     A copy of the GNU General Public License, version 3, is available
 #     at http://www.r-project.org/Licenses/GPL-3
 #
-# Contains: pull.hotspots, quant.sum, quant.plot, hotspot.scan, scan.hl.plot, hotspot.plot
+# Contains: qtlhot.scan, pull.hotspots, quant.sum, quant.plot, hotspot.scan, scan.hl.plot, hotspot.plot
 ######################################################################
-
-## Routines to show hotspots. None here yet.
+qtlhot.scan <- function(cross, scan, max.lod.quant, lod.thrs, probs = seq(length(lod.thrs)) * 0.01, level = 0.05)
+{
+  thr.level <- min(which(probs >= level))
+  lod.thr <- lod.thrs[thr.level]
+  
+  scan.hl <- pull.highlods(scan, lod = lod.thr)
+  quant <- quant.slide(max.lod.quant, lod.thrs, probs, level = level)
+  
+  out <- hotspot.scan(cross, scan.hl, lod.thr, quant)
+  attr(out, "quant") <- quant
+  out
+}
+                        
+######################################################################
 pull.hotspots <- function(cross, scan.hl, chr.pos = NULL, lod.thr = 5, slide.thr = NULL, verbose = FALSE)
 {
   if(is.null(chr.pos)) {
@@ -68,11 +80,8 @@ pull.hotspots <- function(cross, scan.hl, chr.pos = NULL, lod.thr = 5, slide.thr
     NULL
 }
 ###################################################################################################
-quant.sum <- function(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.95)
+quant.slide <- function(max.lod.quant, lod.thrs, probs, level = 0.95, show.max = FALSE)
 {
-  ## lod.thrs and probs should be as provided to create summaries.
-  ## Should in future embed these.
-  
   thr.level <- min(which(probs >= level))
   lod.thr <- lod.thrs[thr.level]
   
@@ -81,18 +90,47 @@ quant.sum <- function(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level
   quant.level <- quant[which((round(probs - level, 2) == 0)), seq(max.quant)]
   quant.level <- quant.level[quant.level >= lod.thr]
 
+  lq <- length(quant.level)
+  if(lq) {
+    if(lq < max.quant & quant.level[lq] > lod.thr)
+      quant.level[as.character(lq + 1)] <- lod.thr
+  }
+  
+  if(show.max)
+    list(quant = quant, max.quant = max.quant, quant.level = quant.level)
+  else
+    quant.level
+}
+###################################################################################################
+quant.sum <- function(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.95)
+{
+  ## lod.thrs and probs should be as provided to create summaries.
+  ## Should in future embed these.
+  
+  thr.level <- min(which(probs >= level))
+  lod.thr <- lod.thrs[thr.level]
+  
+  slider <- quant.slide(max.lod.quant, lod.thrs, probs, level, TRUE)
+
   quant.N.window <- apply(max.N.window, 2, quantile, probs = probs, na.rm = TRUE)
   quant.N <- apply(max.N, 2, quantile, probs = probs, na.rm = TRUE)
   dimnames(quant.N)[[2]] <- dimnames(quant.N.window)[[2]] <- rev(paste(lod.thr, lod.thrs))
 
   list(quant.N.window = quant.N.window, quant.N = quant.N,
-       quant = quant, max.quant = max.quant, quant.level = quant.level,
+       quant = slider$quant, max.quant = slider$max.quant, quant.level = slider$quant.level,
        thr.level = thr.level, lod.thr = lod.thr)
 }
-quant.plot <- function(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.95)
+###################################################################################################
+quant.plot <- function(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.05)
 {
   ## lod.thrs and probs should be as provided to create summaries.
   ## Should in future embed these.
+
+  ## level and probs must be > 0.5. If not, use 1 - x. Probably want to change this later.
+  if(level < 0.5)
+    level <- 1 - level
+  if(min(probs) < 0.5)
+    probs <- 1 - probs
 
   out <- quant.sum(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level)
   
@@ -182,6 +220,10 @@ hotspot.scan <- function(cross, scan.hl, lod.thr, quant.level, window = 5, verbo
                            map.function = "c-f", stepwidth = "max")
   
   chr.pos <- scanone(cross, pheno.col = find.pheno(cross, "trait"))[,1:2]
+  
+  ## Make sure scan.hl has chr and pos. It will not if only used pull.highlods to create.
+  if(is.null(scan.hl$chr))
+    scan.hl <- data.frame(chr.pos[scan.hl$row, ], scan.hl)
 
   hot.scan <- pull.hotspots(cross, scan.hl, chr.pos, lod.thr, quant.level)
 

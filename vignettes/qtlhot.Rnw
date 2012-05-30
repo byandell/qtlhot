@@ -54,7 +54,7 @@ This issue motivated the development of permutation tests that preserve the corr
 
 This tutorial illustrates the application of the $NL$-, $N$- and $Q$-methods, implemented in the \texttt{qtlhot} R package, to a few toy examples. The \texttt{qtlhot} package is built over the \texttt{R/qtl} package (Broman et al. 2003), and we assume the reader is familiar with it.
 
-\section{Basic functionality}
+\section{Basic functionality with No Real Hotspots}
 
 In this section we consider two toy simulated examples. In the first we simulate highly correlated phenotypes. In the second, we simulate uncorrelated phenotypes.
 
@@ -143,13 +143,6 @@ scandrop1 <- set.to.zero.beyond.drop.int(chr = scan1[,1],
 counts1 <- t(count.thr(scandrop1, lod.thrs, droptwo = FALSE))
 @
 
-<<label=figex1counts,width=6,height=6,include=FALSE,echo=FALSE>>= 
-out1 <- data.frame(scan1[, 1:2], counts1)
-class(out1) <- c("scanone", "data.frame")
-par(mar=c(4.1,4.1,0.1,0.1))
-plot(out1, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
-@
-
 Next we infer the hotspot architecture at varying QTL mapping thresholds. In other words, for each genomic position, we count the number of traits that map to it with a LOD score equal or higher than the threshold in \texttt{lod.thrs}. The \texttt{counts1} object is a matrix with 204 rows representing the genetic markers, and 10 columns representing the varying QTL mapping thresholds. As an illustration, we show the counts for the 5 first markers on chromosome 2. The first column gives the counts associated with QTL mapping threshold of 3.11, whereas the last one shows the counts based on the more liberal threshold 2.11. Note how the counts increase as the QTL mapping thresholds decrease.
 
 \begin{Schunk}
@@ -163,8 +156,11 @@ counts1[52:56,]
 
 \begin{figure}[!ht]
 \begin{center}
-<<label=plotex1counts,fig=TRUE,echo=FALSE>>=
-<<figex1counts>>
+<<label=plotex1counts,width=6,height=6,fig=TRUE,echo=FALSE>>=
+out1 <- data.frame(scan1[, 1:2], counts1)
+class(out1) <- c("scanone", "data.frame")
+par(mar=c(4.1,4.1,0.1,0.1))
+plot(out1, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
 @ 
 \end{center}
 \caption{Hotspot architecture associated with QTL mapping threshold of \Sexpr{round(spt[5,], 2)} in example 1.}
@@ -313,6 +309,8 @@ Figure \ref{plotex1slidingbar} depicts a sliding window of hotspot size threshol
 
 Contrary to the $Q$-method that detected all the hotspots on Figure \ref{plotex1counts} as significant (including the spurious hotspots on chromosome 1), and the $N$-method that did not detect any hotspots, the $NL$-method's sliding window correctly detected the simulated hotspots and showed that the apparent hotspots on chromosome 1 were noisy artifacts.
 
+\section{Example with Uncorrelated Phenotypes}
+
 Next we consider a second toy example with uncorrelated phenotype data. We repeat the simulation and analysis steps presented previously changing \texttt{latent.eff} to zero.
 
 <<>>=
@@ -350,14 +348,11 @@ out2 <- data.frame(scan2[, 1:2], counts2)
 class(out2) <- c("scanone", "data.frame")
 @ 
 
-<<label=figex2counts,width=6,height=6,include=FALSE>>=
-par(mar=c(4.1,4.1,0.1,0.1))
-plot(out2, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
-@
 \begin{figure}[!ht]
 \begin{center}
-<<label=plotex2counts,fig=TRUE,echo=FALSE>>=
-<<figex2counts>>
+<<label=plotex2counts,width=6,height=6,fig=TRUE,echo=TRUE>>=
+par(mar=c(4.1,4.1,0.1,0.1))
+plot(out2, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
 @ 
 \caption{Hotspot architecture targeting 5\% GWER for example 2.}
 \label{plotex2counts}
@@ -430,11 +425,7 @@ The $N$-method, as expected, gave rise to much smaller thresholds in this second
 <<>>=
 diag(N.2.thr)
 @
-
-
-Figure \ref{plotex2slidingbar} presents the hotspot significance profile targeting 5\% GWER. For this second example, all methods correctly detected the simulated hotspots.
-
-<<label=figex2slidingbar,width=6,height=6,include=FALSE>>=
+<<label=plotex2slidingbar,width=6,height=6,fig=TRUE,echo=TRUE,include=FALSE>>=
 N.2 <- round(N.2.thr[5, 5], 0)
 sliding.bar.plot(scan = data.frame(scan2[, 1:2], scandrop2), 
                  lod.thr = NL.2.thr[1:N.2, 5], 
@@ -442,15 +433,38 @@ sliding.bar.plot(scan = data.frame(scan2[, 1:2], scandrop2),
                  gap = 50, 
                  y.axes = seq(1, N.2, by = 1))
 @
+
 \begin{figure}[!ht]
 \begin{center}
-<<label=plotex2slidingbar,fig=TRUE,echo=FALSE>>=
-<<figex2slidingbar>>
-@
+\includegraphics{qtlhot-plotex2slidingbar}
 \caption{Hotspot significance profile targeting 5\% GWER for example 2.}
 \label{plotex2slidingbar}
 \end{center}
 \end{figure}
+
+Figure \ref{plotex2slidingbar} presents the hotspot significance profile targeting 5\% GWER. For this second example, all methods correctly detected the simulated hotspots.
+
+<<label=plotex2sigct,width=6,height=6,fig=TRUE,echo=TRUE,include=FALSE>>=
+hot.scan2 <- qtlhot.scan(cross2, scan2, NL.N.2$max.lod.quant, lod.thrs, probs = seq(.01, .1, by = .01), level = 0.05)
+par(mar = c(4.1,4.1,0.1,4.1))
+plot(out2, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
+plot(hot.scan2, lodcolumn = 2, add = TRUE, col = "red")
+## Add right axis with 
+quant <- attr(hot.scan2, "quant")
+tmp <- seq(along = quant)
+axis(4, at = tmp, label = round(quant[tmp], 2), las = 1, cex = 0.35)
+mtext("sliding LOD thresholds",4, 1, cex=1.5)
+@
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{qtlhot-plotex2sigct}
+\caption{Hotspot significance scan targeting 5\% GWER for example 2.}
+\label{plotex2sigct}
+\end{center}
+\end{figure}
+
+Figure \ref{plotex2sigct} shows another way to represent significant hotspots. We overlay the largest significant hotspot counts using the sliding quantiles in red on top of the curve on Figure \ref{plotex2counts}. Notice that the large sizes are all significant, but only small sizes corresponding to larger LOD scores are significant. We add a right axis with the sliding LOD thresholds.
 
 \section{References}
 

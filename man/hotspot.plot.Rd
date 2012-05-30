@@ -1,4 +1,5 @@
 \name{hotspot.plot}
+\alias{qtlhot.scan}
 \alias{hotspot.scan}
 \alias{hotspot.plot}
 \alias{quant.plot}
@@ -11,7 +12,8 @@ Plot routines for hotspots.
 Plot hotspots across genome.
 }
 \usage{
-quant.plot(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.95)
+qtlhot.scan(cross, scan, max.lod.quant, lod.thrs, probs, level = 0.05)
+quant.plot(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.05)
 hotspot.scan(cross, scan.hl, lod.thr, quant.level, window = 5, verbose = FALSE)
 hotspot.plot(hot.scan, quant.thr = NULL, maps = NULL, main = "")
 sliding.bar.plot(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
@@ -22,7 +24,7 @@ sliding.bar.plot(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
   \item{max.N.window}{matrix of max count (permutation by LOD threshold)
   for smoothed counts over \code{window}}
   \item{lod.thrs}{vector of LOD thresholds}
-  \item{probs}{vector ov significance levels for \code{lod.thrs}}
+  \item{probs}{vector of significance levels for \code{lod.thrs}}
   \item{level}{significance level}
   \item{cross}{object of class \code{cross}}
   \item{scan.hl}{data frame with \code{row} index and high LOD interval
@@ -52,11 +54,10 @@ The hotspot.scan() result is an object of class \code{scanone}.
 ## max.lod.quant, max.N and max.N.window are elements of lod.sums.
 ## lod.sums is created by call to lod.quantile.permutation in Phase2 (big=TRUE).
 ## lod.thrs supplied from earlier calculations; probs correspond to these.
-load("Phase3.RData")
-out <- quant.plot(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.95)
+out <- quant.plot(max.lod.quant, max.N, max.N.window, lod.thrs, probs, level = 0.05)
 
-hot.scan <- hotspot.scan(cross, scan.hl, out$lod.thr, out$quant.level)
-hotspot.plot(hot.scan)
+hot.scan <- qtlhot.scan(cross, scan, max.lod.quant, lod.thrs, probs, level = 0.05)
+plot(hot.scan)
 sliding.bar.plot(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
 }
 }
