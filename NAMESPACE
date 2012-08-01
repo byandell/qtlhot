@@ -30,3 +30,18 @@ export(NL.N.summary)
 export(WW.permutations)
 export(WW.perm)
 export(WW.summary)
+
+## CMST Routines.
+
+## export(CausalRocCurve)
+## export(GetRocMatrix)
+
+export(SimCrossCausal)
+export(GetCommonQtls)
+export(CMSTtests)
+export(CMSTtestsList)
+
+## export(FitAllTests)
+## export(CitTests)
+
+## export(mySimulations)
