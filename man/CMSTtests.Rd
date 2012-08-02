@@ -1,6 +1,7 @@
 \name{CMSTtests}
 \alias{CMSTtests}
 \alias{CMSTtestsList}
+\alias{FitAllTests}
 \title{Perform CMST Tests on cross object}
 \description{Performs 6 separate CMST tests (3 versions, 2 penalties).
 }
@@ -8,11 +9,12 @@
 CMSTtests(cross, pheno1, pheno2, Q.chr, Q.pos,
   addcov1 = NULL, addcov2 = NULL, intcov1 = NULL, intcov2 = NULL, 
   method = c("par", "non.par", "joint", "all"),
-  penalty = c("bic", "aic", "both"), verbose = TRUE)
+  penalty = c("bic", "aic", "both"), verbose = FALSE)
 CMSTtestsList(cross, pheno1, pheno2, Q.chr, Q.pos,
   addcov1 = NULL, addcov2 = NULL, intcov1 = NULL, intcov2 = NULL, 
   method = c("par", "non.par", "joint", "all"),
-  penalty = c("bic", "aic", "both"), verbose = FALSE)
+  penalty = c("bic", "aic", "both"), verbose = TRUE)
+FitAllTests(cross, pheno1, pheno2, Q.chr, Q.pos)
 }
 \arguments{
   \item{cross}{object of class \code{cross}}
@@ -50,7 +52,6 @@ out1 <- CMSTtests(CMSTCross,
                   addcov2 = NULL, 
                   intcov1 = NULL, 
                   intcov2 = NULL, 
-                  cross.type = "bc",
                   method = "all",
                   penalty = "both")
 out1[1:6]
@@ -67,7 +68,6 @@ out2 <- CMSTtests(CMSTCross,
                   addcov2 = NULL, 
                   intcov1 = NULL, 
                   intcov2 = NULL, 
-                  cross.type = "bc",
                   method = "par",
                   penalty = "bic")
 out2

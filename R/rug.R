@@ -104,7 +104,7 @@ qm.approx <- function(maps, base = bases, chr,
     ## Need to flesh this out using Aimee's interpolating positions email from 15 nov.
     stop("use.qtl = TRUE is not working yet")
     map.x <- data.frame(...)
-    interpmap(map.x, map.y)
+    ## interpmap(map.x, map.y)
   }
   else
     myapprox(map.x[[1]], map.y[[1]], pos, ...)

@@ -24,7 +24,7 @@ CausalRocCurve <- function(outA, outB, outC, outD, outE,
   data.frame(tpr, fpr, tp, fp, tn, fn)
 }
 #############################################################################
-causal.ROC.curve <- function(...) CausalRocCurve.ROC.curve(...)
+causal.ROC.curve <- function(...) CausalRocCurve(...)
 #############################################################################
 GetRocMatrix <- function(outA, outB, outC, outD, outE, alpha,
                            condense.labels = TRUE, verbose = FALSE)

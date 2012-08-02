@@ -912,7 +912,7 @@ CMSTtestsList <- function(cross,
 #########################################################################################
 FitAllTests <- function(cross, 
                         pheno1, 
-                        phenos,
+                        pheno2,
                         Q.chr,
                         Q.pos) {
   ntests <- length(phenos)
@@ -1156,14 +1156,14 @@ GetCommonQtls <- function(cross,
   intcov1.M <- CreateCovMatrix(cross, cov.names = intcov1)
   intcov2.M <- CreateCovMatrix(cross, cov.names = intcov2)
   scan1 <- scanone(cross, pheno.col = find.pheno(cross, pheno1), 
-                   method = "hk", intcov = intcov1.M,
-                   addcov = cbind(addcov1.M, intcov1.M))
+                   method = "hk", intcovar = intcov1.M,
+                   addcovar = cbind(addcov1.M, intcov1.M))
   scan2 <- scanone(cross, pheno.col = find.pheno(cross, pheno2), 
-                   method = "hk", intcov = intcov2.M, 
-                   addcov = cbind(addcov2.M, intcov2.M))
+                   method = "hk", intcovar = intcov2.M, 
+                   addcovar = cbind(addcov2.M, intcov2.M))
   scan2g1 <- scanone(cross, pheno.col = find.pheno(cross, pheno2), 
-                     method = "hk", intcov = intcov2.M,
-                     addcov = cbind(addcov2.M, intcov2.M, y1))
+                     method = "hk", intcovar = intcov2.M,
+                     addcovar = cbind(addcov2.M, intcov2.M, y1))
   scanJ <- scan1
   scanJ[, 3] <- scan1[, 3] + scan2g1[, 3]
   FindCommonQtls(cross, scanJ, scan1, scan2, thr, peak.dist)
@@ -1367,7 +1367,11 @@ get.power.type1.prec.matrix.2 <- function(out, models, alpha)
   list(Power=Power, Type1=Type1, Prec=Prec)
 }
 ##############################################################################
-JoinKoOutputs <- function(x = comap.targets) {
+JoinKoOutputs <- function(x, out) ## x = comap.targets
+{
+  ## This is one of Elias's routines that relies on external files.
+  ## Not clear where x and out come from.
+  
   reg.nms <- names(x)
   load(paste("output_ko_validation", reg.nms[1], "RData", sep = "."))
   join.out <- vector(mode = "list", length = 11)
@@ -1379,7 +1383,7 @@ JoinKoOutputs <- function(x = comap.targets) {
     join.out[[i]] <- out[[i]]
   }
   join.out[[11]] <- cbind(rep(reg.nms[1], length(x[[1]])), x[[1]])
-  for (k in 2 : length(comap.targets)) {
+  for (k in 2 : length(x)) {
     load(paste("output_ko_validation", reg.nms[k], "Rdata", sep="."))
     for (i in 1 : 10) {
       join.out[[i]] <- rbind(join.out[[i]], out[[i]])
@@ -1397,7 +1401,7 @@ GetCis <- function(x, window = 10) {
   list(cis.reg = xx, cis.index = index) 
 }
 ##############################################################################
-GetCisCandReg <- function(cand.reg, scan, lod.thr, drop) {
+GetCisCandReg <- function(cand.reg, scan, lod.thr, drop = 1.5) {
   all.trait.nms <- cand.reg[, 1]
   cand.reg <- cand.reg[cand.reg[, 2] == cand.reg[, 4],]
   n <- nrow(cand.reg)
@@ -1424,7 +1428,11 @@ GetCisCandReg <- function(cand.reg, scan, lod.thr, drop) {
 }
 ##############################################################################
 PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs, 
-                                   to.load, cis.index) {
+                                   to.load, cis.index, join.out)
+{
+  ## Unclear what this does. Part of KO data analysis.
+  ## join.out added.
+  
   load(to.load)
   rnms <- c("aic", "bic", "j.bic", "p.bic", "np.bic", "j.aic", "p.aic", "np.aic", "cit")
   nt <- length(nms)
