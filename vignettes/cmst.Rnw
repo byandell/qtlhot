@@ -37,13 +37,7 @@
 %\usepackage{setspace}
 %\doublespacing
 
-
-
-
 \date{\today}
-
-
-
 
 %% ** EDIT HERE **
 %% PLEASE INCLUDE ALL MACROS BELOW
@@ -112,20 +106,16 @@
 
 Current efforts in systems genetics have focused on the development of statistical approaches that aim to disentangle causal relationships among molecular phenotypes in segregating populations. Model selection criterions, such as the AIC and BIC, have been widely used for this purpose, in spite of being unable to quantify the uncertainty associated with the model selection call. In this tutorial we illustrate the use of software implementing the causal model selection hypothesis tests proposed by Chaibub Neto et al. (2012).
 
-%to perform model selection among models representing distinct causal relationships. We focus on models composed of pairs of phenotypes and use their common QTL to determine which phenotype has a causal effect on the other, or whether the phenotypes are not causally related, and are only statistically associated. Our hypothesis tests are fully analytical and avoid the use of computationally expensive permutation or re-sampling strategies. They adapt and extend Vuong's model selection test to the comparison of four possibly misspecified models, handling the full range of possible causal relationships among a pair of phenotypes. We evaluate the performance of our tests against the AIC, BIC and a recently published causality inference test in simulation studies. Furthermore, we compare the precision of the causal predictions made by the methods using biologically validated causal relationships extracted from a database of 247  knockout experiments in yeast. Overall, our model selection hypothesis tests achieve higher precision than the alternative methods at the expense of reduced statistical power.
-
 \section{Overview}
 
 This tutorial illustrates the basic functionality of the CMST routines in the \texttt{qtlhot} R package using few simulated toy examples. The analysis of a yeast genetical genomics data-set presented in Chaibub Neto et al. (2012) is reproduced in a separate package, \texttt{R/qtlyeast}. The \texttt{R/qtlhot} package depends on \texttt{R/qtl} (Broman et al. 2003), and we assume the reader is familiar with it.
 
-%application of the causal model selection tests (Chaibub Neto et al. 2012), implemented in the \texttt{cmst} R package, to a few simulated toy examples, and
-
 \section{Basic functionality}
 
-Here, we illustrate the basic functionality of the \texttt{R/qtlcmst} package in a toy simulated example.
+Here, we illustrate the basic functionality of the CMST routines in the \texttt{R/qtlhot} package in a toy simulated example.
 
 <<>>=
-library(qtlcmst)
+library(qtlhot)
 @ 
 
 We first use the \texttt{SimCrossCausal} function to simulate a \texttt{cross} object with 3 phenotypes, $y_1$, $y_2$ and $y_3$, where $y_1$ has a causal effect on both $y_2$ and $y_3$. The simulated cross data set, \texttt{Cross}, is composed of: 100 individuals (\texttt{n.ind = 100}); 3 chromosomes of length 100cM (\texttt{len = rep(100, 3)}); 101 unequally spaced markers per chromosome (\texttt{n.mar = 101} and \texttt{eq.spacing = FALSE}); additive genetic effect set to 1 (\texttt{add.eff = 1}); dominance genetic effect set to 0 (\texttt{dom.eff = 0}); residual variances for $y_1$ (\texttt{sig2.1}) and the other phenotypes (\texttt{sig2.2}) set to 0.4 and 0.1, respectively; backcross cross type (\texttt{cross.type = "bc"}); and phenotype data transformed to normal scores (\texttt{normalize = TRUE}). The argument \texttt{beta = rep(0.5, 2)}, represents the causal effect of $y_1$ on the other phenotypes (i.e., coefficients of the regressions of $y_2 = 0.5 \, y_1 + \epsilon$ and $y_3 = 0.5 \, y_1 + \epsilon$). The length of beta controls the number of phenotypes to be simulated.

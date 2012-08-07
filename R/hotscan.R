@@ -29,14 +29,20 @@ qtlhot.scan <- function(cross, scan, max.lod.quant, lod.thrs, probs = seq(length
   attr(out, "quant") <- quant
   out
 }
-                        
+######################################################################
+get.chr.pos <- function(cross)
+{
+  if(is.null(cross$geno[[1]]$prob))
+    stop("must first run calc.genoprob with proper settings")
+  ncross <- cross
+  ncross$pheno <- data.frame(trait = rnorm(nind(cross)))
+  scanone(ncross, pheno.col= find.pheno(ncross, "trait"))[,1:2]
+}
 ######################################################################
 pull.hotspots <- function(cross, scan.hl, chr.pos = NULL, lod.thr = 5, slide.thr = NULL, verbose = FALSE)
 {
-  if(is.null(chr.pos)) {
-    cross$pheno$trait <- rnorm(nind(cross))
-    chr.pos <- scanone(cross, pheno.col= find.pheno(cross, "trait"))[,1:2]
-  }
+  if(is.null(chr.pos))
+    chr.pos <- get.chr.pos(cross)
   
   scan.hl <- scan.hl[scan.hl$lod >= lod.thr,]
   if(nrow(scan.hl)) {
@@ -214,12 +220,10 @@ quant.plot <- function(max.lod.quant, max.N, max.N.window, lod.thrs, probs, leve
 hotspot.scan <- function(cross, scan.hl, lod.thr, quant.level, window = 5, verbose = FALSE)
 {
   ## Kludge to get chr and pos[
-  cross$pheno$trait <- rnorm(nind(cross))
   if(is.null(cross$geno[[1]]$prob))
     cross <- calc.genoprob(cross, step=0.5, error.prob = 0.002,
                            map.function = "c-f", stepwidth = "max")
-  
-  chr.pos <- scanone(cross, pheno.col = find.pheno(cross, "trait"))[,1:2]
+  chr.pos <- get.chr.pos(cross)
   
   ## Make sure scan.hl has chr and pos. It will not if only used pull.highlods to create.
   if(is.null(scan.hl$chr))

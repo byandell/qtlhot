@@ -12,14 +12,20 @@ chromosome where the peak is located (peak.chr). Some candidates may map to the
 same chromosome where they are physically located.
 }
 \usage{
-GetCandReg(scan, annot, traits, lod.thr, drop = 1.5)
-GetCisCandReg(cand.reg, scan, lod.thr, drop = 1.5)
-GetCoMappingTraits(traits, scan, lod.thr, drop = 1.5)
+GetCandReg(cross, highlod, annot, traits, all.traits = names(cross$pheno),
+  chr.pos = get.chr.pos(cross))
+GetCisCandReg(cross, highlod, cand.reg, all.trait.nms = names(cross$pheno),
+  chr.pos = get.chr.pos(cross))
+GetCoMappingTraits(cand.reg, scan, lod.thr, drop = 1.5)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{scan}{
+  \item{cross}{
 object of class \code{cross}; see \code{\link[qtl]{read.cross}}
+}
+  \item{highlod}{
+data frame from \code{\link{pull.highlods}}, which is sparse summary of
+high LODs in large \code{\link[qtl]{scanone}} object
 }
   \item{cand.reg}{
 data frame with candidate regulator; see value section below
@@ -30,14 +36,18 @@ identifier, third column as chromosome, and fifth column as position in
 cM; typically column 2 has gene name, and column 4 has position in Mb
 }
   \item{traits}{
-names of traits to examine as candidate regulators; names must have
-corresponding columns in \code{scan} object
+names of traits to examine as candidate regulators; names must
+correspond to phenotypes in \code{cross} object
 }
   \item{lod.thr}{
 critical value for LOD threshold
 }
   \item{drop}{
 allowably drop in LOD for support interval (default is 1.5)
+}
+  \item{chr.pos}{
+first two columns of \code{\link[qtl]{scanone}} object with chromosome
+and position in cM
 }
 }
 \details{

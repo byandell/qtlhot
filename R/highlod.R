@@ -23,15 +23,19 @@
 ######################################################################
 
 ## see  ~/p/private/diabetes1/diabetes10/scan.perm/Rcode files
-pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5)
+pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5,
+                          extend = TRUE)
 {
   if(missing(pheno.col))
     pheno.col <- names(scans)[-(1:2)]
   
   ## Extract matrix of lod scores.
   x <- as.matrix(scans[,-(1:2), drop = FALSE])
-  ## Find which values are at or above l!od threshold. 
-  wh <- which(x >= lod)
+  ## Find which values are at or above LOD threshold.
+  if(extend)
+    wh <- which(x > lod)
+  else
+    wh <- which(x >= lod)
   
   ## Get row and column indices.
   rr <- row(x)[wh]
@@ -40,10 +44,22 @@ pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5)
   ## Find which are within drop.lod of max lod per chr.
   lod <- x[wh]
   chr <- scans$chr[rr]
+  ## This assumes scans or sorted by chr, then pos within chr. Should be.
   tmp <- interaction(cc, chr, drop = TRUE)
   maxlod <- tapply(lod, tmp, max)
-  ## Is not adding name properly here.
-  wh <- which(maxlod[tmp] <= lod + drop.lod)
+  if(extend) {
+    is.in <- maxlod[tmp] < lod + drop.lod
+    ## Extend one beyond.
+    tmpfn <- function(x) {
+      d <- diff(x)
+      x | (c(d,0) == 1) | (c(0,d) == -1)
+    }
+    is.in <- tapply(is.in, tmp, tmpfn)
+    wh <- which(is.in)
+    ## Extend out one pseudo-marker.
+  }
+  else
+    wh <- which(maxlod[tmp] <= lod + drop.lod)
 
   ## Reget values.
   rr <- rr[wh]
