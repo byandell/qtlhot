@@ -8,13 +8,15 @@ Pull high LOD values with chr and pos.
 Pull high LOD values with chr and pos.
 }
 \usage{
-pull.highlods(scans, pheno.col, lod = 4.5, drop.lod = 1.5)
+pull.highlods(scans, pheno.col, lod = 4.5, drop.lod = 1.5, extend = TRUE)
 }
 \arguments{
   \item{scans}{object of class \code{\link[qtl]{scanone}}}
   \item{pheno.col}{column numbers for phenotypes (all if missing)}
   \item{lod}{LOD threshold}
   \item{drop.lod}{LOD drop from max to keep for support intervals}
+  \item{extend}{extend support interval just past \code{drop.lod};
+    matches behavior of \code{\link[qtl]{lodint}}}
 }
 \value{
   Data frame with
