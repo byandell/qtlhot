@@ -11,9 +11,9 @@ OGetCisCandReg <- function(cand.reg, scan, lod.thr, drop = 1.5) {
     phys.pos <- cand.reg[i, 3]
     trait.index <- which(trait.nms == cand.reg[i, 1]) + 2
     sscan <- scan[scan[, 1] == cand.reg[i, 4], c(1, 2, trait.index)]
-    lod.interval <- lodint(sscan, chr = cand.reg[i, 4], drop)
+    lod.interval <- lodint(sscan, chr = cand.reg[i, 4], drop = drop)
     peak.pos.lower[i] <- lod.interval[1, 2]
-    peak.pos.upper[i] <- lod.interval[3, 2]
+    peak.pos.upper[i] <- lod.interval[nrow(lod.interval), 2]
     lod.phys.pos <- sscan[which.min(abs(sscan[, 2] - cand.reg[i, 3])), 3]
     if (phys.pos >= peak.pos.lower[i] & phys.pos <= peak.pos.upper[i] & 
         lod.phys.pos >= lod.thr) {
@@ -77,7 +77,7 @@ OGetCoMappingTraits <- function(traits, scan, lod.thr, drop = 1.5) {
       sscan <- sub.scan[, c(1, 2, trait.index + 2)]
       lod.interval <- lodint(sscan, chr = traits[i, 4], drop = drop)
       lb <- lod.interval[1, 2]
-      ub <- lod.interval[3, 2]
+      ub <- lod.interval[nrow(lod.interval), 2] ## was 3; error if there are tied LOD scores.
       if(peak.pos >= lb & peak.pos <= ub)
         is.target[j] <- TRUE
     }

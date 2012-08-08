@@ -22,7 +22,7 @@ qtlhot.scan <- function(cross, scan, max.lod.quant, lod.thrs, probs = seq(length
   thr.level <- min(which(probs >= level))
   lod.thr <- lod.thrs[thr.level]
   
-  scan.hl <- pull.highlods(scan, lod = lod.thr)
+  scan.hl <- pull.highlods(scan, lod = lod.thr, restrict.lod = TRUE)
   quant <- quant.slide(max.lod.quant, lod.thrs, probs, level = level)
   
   out <- hotspot.scan(cross, scan.hl, lod.thr, quant)

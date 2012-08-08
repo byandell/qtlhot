@@ -1,5 +1,6 @@
 \name{PrecTpFpMatrix}
 \alias{PrecTpFpMatrix}
+\alias{JoinTestOutputs}
 \title{
 Determine false positive and true positive rates for known targets.
 }
@@ -7,10 +8,12 @@ Determine false positive and true positive rates for known targets.
 Determine how well different tests do to predict candidates of regulation.
 }
 \usage{
+JoinTestOutputs(comap)
 PrecTpFpMatrix(alpha, nms, val.targets, all.orfs, to.load, cis.index)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
+\item{comap}{list result of \code{GetComappingTraits}}
   \item{alpha}{
 significance levels at which summaries are computed
 }
@@ -23,17 +26,18 @@ validated targets of candidate regulators
   \item{all.orfs}{
 all trait names
 }
-  \item{to.load}{
-name of file with RData object of joined output
+  \item{tests}{
+list object of joined output created by \code{JoinTestsOutputs}
 }
   \item{cis.index}{
 numeric index into \code{all.orfs} to identify cis traits
 }
 }
 \details{
-After loading the joined results we use the function PrecTpFpMatrix to summarize the
-performance of the different methods in terms of ``biologically validated'' true positives, false
-positives and precision, of the inferred causal relations. We define a
+\code{JoinTestOutputs} joins files of results of \code{\link{FitAllTests}}.
+The joined tests are summarized with \code{PrecTpFpMatrix} using the
+``biologically validated'' true positives, false
+positives and precision, for the inferred causal relations. We define a
 true positive as a statistically significant causal relation between a
 gene and a putative target gene when the putative target gene belongs to
 the known signature of the gene. Similarly, we define a false positive
@@ -60,7 +64,7 @@ only.
 Elias Chaibub Neto
 }
 \seealso{
-\code{\link{GetCandReg}}
+\code{\link{GetCandReg}}, \code{\link{CMSTTests}}
 }
 \examples{
 \dontrun{

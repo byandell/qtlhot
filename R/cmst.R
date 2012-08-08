@@ -910,55 +910,25 @@ CMSTtestsList <- function(cross,
   out
 }
 #########################################################################################
-FitAllTests <- function(cross, 
-                        pheno1, 
-                        pheno2,
-                        Q.chr,
-                        Q.pos) {
-  ntests <- length(phenos)
-  nms <- paste(pheno1, phenos, sep = "_")
-  pval.nms <- c("pval.1", "pval.2", "pval.3", "pval.4")
-  AIC.nms <- c("AIC.1", "AIC.2", "AIC.3", "AIC.4", "z.12", "z.13", "z.14",
-               "z.23", "z.24", "z.34")
-  BIC.nms <- c("BIC.1", "BIC.2", "BIC.3", "BIC.4", "z.12", "z.13", "z.14",
-               "z.23", "z.24", "z.34")
-  out <- vector(mode = "list", length = 10)
-  names(out) <- c("R2s", "AIC.stats", "BIC.stats", 
-                  "pvals.j.BIC", "pvals.p.BIC", "pvals.np.BIC",
-                  "pvals.j.AIC", "pvals.p.AIC", "pvals.np.AIC",
-                  "pvals.cit")
-  out[[1]] <- matrix(NA, ntests, 2, 
-                     dimnames = list(nms, c("R2.Y1 ~ Q", "R2.Y2 ~ Q")))
-  out[[2]] <- matrix(NA, ntests, 10, dimnames = list(nms, AIC.nms))
-  out[[3]] <- matrix(NA, ntests, 10, dimnames = list(nms, BIC.nms))
-  for (i in 4 : 9) {
-    out[[i]] <- matrix(NA, ntests, 4, dimnames = list(nms, pval.nms))
-  }
-  out[[10]] <- matrix(NA, ntests, 2, 
-                      dimnames = list(nms, c("pval.1", "pval.2")))
-  for(k in 1 : ntests) {
-    aux <- CMSTtests(cross, pheno1, phenos[k], Q.chr, Q.pos, 
+FitAllTests <- function(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
+{
+  out <- CMSTtests(cross, pheno1, pheno2, Q.chr, Q.pos, 
                      NULL, NULL, NULL, NULL, "all", "both", FALSE)
-    zb <- t(aux$Z.bic)
-    za <- t(aux$Z.aic)
-    out[[1]][k,] <- aux$R2
-    out[[2]][k,] <- c(aux$AICs, za[!is.na(za)]) 
-    out[[3]][k,] <- c(aux$BICs, zb[!is.na(zb)])
-    out[[4]][k,] <- aux$pvals.j.BIC
-    out[[5]][k,] <- aux$pvals.p.BIC
-    out[[6]][k,] <- aux$pvals.np.BIC
-    out[[7]][k,] <- aux$pvals.j.AIC
-    out[[8]][k,] <- aux$pvals.p.AIC
-    out[[9]][k,] <- aux$pvals.np.AIC
+
+  out$pvals.cit <- matrix(NA, ntests, 2, dimnames = list(nms, c("pval.1", "pval.2")))
+
+  ntests <- length(pheno2)
+  for(k in 1 : ntests) {
     cit.mar <- find.marker(cross, Q.chr, Q.pos)
     LL <- pull.geno(cross)[, cit.mar]
     GG <- cross$pheno[, pheno1]
-    TT <- cross$pheno[, phenos[k]]
+    TT <- cross$pheno[, pheno2[k]]
     aux2 <- try(CitTests(LL, GG, TT), silent = TRUE)
     if(class(aux2) != "try-error") {
-      out[[10]][k,] <- aux2
+      out$pvals.cit[k,] <- aux2
     }
-    cat("pheno2 = ", k, "\n")   
+    if(verbose)
+      cat("CIT pheno2 = ", k, "\n")   
   }
   out
 }
@@ -1367,31 +1337,27 @@ get.power.type1.prec.matrix.2 <- function(out, models, alpha)
   list(Power=Power, Type1=Type1, Prec=Prec)
 }
 ##############################################################################
-JoinKoOutputs <- function(x, out) ## x = comap.targets
+JoinTestOutputs <- function(comap)
 {
   ## This is one of Elias's routines that relies on external files.
-  ## Not clear where x and out come from.
+  ## It should be parallelized.
   
-  reg.nms <- names(x)
+  reg.nms <- names(comap)
+  out <- NULL
   load(paste("output_ko_validation", reg.nms[1], "RData", sep = "."))
-  join.out <- vector(mode = "list", length = 11)
-  names(join.out) <- c("R2s", "AIC.stats", "BIC.stats", 
-                     "pvals.j.BIC", "pvals.p.BIC", "pvals.np.BIC",
-                     "pvals.j.AIC", "pvals.p.AIC", "pvals.np.AIC",
-                     "pvals.cit", "phenos")
-  for (i in 1 : 10) {
-    join.out[[i]] <- out[[i]]
-  }
-  join.out[[11]] <- cbind(rep(reg.nms[1], length(x[[1]])), x[[1]])
-  for (k in 2 : length(x)) {
+  join.out <- out
+  ## Add extra element to join.out: phenos.
+  join.out$phenos <- cbind(rep(reg.nms[1], length(comap[[1]])), comap[[1]])
+
+  for (k in 2 : length(comap)) {
     load(paste("output_ko_validation", reg.nms[k], "Rdata", sep="."))
     for (i in 1 : 10) {
       join.out[[i]] <- rbind(join.out[[i]], out[[i]])
     }
     join.out[[11]] <- 
-      rbind(join.out[[11]], cbind(rep(reg.nms[k], length(x[[k]])), x[[k]]))
+      rbind(join.out[[11]], cbind(rep(reg.nms[k], length(comap[[k]])), comap[[k]]))
   }
- save(join.out, file = "joined_ko_output.RData", compress=TRUE)
+ join.out
 }
 ##############################################################################
 GetCis <- function(x, window = 10) {
@@ -1444,12 +1410,11 @@ GetCisCandReg <- function(cross, highlod, cand.reg,
 }
 ##############################################################################
 PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs, 
-                                   to.load, cis.index, join.out)
+                                   tests, cis.index)
 {
   ## Unclear what this does. Part of KO data analysis.
-  ## join.out added.
+  ## tests added.
   
-  load(to.load)
   rnms <- c("aic", "bic", "j.bic", "p.bic", "np.bic", "j.aic", "p.aic", "np.aic", "cit")
   nt <- length(nms)
   TP <- FP <- TN <- FN <- NC <- data.frame(matrix(0, 9, nt))
@@ -1458,28 +1423,28 @@ PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs,
   row.names(TP) <- row.names(FP) <- row.names(TN) <- row.names(FN) <- row.names(NC) <- rnms
   Causal <- NotCausal <- vector(mode = "list", length = 9)
   for (k in 1 : nt) {
-      aux <- which(join.out[[11]][,1] == nms[k])
-      aux.nms <- join.out[[11]][aux, 2]
+      aux <- which(tests[[11]][,1] == nms[k])
+      aux.nms <- tests[[11]][aux, 2]
       tar[k] <- length(aux)
       for (i in 2 : 3) {
-        aux.rank <- apply(join.out[[i]][aux, 1:4, drop = F], 1, rank)
+        aux.rank <- apply(tests[[i]][aux, 1:4, drop = F], 1, rank)
         aux.best <- apply(aux.rank, 2, function(x) which.min(x))
         aux.index <- as.numeric(which(aux.best == 1))
         Causal[[i - 1]] <- aux.nms[aux.index] 
         NotCausal[[i - 1]] <- aux.nms[-aux.index] 
       }  
       for (i in 4 : 9) {
-        Causal[[i - 1]] <- aux.nms[which(join.out[[i]][aux, 1] <= alpha)]
+        Causal[[i - 1]] <- aux.nms[which(tests[[i]][aux, 1] <= alpha)]
         NotCausal[[i - 1]] <- 
-          aux.nms[c(which(join.out[[i]][aux, 2] <= alpha),
-                    which(join.out[[i]][aux, 3] <= alpha),
-                    which(join.out[[i]][aux, 4] <= alpha))] 
+          aux.nms[c(which(tests[[i]][aux, 2] <= alpha),
+                    which(tests[[i]][aux, 3] <= alpha),
+                    which(tests[[i]][aux, 4] <= alpha))] 
       }  
       Causal[[9]] <- 
-        aux.nms[which(join.out[[10]][aux, 1] <= alpha & join.out[[10]][aux, 2] > alpha)]
+        aux.nms[which(tests[[10]][aux, 1] <= alpha & tests[[10]][aux, 2] > alpha)]
       NotCausal[[9]] <- 
-        aux.nms[c(which(join.out[[10]][aux, 1] > alpha & join.out[[10]][aux, 2] <= alpha),
-                  which(join.out[[10]][aux, 1] >= alpha & join.out[[10]][aux, 2] >= alpha))]
+        aux.nms[c(which(tests[[10]][aux, 1] > alpha & tests[[10]][aux, 2] <= alpha),
+                  which(tests[[10]][aux, 1] >= alpha & tests[[10]][aux, 2] >= alpha))]
       val <- val.targets[[match(nms[k], names(val.targets))]]
       not.val <- all.orfs[-match(unique(c(nms[k], val)), all.orfs)]
       for (i in 1 : 9) {
@@ -1489,13 +1454,13 @@ PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs,
         FN[i, k] <- length(!is.na(intersect(NotCausal[[i]], val)))
       }
       for (i in 4 : 9) {
-        NC[i - 1, k] <- length(c(which(join.out[[i]][aux, 1] > alpha),
-                             which(join.out[[i]][aux, 2] > alpha),
-                             which(join.out[[i]][aux, 3] > alpha),
-                             which(join.out[[i]][aux, 4] > alpha)))
+        NC[i - 1, k] <- length(c(which(tests[[i]][aux, 1] > alpha),
+                             which(tests[[i]][aux, 2] > alpha),
+                             which(tests[[i]][aux, 3] > alpha),
+                             which(tests[[i]][aux, 4] > alpha)))
       }
-      NC[9, k] <- length(c(which(join.out[[10]][aux, 1] < alpha),
-                           which(join.out[[10]][aux, 2] < alpha)))
+      NC[9, k] <- length(c(which(tests[[10]][aux, 1] < alpha),
+                           which(tests[[10]][aux, 2] < alpha)))
   }
   tp <- apply(TP, 1, sum)
   fp <- apply(FP, 1, sum)
@@ -1518,8 +1483,8 @@ PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs,
   list(overall.1, overall.2, tar)
 }
 ##############################################################################
-PrecTpFpMatrix <- function(alpha, nms, val.targets, all.orfs, to.load,
-                           cis.index) {
+PrecTpFpMatrix <- function(alpha, nms, val.targets, all.orfs, tests, cis.index)
+{
   le <- length(alpha)
   Prec1 <- Tp1 <- Fp1 <- matrix(NA, 9, le, 
     dimnames=list(c("aic", "bic", "j.bic", "p.bic", "np.bic", "j.aic", 
@@ -1529,7 +1494,7 @@ PrecTpFpMatrix <- function(alpha, nms, val.targets, all.orfs, to.load,
     aux <- PerformanceSummariesKo(alpha = alpha[i], nms,
                                   val.targets = val.targets, 
                                   all.orfs = all.orfs, 
-                                  to.load = to.load,
+                                  tests = tests,
                                   cis.index = cis.index)
     Prec1[,i] <- round(aux[[1]][,1], 2) 
     Prec2[,i] <- round(aux[[2]][,1], 2)

@@ -3,8 +3,6 @@
 
 \documentclass[11pt]{article}
 
-%\documentclass[12pt]{thesis}
-
 \usepackage{epsf}
 \usepackage{epsfig}
 \usepackage{amssymb,amsmath}
@@ -17,9 +15,6 @@
 
 
 \usepackage{graphicx}
-%\usepackage{Sweave}
-%\usepackage{cite}
-%\usepackage{color}
 \usepackage{Sweave}
 
 %\topmargin 0.0cm

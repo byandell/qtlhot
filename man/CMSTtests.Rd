@@ -14,7 +14,7 @@ CMSTtestsList(cross, pheno1, pheno2, Q.chr, Q.pos,
   addcov1 = NULL, addcov2 = NULL, intcov1 = NULL, intcov2 = NULL, 
   method = c("par", "non.par", "joint", "all"),
   penalty = c("bic", "aic", "both"), verbose = TRUE)
-FitAllTests(cross, pheno1, pheno2, Q.chr, Q.pos)
+FitAllTests(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
 }
 \arguments{
   \item{cross}{object of class \code{cross}}
@@ -39,7 +39,7 @@ Chaibub Neto E, Broman AT, Keller MP, Attie AD, Zhang B, Zhu J, Yandell BS,
 Causal model selection hypothesis tests in systems genetics.
 Genetics (in review).
 }
-\seealso{\code{\link{CMSTCross}}}
+\seealso{\code{\link{CMSTCross}}, \code{\link{PrecTpFpMatrix}}}
 \examples{
 data(CMSTCross)
 nms <- names(CMSTCross$pheno)

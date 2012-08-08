@@ -45,6 +45,7 @@ export(GetCandReg)
 export(GetCisCandReg)
 export(GetCoMappingTraits)
 export(FitAllTests)
+export(JoinTestOutputs)
 export(PrecTpFpMatrix)
 
 ## export(mySimulations)

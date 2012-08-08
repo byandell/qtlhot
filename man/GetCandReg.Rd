@@ -45,7 +45,7 @@ critical value for LOD threshold
   \item{drop}{
 allowably drop in LOD for support interval (default is 1.5)
 }
-  \item{chr.pos}{
+\item{chr.pos}{
 first two columns of \code{\link[qtl]{scanone}} object with chromosome
 and position in cM
 }
@@ -64,6 +64,9 @@ targets of each trait. A trait is included in the putative target list of
 a trait when its LOD peak is greater than \code{lod.thr} and the
 \code{drop} LOD support interval around the peak contains the location
 of the trait’s QTL.
+The function \code{JoinTestOutputs} currently relies on external files
+that contain results of \code{\link{FitAllTests}}. It needs to be
+rewritten to save space.
 }
 \value{
   \code{GetCoMappingTraits} returns a list with each element being the

@@ -24,48 +24,69 @@
 
 ## see  ~/p/private/diabetes1/diabetes10/scan.perm/Rcode files
 pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5,
-                          extend = TRUE)
+                          extend = TRUE, restrict.lod = TRUE)
 {
   if(missing(pheno.col))
     pheno.col <- names(scans)[-(1:2)]
   
   ## Extract matrix of lod scores.
   x <- as.matrix(scans[,-(1:2), drop = FALSE])
-  ## Find which values are at or above LOD threshold.
-  if(extend)
-    wh <- which(x > lod)
-  else
-    wh <- which(x >= lod)
+
+  ## Keep only traits with some LOD above lod threshold.
+  keep <- apply(x, 2, function(x, lod) any(x >= lod), lod)
+  x <- x[, keep, drop = FALSE]
+  
+  ## Find which values are at within drop.lod of maximum per chr and trait.
+  if(restrict.lod) {
+    ## Restrict to loci above LOD threshold.
+    if(extend)
+      tmpfn <- function(x, lod, drop.lod) {
+        maxx <- max(x)
+        g <- (maxx >= lod) & (maxx < x + drop.lod)
+        if(any(g)) {
+          d <- diff(g)
+          ## Add one more pseudomarker on either side if possible.
+          (g | (c(d,0) == 1) | (c(0,d) == -1)) & (x >= lod)
+        }
+        else
+          g
+      }
+    else
+      tmpfn <- function(x, lod, drop.lod) {
+        (max(x) <= x + drop.lod) & (x >= lod)
+      }
+  }
+  else {
+    if(extend)
+      tmpfn <- function(x, lod, drop.lod) {
+        maxx <- max(x)
+        g <- (maxx >= lod) & (maxx < x + drop.lod)
+        if(any(g)) {
+          d <- diff(g)
+          ## Add one more pseudomarker on either side if possible.
+          g | (c(d,0) == 1) | (c(0,d) == -1)
+        }
+        else
+          g
+      }
+    else
+      tmpfn <- function(x, lod, drop.lod) {
+        maxx <- max(x)
+        (maxx >= lod) & (maxx <= x + drop.lod)
+      }
+  }
+  lodint.pos <- function(x, chr, lod, drop.lod) {
+    unlist(tapply(x, chr, tmpfn, lod, drop.lod))
+  }
+  wh <- apply(x, 2, lodint.pos, scans$chr, lod, drop.lod)
   
   ## Get row and column indices.
   rr <- row(x)[wh]
-  cc <- col(x)[wh]
+  cc <- seq(keep)[keep][col(x)[wh]]
 
   ## Find which are within drop.lod of max lod per chr.
   lod <- x[wh]
-  chr <- scans$chr[rr]
-  ## This assumes scans or sorted by chr, then pos within chr. Should be.
-  tmp <- interaction(cc, chr, drop = TRUE)
-  maxlod <- tapply(lod, tmp, max)
-  if(extend) {
-    is.in <- maxlod[tmp] < lod + drop.lod
-    ## Extend one beyond.
-    tmpfn <- function(x) {
-      d <- diff(x)
-      x | (c(d,0) == 1) | (c(0,d) == -1)
-    }
-    is.in <- tapply(is.in, tmp, tmpfn)
-    wh <- which(is.in)
-    ## Extend out one pseudo-marker.
-  }
-  else
-    wh <- which(maxlod[tmp] <= lod + drop.lod)
-
-  ## Reget values.
-  rr <- rr[wh]
-  cc <- cc[wh]
-  lod <- lod[wh]
-
+  
   ## return data frame with genome row, trait column and lod value.
   cbind.data.frame(row = rr, phenos = pheno.col[cc], lod = lod)
 }
@@ -119,7 +140,8 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
     per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
                         addcovar=covars$addcovar, intcovar=covars$intcovar)
 
-    per.scan.hl <- pull.highlods(per.scan, lod = lod.min, drop.lod = drop.lod)
+    per.scan.hl <- pull.highlods(per.scan, lod = lod.min, drop.lod = drop.lod,
+                                 restrict.lod = TRUE)
 
     save(per.scan.hl, perms,
          file=paste("per.scan",pheno.set, i,"RData",sep="."))
