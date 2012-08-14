@@ -22,7 +22,7 @@ qtlhot.scan <- function(cross, scan, max.lod.quant, lod.thrs, probs = seq(length
   thr.level <- min(which(probs >= level))
   lod.thr <- lod.thrs[thr.level]
   
-  scan.hl <- pull.highlods(scan, lod = lod.thr, restrict.lod = TRUE)
+  scan.hl <- pull.highlods(scan, lod = lod.thr, restrict.lod = TRUE)$highlod
   quant <- quant.slide(max.lod.quant, lod.thrs, probs, level = level)
   
   out <- hotspot.scan(cross, scan.hl, lod.thr, quant)
@@ -30,60 +30,13 @@ qtlhot.scan <- function(cross, scan, max.lod.quant, lod.thrs, probs = seq(length
   out
 }
 ######################################################################
-get.chr.pos <- function(cross)
-{
-  if(is.null(cross$geno[[1]]$prob))
-    stop("must first run calc.genoprob with proper settings")
-  ncross <- cross
-  ncross$pheno <- data.frame(trait = rnorm(nind(cross)))
-  scanone(ncross, pheno.col= find.pheno(ncross, "trait"))[,1:2]
-}
-######################################################################
 pull.hotspots <- function(cross, scan.hl, chr.pos = NULL, lod.thr = 5, slide.thr = NULL, verbose = FALSE)
 {
   if(is.null(chr.pos))
     chr.pos <- get.chr.pos(cross)
-  
-  scan.hl <- scan.hl[scan.hl$lod >= lod.thr,]
-  if(nrow(scan.hl)) {
-    ## Straight count of LODs above threshold. Includes shoulders and peaks.
-    tbl <- table(scan.hl$row)
-    tmp <- rep(0, nrow(chr.pos))
-    if(length(tbl))
-      tmp[as.numeric(names(tbl))] <- tbl
-    chr.pos$max.N <- tmp
 
-    if(!is.null(slide.thr)) {
-      ## If sliding thresholds supplied.
-      slide.thr <- slide.thr[slide.thr >= lod.thr & !is.na(slide.thr)]
-      if(length(slide.thr)) {
-        ## Want to work down slide.thr. One way is to see how many are above smallest
-        ## and stop if above the index.
-        index <- rep(TRUE, nrow(scan.hl))
-        hot.size <- rep(0, nrow(chr.pos))
-        for(hot.crit in rev(seq(length(slide.thr)))) {
-          if(verbose)
-            cat(hot.crit, "\n")
-          above <- scan.hl$lod[index] >= slide.thr[hot.crit]
-          if(!any(above))
-            break;
-          tbl <- table(scan.hl$row[index][above])
-          tbl <- tbl[tbl >= hot.crit]
-          if(length(tbl)) {
-            ## Record hotspot size if above hot.crit for thr, then mask those loci out.
-            hot.size[as.numeric(names(tbl))] <- tbl
-            index[scan.hl$row %in% names(tbl)] <- FALSE
-          }
-          if(!any(index))
-            break;
-        }
-        chr.pos$quant <- hot.size
-      }
-    }
-    chr.pos
-  }
-  else
-    NULL
+  hotsize.highlod(list(highlod = scan.hl, chr.pos = chr.pos),
+                  lod.thr, slide.thr)
 }
 ###################################################################################################
 quant.slide <- function(max.lod.quant, lod.thrs, probs, level = 0.95, show.max = FALSE)

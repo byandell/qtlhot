@@ -204,7 +204,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
                         addcovar=covars$addcovar, intcovar=covars$intcovar)
 
     per.scan.hl <- pull.highlods(per.scan, lod = lod.min, drop.lod = drop.lod,
-                                 restrict.lod = TRUE)
+                                 restrict.lod = TRUE)$highlod
 
     save(per.scan.hl, perms,
          file=file.path(dirpath, paste("per.scan",pheno.index, index,"RData",sep=".")))

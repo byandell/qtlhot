@@ -103,3 +103,12 @@ findpeaks <- function(results, lodcolumn=7, window=5, n.peaks=20)
   output
 }
       
+######################################################################
+get.chr.pos <- function(cross)
+{
+  if(is.null(cross$geno[[1]]$prob))
+    stop("must first run calc.genoprob with proper settings")
+  ncross <- cross
+  ncross$pheno <- data.frame(trait = rnorm(nind(cross)))
+  scanone(ncross, pheno.col= find.pheno(ncross, "trait"))[,1:2]
+}

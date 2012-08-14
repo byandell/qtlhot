@@ -88,7 +88,10 @@ pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5,
   lod <- x[wh]
   
   ## return data frame with genome row, trait column and lod value.
-  cbind.data.frame(row = rr, phenos = pheno.col[cc], lod = lod)
+  out <- list(highlod = cbind.data.frame(row = rr, phenos = pheno.col[cc], lod = lod),
+              chr.pos = scans[,1:2])
+  class(out) <- c("highlod", "list")
+  out
 }
 
 sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
@@ -141,7 +144,7 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
                         addcovar=covars$addcovar, intcovar=covars$intcovar)
 
     per.scan.hl <- pull.highlods(per.scan, lod = lod.min, drop.lod = drop.lod,
-                                 restrict.lod = TRUE)
+                                 restrict.lod = TRUE)$highlod
 
     save(per.scan.hl, perms,
          file=paste("per.scan",pheno.set, i,"RData",sep="."))
