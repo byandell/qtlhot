@@ -5,12 +5,12 @@
 Summary of threshold results.
 }
 \usage{
-filter.threshold(cross, nT, latent.eff, res.var, lod.thrs, drop = 1.5,
+filter.threshold(cross, n.phe, latent.eff, res.var, lod.thrs, drop = 1.5,
   Ns, n.perm, alpha.levels, NL.N.thrs, WW.thrs, verbose = FALSE)
 }
 \arguments{
   \item{cross}{object of class \code{cross}; see \code{\link[qtl]{read.cross}}}
-  \item{nT}{number of traits}
+  \item{n.phe}{number of traits, or phenotypes}
   \item{latent.eff}{ratio of latent effect SD to residual SD}
   \item{res.var}{residual variance (=SD^2)}
   \item{lod.thrs}{LOD threshold values for range of significance (alpha) levels}

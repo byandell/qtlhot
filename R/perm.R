@@ -15,7 +15,7 @@
 #     A copy of the GNU General Public License, version 3, is available
 #     at http://www.r-project.org/Licenses/GPL-3
 #
-# Contains: NL.N.permutations, NL.N.perm, count.thr, exceed.thr, NL.N.summary
+# Contains: NL.N.permutations, NL.N.perm,NL.N.summary
 ######################################################################
 
 ## This set of functions compute the permutation LOD thresholds for the NL-method
@@ -99,26 +99,6 @@ NL.N.perm <- function(cross, Nmax, n.perm, lod.thrs, drop = 1.5,
     max.N[i,] <- apply(count.thr(scanmat, lod.thrs, FALSE), 1, max)
   }
   list(max.lod.quant = max.lod.quant, max.N = max.N)
-}
-count.thr <- function(scan, lod.thrs, droptwo = TRUE)
-{
-  ## Count number of traits at or above each value of lod.thrs for each locus.
-  ## Result is n.loci * n.thr matrix.
-  if(droptwo)
-    scan <- scan[, -c(1,2), drop = FALSE]
-  apply(scan, 1, exceed.thr, lod.thrs)
-}
-exceed.thr <- function(x, y)
-{
-  ## Finds out how many in x exceed each value of y.
-  res <- rep(0, length(y))
-  for(k in order(y)) {
-    x <- x[x > y[k]]
-    if(length(x) == 0)
-      break
-    res[k] <- length(x)
-  }
-  res
 }
 NL.N.summary <- function(max.lod.quant, max.N, alpha.levels)
 {

@@ -15,8 +15,9 @@
 #     A copy of the GNU General Public License, version 3, is available
 #     at http://www.r-project.org/Licenses/GPL-3
 #
-# Contains: mySimulations, get.hotspot, sim.hotspot, filter.threshold,
-#           NL.counts, N.WW.counts, mycat
+# Contains:  count.thr, exceed.thr,
+#            get.hotspot, filter.threshold,
+#            NL.counts, N.WW.counts, mycat
 ######################################################################
 
 ## This function computes the error rates for the NL-, N- and West/Wu methods
@@ -29,7 +30,27 @@
 ## of the nSim simulations we detected at least one false hotspot anywhere in
 ## the genome.  
 ##
-mySimulations <- function(...) sim.hotspot(...)
+count.thr <- function(scan, lod.thrs, droptwo = TRUE)
+{
+  ## Count number of traits at or above each value of lod.thrs for each locus.
+  ## Result is n.loci * n.thr matrix.
+  if(droptwo)
+    scan <- scan[, -c(1,2), drop = FALSE]
+  apply(scan, 1, exceed.thr, lod.thrs)
+}
+exceed.thr <- function(x, y)
+{
+  ## Finds out how many in x exceed each value of y.
+  res <- rep(0, length(y))
+  for(k in order(y)) {
+    x <- x[x > y[k]]
+    if(length(x) == 0)
+      break
+    res[k] <- length(x)
+  }
+  res
+}
+#################################################################################
 get.hotspot <- function(filenames,
                         ## Following supplied in filenames[1].
                         Nmax, out.sim)
@@ -84,65 +105,8 @@ get.hotspot <- function(filenames,
   list(nSim = nSim, NL.err=NL.err, N.err=N.err, WW.err=WW.err, thrNL=thrNL, thrN=thrN, 
        thrWW=thrWW)  
 }
-sim.hotspot <- function(nSim, 
-                        cross, 
-                        nT,
-                        latent.eff,
-                        res.var = 1,
-                        Ns,
-                        n.perm,
-                        alpha.levels,
-                        lod.thrs,
-                        drop=1.5,
-                        verbose = FALSE)
-{
-  Nmax <- length(Ns)
-
-  nalpha <- length(alpha.levels)
-  nlod <- length(lod.thrs)
-
-  ## outputs count the number of times we detected
-  ## a hotspot using the respective method
-  outNL <- matrix(0, Nmax, nalpha)
-  outN <- outWW <- matrix(0, nlod, nalpha)
-
-  ## we are saving the thresholds of each simulation
-  thrNL <- array(dim=c(Nmax, nalpha, nSim))
-  thrN <- array(dim=c(nlod, nalpha, nSim))
-  thrWW <- array(dim=c(nlod, nalpha, nSim))
-
-  for(k in 1:nSim){
-    mycat(k, verbose, TRUE)
-
-    mycat("sim.null.pheno.data", verbose)
-    ncross <- sim.null.pheno.data(cross, nT, latent.eff, res.var)
-  
-    ## Simulate correlated phenotypes and create threshold summaries.
-    out.sim <- filter.threshold(ncross, nT, latent.eff[k], res.var,
-                             lod.thrs, drop,
-                             Ns, n.perm, alpha.levels,
-                             verbose)
-
-    thrNL[,,k] <- out.sim$NL.thrs
-    thrN[,,k] <- out.sim$N.thrs
-    thrWW[,,k] <- out.sim$WW.thrs    
-    outNL <- outNL + out.sim$NL
-    outN <- outN + out.sim$N.counts
-    outWW <- outWW + out.sim$WW.counts
-  }
-
-  
-  NL.err <- outNL/nSim
-  dimnames(NL.err) <- list(as.factor(Ns), as.factor(alpha.levels))
-  N.err <- outN / nSim
-  dimnames(N.err) <- list(as.factor(lod.thrs), as.factor(alpha.levels))
-  WW.err <- outWW / nSim
-  dimnames(WW.err) <- list(as.factor(lod.thrs), as.factor(alpha.levels))
-  list(nSim = nSim, NL.err=NL.err, N.err=N.err, WW.err=WW.err, thrNL=thrNL, thrN=thrN, 
-       thrWW=thrWW)  
-}
 ########################################################################################
-filter.threshold <- function(cross, nT, latent.eff, res.var,
+filter.threshold <- function(cross, n.phe, latent.eff, res.var,
                              lod.thrs, drop = 1.5,
                              Ns, n.perm, alpha.levels,
                              NL.N.thrs = NL.N.permutations(cross, Ns, n.perm, alpha.levels,
@@ -151,7 +115,7 @@ filter.threshold <- function(cross, nT, latent.eff, res.var,
                              verbose = FALSE)
 {
   mycat("scanone", verbose)
-  scanmat <- scanone(cross, pheno.col=c(1:nT), method="hk")
+  scanmat <- scanone(cross, pheno.col=c(1:n.phe), method="hk")
   chr <- scanmat[,1]
   scanmat <- as.matrix(scanmat[, -(1:2), drop = FALSE])
   

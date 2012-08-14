@@ -5,6 +5,10 @@ sim.null.cross
 	*sim.cross
 	*calc.genoprob
 sim.null.pheno.data
+mySimulations = sim.hotspot
+sim.hotspot
+	sim.null.pheno.data
+	sum.threshold
 
 perm.R:
 NL.N.permutations
@@ -14,15 +18,11 @@ NL.N.permutations
 		mycat
 		count.thr
 	NL.N.summary
-count.thr
-	exceed.thr
 
 study.R:
-mySimulations = sim.hotspot
+count.thr
+	exceed.thr
 get.hotspot
-sim.hotspot
-	sim.null.pheno.data
-	sum.threshold
 sum.threshold
 	*scanone
 	set.to.zero.beyond.drop.int

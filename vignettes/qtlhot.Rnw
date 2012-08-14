@@ -69,7 +69,7 @@ ncross1 <- sim.null.cross(chr.len = rep(100, 4),
                           n.mar = 51,
                           n.ind = 100,
                           type = "bc",
-                          n.pheno = 1000,
+                          n.phe = 1000,
                           latent.eff = 3,
                           res.var = 1,
                           init.seed = 123457)
@@ -89,20 +89,16 @@ cross1 <- include.hotspots(cross = ncross1,
                            lod.range.2 = c(5, 8),
                            lod.range.3 = c(10, 15),
                            res.var = 1,
-                           nT = 1000,
+                           n.phe = 1000,
                            init.seed = 12345)
 @
-
-
-
 
 Note that by choosing \texttt{latent.eff = 3} we generate highly correlated phenotype data. The distribution of the correlation values for each pair of phenotypes is given below.
 
 <<>>=
-nphe1 <- as.matrix(cross1$pheno)
-ncor1 <- cor(nphe1)
-ncor1 <- ncor1[lower.tri(ncor1)]
-summary(ncor1)
+ncor1 <- cor(cross1$pheno)
+summary(ncor1[lower.tri(ncor1)])
+rm(ncor1)
 @
 <<echo=FALSE>>=
 if(file.exists("savedperms.RData")) load("savedperms.RData")
@@ -124,9 +120,9 @@ if(!exists("pt")) {
 \end{Schunk}
 <<>>=
 alphas <- seq(0.01, 0.10, by=0.01)
-spt <- summary(pt, alphas)
-spt
-lod.thrs <- as.vector(spt)
+lod.thrs <- summary(pt, alphas)
+lod.thrs
+lod.thrs <- as.vector(lod.thrs)
 @
 
 We perform QTL mapping analysis for all 1,000 phenotypes using Haley-Knott regression, and process the LOD profiles by setting to zero LOD values outside the 1.5 LOD support interval (Manichaikul et al. 2006) around the peak at each chromosome (as well as LOD values below the single trait mapping threshold, \texttt{thr}). LOD support intervals are the most commonly used interval estimate for the location of a QTL. By setting to zero the LOD scores outside the LOD support interval we can considerably decrease the spread of the hotspot.
@@ -163,11 +159,11 @@ par(mar=c(4.1,4.1,0.1,0.1))
 plot(out1, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
 @ 
 \end{center}
-\caption{Hotspot architecture associated with QTL mapping threshold of \Sexpr{round(spt[5,], 2)} in example 1.}
+\caption{Hotspot architecture associated with QTL mapping threshold of \Sexpr{round(lod.thrs[5,], 2)} in example 1.}
 \label{plotex1counts}
 \end{figure}
 
-We plot the hotspot architecture inferred using the single trait permutation threshold \Sexpr{round(spt[5,], 2)} ($\alpha = 0.05$). Figure \ref{plotex1counts} shows the counts across the genome. Recall that in the call of function \texttt{include.hotspots} we set to simulate 3 hotspots: (1) a hotspot of size 100 at position 25cM of chromosome 2 with LOD scores around 2.5; (2) a hotspot of size 50 at position 75cM of chromosome 3 with LOD scores ranging from 5 to 8; and (3) a hotspot of size 20 at position 50cM of chromosome 4 with LOD scores ranging from 10 to 15. Nonetheless, Figure \ref{plotex1counts} shows several spurious peaks on chromosome 1, that arise because of the high correlation of the phenotypes.
+We plot the hotspot architecture inferred using the single trait permutation threshold \Sexpr{round(lod.thrs[5,], 2)} ($\alpha = 0.05$). Figure \ref{plotex1counts} shows the counts across the genome. Recall that in the call of function \texttt{include.hotspots} we set to simulate 3 hotspots: (1) a hotspot of size 100 at position 25cM of chromosome 2 with LOD scores around 2.5; (2) a hotspot of size 50 at position 75cM of chromosome 3 with LOD scores ranging from 5 to 8; and (3) a hotspot of size 20 at position 50cM of chromosome 4 with LOD scores ranging from 10 to 15. Nonetheless, Figure \ref{plotex1counts} shows several spurious peaks on chromosome 1, that arise because of the high correlation of the phenotypes.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -318,7 +314,7 @@ ncross2 <- sim.null.cross(chr.len = rep(100,4),
                           n.mar = 51, 
                           n.ind = 100,
                           type = "bc", 
-                          n.pheno = 1000, 
+                          n.phe = 1000, 
                           latent.eff = 0, 
                           res.var = 1, 
                           init.seed = 123457)
@@ -332,12 +328,11 @@ cross2 <- include.hotspots(cross = ncross2,
                            lod.range.2 = c(5, 8),
                            lod.range.3 = c(10, 15),
                            res.var = 1,
-                           nT = 1000,
+                           n.phe = 1000,
                            init.seed = 12345)
-nphe2 <- as.matrix(cross2$pheno)
-ncor2 <- cor(nphe2)
-ncor2 <- ncor2[lower.tri(ncor2)]
-summary(ncor2)
+ncor2 <- cor(cross2$pheno)
+summary(ncor2[lower.tri(ncor2)])
+rm(ncor2)
 scan2 <- scanone(cross2, pheno.col = 1:1000, method = "hk")
 scandrop2 <- set.to.zero.beyond.drop.int(chr = scan2[,1],
                                          scanmat = as.matrix(scan2[,-c(1,2)]), 
