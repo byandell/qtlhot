@@ -62,6 +62,16 @@ WW.perm <- function(scanmat, lod.thrs, n.perm, verbose = FALSE)
   max.WW
 }
 
+WW.perm.highlod <- function(highobj, lod.thrs, n.perm, verbose = FALSE)
+{
+  phenos <- sort(unique(highobj$highlod$pheno))
+  n.chrpos <- nrow(highobj$chr.pos)
+
+  ## Want to replace row in highobj$highlod with permuted row.
+  ## With separate permutation by pheno of seq(n.chrpos).
+  
+}
+
 WW.summary <- function(max.WW, alpha.levels)
 {
   nalpha <- length(alpha.levels)

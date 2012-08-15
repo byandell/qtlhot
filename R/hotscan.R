@@ -36,7 +36,7 @@ pull.hotspots <- function(cross, scan.hl, chr.pos = NULL, lod.thr = 5, slide.thr
     chr.pos <- get.chr.pos(cross)
 
   hotsize.highlod(list(highlod = scan.hl, chr.pos = chr.pos),
-                  lod.thr, slide.thr)
+                  lod.thr, NULL, slide.thr)
 }
 ###################################################################################################
 quant.slide <- function(max.lod.quant, lod.thrs, probs, level = 0.95, show.max = FALSE)

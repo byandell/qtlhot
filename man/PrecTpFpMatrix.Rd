@@ -64,7 +64,7 @@ only.
 Elias Chaibub Neto
 }
 \seealso{
-\code{\link{GetCandReg}}, \code{\link{CMSTTests}}
+\code{\link{GetCandReg}}, \code{\link{CMSTtests}}
 }
 \examples{
 \dontrun{

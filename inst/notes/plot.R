@@ -2,14 +2,10 @@
 ## PLOT OF HOTSPOTS
 ## vignette qtlhot: no parallel need
 scan1 <- scanone(cross1, pheno.col = 1:1000, method = "hk")
-scandrop1 <- set.to.zero.beyond.drop.int(chr = scan1[,1],
-                                         scanmat = as.matrix(scan1[,-c(1,2)]),
-                                         thr = min(lod.thrs),
-                                         drop = 1.5)
-counts1 <- t(count.thr(scandrop1, lod.thrs, droptwo = FALSE))
-out1 <- data.frame(scan1[, 1:2], counts1)
-class(out1) <- c("scanone", "data.frame")
-plot(out1, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
+high1 <- pull.highlods(scan1,, lod.thr = 3.47, drop.lod = 1.5)
+hots1 <- hotsize(high1, lod.thr = 3.47, window = 5, quant.level = NL.N.1)
+plot(hots1)
+
 ## Permutations
 NL.N.1 <- NL.N.perm(cross = cross1,
                       Nmax = 300,

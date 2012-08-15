@@ -21,46 +21,53 @@
 #           cat.scanone, get.tails, lod.quantile.permutation,
 #           make.max.N, make.maxlod, smooth.neqtl, lod.quantile.permutations.2
 ######################################################################
-
 ## see  ~/p/private/diabetes1/diabetes10/scan.perm/Rcode files
-pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5,
-                          extend = TRUE, restrict.lod = TRUE)
+pull.highlods <- function(scans, pheno.col, ...)
 {
-  if(missing(pheno.col))
-    pheno.col <- names(scans)[-(1:2)]
+  if(!missing(pheno.col))
+    scans <- scans[, c(1:2, pheno.col)]
+  highlod(scans, ...)
+}
+highlod <- function(scans, lod.thr = 0, drop.lod = 1.5,
+                    extend = TRUE, restrict.lod = FALSE, ...)
+{
+  pheno.col <- seq(ncol(scans) - 2)
+
+  if(is.null(lod.thr))
+    lod.thr <- 0
   
   ## Extract matrix of lod scores.
   x <- as.matrix(scans[,-(1:2), drop = FALSE])
 
   ## Keep only traits with some LOD above lod threshold.
-  keep <- apply(x, 2, function(x, lod) any(x >= lod), lod)
+  keep <- apply(x, 2, function(x, lod.thr) any(x >= lod.thr), lod.thr)
   x <- x[, keep, drop = FALSE]
   
   ## Find which values are at within drop.lod of maximum per chr and trait.
   if(restrict.lod) {
     ## Restrict to loci above LOD threshold.
     if(extend)
-      tmpfn <- function(x, lod, drop.lod) {
+      tmpfn <- function(x, lod.thr, drop.lod) {
         maxx <- max(x)
-        g <- (maxx >= lod) & (maxx < x + drop.lod)
+        g <- (maxx >= lod.thr) & (maxx < x + drop.lod)
         if(any(g)) {
           d <- diff(g)
           ## Add one more pseudomarker on either side if possible.
-          (g | (c(d,0) == 1) | (c(0,d) == -1)) & (x >= lod)
+          (g | (c(d,0) == 1) | (c(0,d) == -1)) & (x >= lod.thr)
         }
         else
           g
       }
     else
-      tmpfn <- function(x, lod, drop.lod) {
-        (max(x) <= x + drop.lod) & (x >= lod)
+      tmpfn <- function(x, lod.thr, drop.lod) {
+        (max(x) <= x + drop.lod) & (x >= lod.thr)
       }
   }
-  else {
+  else { ## Do not restrict support interval to be above lod.thr
     if(extend)
-      tmpfn <- function(x, lod, drop.lod) {
+      tmpfn <- function(x, lod.thr, drop.lod) {
         maxx <- max(x)
-        g <- (maxx >= lod) & (maxx < x + drop.lod)
+        g <- (maxx >= lod.thr) & (maxx < x + drop.lod)
         if(any(g)) {
           d <- diff(g)
           ## Add one more pseudomarker on either side if possible.
@@ -70,15 +77,15 @@ pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5,
           g
       }
     else
-      tmpfn <- function(x, lod, drop.lod) {
+      tmpfn <- function(x, lod.thr, drop.lod) {
         maxx <- max(x)
-        (maxx >= lod) & (maxx <= x + drop.lod)
+        (maxx >= lod.thr) & (maxx <= x + drop.lod)
       }
   }
-  lodint.pos <- function(x, chr, lod, drop.lod) {
-    unlist(tapply(x, chr, tmpfn, lod, drop.lod))
+  lodint.pos <- function(x, chr, lod.thr, drop.lod) {
+    unlist(tapply(x, chr, tmpfn, lod.thr, drop.lod))
   }
-  wh <- apply(x, 2, lodint.pos, scans$chr, lod, drop.lod)
+  wh <- apply(x, 2, lodint.pos, scans$chr, lod.thr, drop.lod)
   
   ## Get row and column indices.
   rr <- row(x)[wh]
@@ -91,9 +98,24 @@ pull.highlods <- function(scans, pheno.col, lod=4.5, drop.lod = 1.5,
   out <- list(highlod = cbind.data.frame(row = rr, phenos = pheno.col[cc], lod = lod),
               chr.pos = scans[,1:2])
   class(out) <- c("highlod", "list")
+  attr(out, "lod.thr") <- lod.thr
+  attr(out, "drop.lod") <- drop.lod
   out
 }
-
+print.highlod <- function(object, ...) print(summary(object, ...))
+summary.highlod <- function(object, ...)
+{
+  cat("frequency of high LOD entries by chromosome:\n")
+  print(addmargins(table(high1$chr.pos$chr[high1$highlod$row])))
+  cat("\nfrequency of high LOD entries per phenotype:\n")
+  print(table(table(high1$highlod$pheno)))
+  invisible()
+}
+plot.highlod <- function(x, ...)
+{
+  plot(hotsize(x, ...), ...)
+}
+###################################################################################
 sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
 {
   ic <- getsex(cross)$sex
@@ -264,7 +286,7 @@ make.maxlod <- function(cat.scan.hl, chr.pos)
 }
 
 smooth.neqtl <- function(cat.scan.hl, chr.pos, max.hl = make.maxlod(cat.scan.hl, chr.pos),
-                         lod.thr, window = 5)
+                         lod.thr = 0, window = 5)
 {
   chr <- chr.pos$chr
   pos <- chr.pos$pos

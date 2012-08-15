@@ -6,6 +6,19 @@
 useDynLib(qtlhot)
 export(add.phenos)
 
+export(pull.highlods)
+export(highlod)
+S3method(plot, highlod)
+S3method(summary, highlod)
+S3method(print, highlod)
+
+export(hotsize)
+S3method(hotsize, highlod)
+S3method(hotsize, scanone)
+S3method(plot, hotsize)
+S3method(summary, hotsize)
+S3method(print, hotsize)
+
 export(big.phase0)
 export(qtlhot.phase0)
 export(parallel.qtlhot)
@@ -21,7 +34,6 @@ export(include.hotspots)
 export(count.thr)
 export(set.to.zero.beyond.drop.int)
 export(filter.threshold)
-export(pull.highlods)
 export(lod.quantile.permutation)
 
 export(NL.N.permutations)

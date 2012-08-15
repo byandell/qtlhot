@@ -1,5 +1,6 @@
-\name{pull.highlods}
+\name{highlod}
 \alias{pull.highlods}
+\alias{highlod}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Pull high LOD values with chr and pos.
@@ -8,20 +9,21 @@ Pull high LOD values with chr and pos.
 Pull high LOD values with chr and pos.
 }
 \usage{
-pull.highlods(scans, pheno.col, lod = 4.5, drop.lod = 1.5,
-  extend = TRUE, restrict.lod = FALSE)
+pull.highlods(scans, pheno.col, ...)
+highlod(scans, lod.thr = 0, drop.lod = 1.5,
+  extend = TRUE, restrict.lod = FALSE, ...)
 }
 \arguments{
   \item{scans}{object of class \code{\link[qtl]{scanone}}}
   \item{pheno.col}{column numbers for phenotypes (all if missing)}
-  \item{lod}{LOD threshold}
+  \item{lod.thr}{LOD threshold}
   \item{drop.lod}{LOD drop from max to keep for support intervals}
   \item{extend}{extend support interval just past \code{drop.lod};
     matches behavior of \code{\link[qtl]{lodint}} when \code{TRUE}}
   \item{restrict.lod}{restrict to loci above LOD threshold if
-    \code{TRUE}, which important when searching for hotspots, but
-    probably not when finding peak overlap; matches behavior of
-    \code{\link[qtl]{lodint}} when \code{FALSE}}
+    \code{TRUE}; matches behavior of \code{\link[qtl]{lodint}} when
+    \code{FALSE} (default)}
+  \item{\dots}{arguments passed along}
 }
 \value{
   Data frame with
@@ -35,7 +37,7 @@ Brian S Yandell and Elias Chaibub Neto
 \examples{
 \dontrun{
 ## Used in Phase2 (big=TRUE) for parallel hotspot runs.
-per.scan.hl <- pull.highlods(per.scan, lod = lod.min,
+per.scan.hl <- pull.highlods(per.scan, lod.thr = lod.min,
   drop.lod = 1.5, restrict.lod = TRUE)
 }
 }
