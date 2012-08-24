@@ -53,16 +53,16 @@ exceed.thr <- function(x, y)
 #################################################################################
 get.hotspot <- function(filenames,
                         ## Following supplied in filenames[1].
-                        Nmax, out.sim)
+                        n.quant, out.sim)
 {
   ## filenames = list.files(".", paste(prefix, latent.eff, sets, "RData", sep = "."))
   ## latent.eff = 0, prefix = "Pilot", sets = "[0-9][0-9]*"
   
-  ## Get stored Nmax value, and out.sim to get alpha.levels and lod.thrs.
+  ## Get stored n.quant value, and out.sim to get alpha.levels and lod.thrs.
   load(filenames[1])
   nSim <- length(filenames)
-  Nmax <- Nmax ## Null action to make sure Nmax is valued.
-  Ns <- seq(Nmax)
+  n.quant <- n.quant ## Null action to make sure n.quant is valued.
+  s.quant <- seq(n.quant)
   tmp <- dimnames(out.sim$N.thrs)
   lod.thrs <- as.numeric(tmp[[1]])
   alpha.levels <- as.numeric(tmp[[2]])
@@ -73,13 +73,13 @@ get.hotspot <- function(filenames,
   
   ## outputs count the number of times we detected
   ## a hotspot using the respective method
-  outNL <- matrix(0, Nmax, nalpha)
+  outNL <- matrix(0, n.quant, nalpha)
   dimnames(outNL) <- list(NULL, alpha.levels)
   outN <- outWW <- matrix(0, nlod, nalpha)
   dimnames(outN) <- dimnames(outWW) <- list(lod.thrs, alpha.levels)
   
   ## we are saving the thresholds of each simulation
-  thrNL <- array(dim=c(Nmax, nalpha, nSim))
+  thrNL <- array(dim=c(n.quant, nalpha, nSim))
   thrN <- thrWW <- array(dim=c(nlod, nalpha, nSim))
   dimnames(thrN) <- dimnames(thrWW) <- list(lod.thrs, alpha.levels, NULL)
   dimnames(thrNL) <- list(NULL, alpha.levels, NULL)
@@ -97,7 +97,7 @@ get.hotspot <- function(filenames,
   }
   
   NL.err <- outNL/nSim
-  dimnames(NL.err) <- list(as.factor(Ns), as.factor(alpha.levels))
+  dimnames(NL.err) <- list(as.factor(s.quant), as.factor(alpha.levels))
   N.err <- outN / nSim
   dimnames(N.err) <- list(as.factor(lod.thrs), as.factor(alpha.levels))
   WW.err <- outWW / nSim
@@ -108,57 +108,56 @@ get.hotspot <- function(filenames,
 ########################################################################################
 filter.threshold <- function(cross, n.phe, latent.eff, res.var,
                              lod.thrs, drop = 1.5,
-                             Ns, n.perm, alpha.levels,
-                             NL.N.thrs = NL.N.permutations(cross, Ns, n.perm, alpha.levels,
-                               lod.thrs, verbose = verbose),
-                             WW.thrs = WW.permutations(scan.drop, lod.thrs, alpha.levels, n.perm),
+                             s.quant, n.perm, alpha.levels,
+                             qh.thrs = summary(hotperm(cross, max(s.quant), n.perm, alpha.levels,
+                               lod.thrs, verbose = verbose)),
+                             ww.thrs = summary(ww.perm(highobj, n.perm, lod.thrs, alpha.levels)),
                              verbose = FALSE)
 {
   mycat("scanone", verbose)
   scanmat <- scanone(cross, pheno.col=c(1:n.phe), method="hk")
-  chr <- scanmat[,1]
-  scanmat <- as.matrix(scanmat[, -(1:2), drop = FALSE])
-  
-  ## we use the lowest lod threshold in the LOD drop interval 
-  mycat("set.to.zero.beyond.drop.int", verbose)
-  scan.drop <- set.to.zero.beyond.drop.int(chr, scanmat, min(lod.thrs), drop)
 
-  ## computes an array of size Nmax by nalpha by npos.
-  ## showing for each Ns size and alpha level, the 
+  ## Reduce to high LOD scores.
+  mycat("highlod", verbose)
+  highobj <- highlod(scanmat, min(lod.thrs), drop, restrict.lod = TRUE)
+  rm(scanmat)
+  gc()
+  
+  ## computes an array of size n.quant by nalpha by npos.
+  ## showing for each s.quant size and alpha level, the 
   ## hotspot sizes at each genomic location.
   mycat("NL.counts", verbose)
-  NL.thrs <- NL.N.thrs[[1]]
-  N.thrs <- NL.N.thrs[[2]]
-  Nmax <- length(Ns)
-  NL <- NL.counts(scan.drop, Nmax, NL.thrs)
+  NL.thrs <- qh.thrs[[1]]
+  N.thrs <- qh.thrs[[2]]
+  n.quant <- length(s.quant)
+  NL <- NL.counts(highobj, n.quant, NL.thrs)
   
   ## computes a matrix of size nlod by npos.
   ## showing for each lod threshold the 
   ## hotspot sizes at each genomic location.
   mycat("N.WW.counts", verbose)
-  N.WW <- N.WW.counts(scan.drop, lod.thrs, N.thrs, WW.thrs)
+  N.WW <- N.WW.counts(highobj, lod.thrs, N.thrs, ww.thrs)
   
-  list(NL.thrs = NL.thrs, N.thrs = N.thrs, WW.thrs = WW.thrs, NL = NL,
+  list(NL.thrs = NL.thrs, N.thrs = N.thrs, WW.thrs = ww.thrs, NL = NL,
        N.counts = N.WW$N, WW.counts = N.WW$WW)
 }
 
-## Computes an array of size Nmax (number of spurious hotspots sizes) by 
+## Computes an array of size n.quant (number of spurious hotspots sizes) by 
 ## nalpha (number of significance levels) by npos (number of locus), and for
 ## each spurious hotspot size/significance level threshold, it computes the 
 ## number of traits mapping with LOD higher than the threshold at each one
 ## of the genomic positions.
 ##
-NL.counts <- function(scanmat, Nmax, NL.thrs)
+NL.counts <- function(highobj, n.quant, NL.thrs)
 {
   ## get the maximum spurious hotspot size (N-method) 
   ## for different QTL mapping significance levels
 
-  n.phe <- ncol(scanmat)
-
-  quants <- 1 - (seq(Nmax) - 1) / n.phe
-  XX <- apply(apply(scanmat, 1, quantile, quants), 1, max)
-  NL.counts <- apply(NL.thrs, 2, function(x,y) (x < y), XX)
-  ## dimnames(NL.counts)[[2]] <- seq(Nmax)
+  XX <- quantile(highobj, n.quant = n.quant)
+  NL.counts <- apply(NL.thrs, 2,
+                     function(x,y) (x < y[seq(x)]),
+                     XX)
+  ## dimnames(NL.counts)[[2]] <- seq(n.quant)
   NL.counts
 }
 
@@ -167,10 +166,10 @@ NL.counts <- function(scanmat, Nmax, NL.thrs)
 ## of traits mapping with LOD higher than the threshold at each one of
 ## the genomic positions. The same counts are used by the N- and WW-methods.
 ##
-N.WW.counts <- function(scanmat, lod.thrs, N.thrs, WW.thrs)
+N.WW.counts <- function(highobj, lod.thrs, N.thrs, WW.thrs)
 {
   ## XX = genome position by number of traits above LOD threshold.
-  XX <- apply(count.thr(scanmat, lod.thrs, FALSE), 1, max)
+  XX <- max(highobj, lod.thr = lod.thrs)
 
   ## N.counts[lod,alpha] = TRUE if max hotspot size using lod is above alpha perm threshold.
   N.counts <- apply(N.thrs, 2, function(x,y) (x < y), XX)
@@ -181,7 +180,7 @@ N.WW.counts <- function(scanmat, lod.thrs, N.thrs, WW.thrs)
 
   list(N = N.counts, WW = WW.counts)
 } 
-mycat <- function(title, verbose = FALSE, init = FALSE)
+mycat <- function(title, verbose = FALSE, init = FALSE, last = "\n")
 {
   if(verbose) {
     if(verbose > 1) {
@@ -190,6 +189,6 @@ mycat <- function(title, verbose = FALSE, init = FALSE)
       else
         cat(round(as.numeric(proc.time()[1:3])), "")
     }
-    cat(title, "\n")
+    cat(title, last)
   }
 }

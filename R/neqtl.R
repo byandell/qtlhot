@@ -45,7 +45,8 @@ smoothall <- function(themax, thechr, thepos, window=5)
 ## In theloc by=0.2 was outside the seq() function--moved it inside  ATB 12/15/09 ##
 smoothchr <- function(themax, thepos, window=5)
 {
-  theloc <- sort(unique(c(thepos, seq(0, max(thepos), by=0.2))))
+  ## theloc <- sort(unique(c(thepos, seq(0, max(thepos), by=0.2))))
+  theloc <- thepos
 
   temploc <- c(themax, theloc)
   tempval <- c(rep(1, length(themax)), rep(0, length(theloc)))

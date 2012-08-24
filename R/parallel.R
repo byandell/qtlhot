@@ -1,3 +1,4 @@
+## need to get rid of scandrop, zero, use highlod
 ######################################################################
 # parallel.R
 #
@@ -217,25 +218,25 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
 
   outfile <- paste("perm", ".", cross.index, "_", index, ".RData", sep = "")
 
-  ## Following is in NL.N.perm stuff.
+  ## Following is in hotperm stuff.
   ## filter.threshold is big loop. Have perm loop within it. n.phe*n.perm runs of scanone per dataset.
   ## For simulation study, have many datasets!
 
   ## Creates max.N of size n.perm x n.lod and max.lod.quant of size n.perm x Nmax.
   ## Size of n.perm determines the run time.
-  NLN <- NL.N.perm(cross, Nmax, n.perm, lod.thrs, drop = drop,
-                   verbose = verbose)
+  mycat("hotperm", verbose)
+  NLN <- hotperm(cross, Nmax, n.perm, alpha.levels, lod.thrs, drop, verbose)
 
   mycat("scanone", verbose)
   scanmat <- scanone(cross, pheno.col = seq(n.phe), method = "hk")
-  chr <- scanmat[,1]
-  scanmat <- as.matrix(scanmat[, -(1:2), drop = FALSE])
+
+  ## Reduce to high LOD scores.
+  mycat("highlod", verbose)
+  highobj <- highlod(scanmat, min(lod.thrs), drop, restrict.lod = TRUE)
+  rm(scanmat)
+  gc()
   
-  ## we use the lowest lod threshold in the LOD drop interval 
-  mycat("set.to.zero.beyond.drop.int", verbose)
-  scan.drop <- set.to.zero.beyond.drop.int(chr, scanmat, min(lod.thrs), drop)
-  
-  WW <- WW.perm(scan.drop, lod.thrs, n.perm)
+  WW <- ww.perm(highobj, n.perm, alpha.levels, lod.thrs, n.perm)
   
   save(NLN, WW, index, lod.thrs, alpha.levels, drop,
        file = outfile, compress = TRUE)
@@ -282,8 +283,11 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
   n.perms <- n.perm * n.split
   n.lod <- length(lod.thrs)
   
-  max.N <- max.WW <- matrix(NA, n.perms, n.lod)
-  max.lod.quant <- matrix(NA, n.perms, Nmax)
+  max.ww <- matrix(NA, n.perms, n.lod)
+  class(max.ww) <- c("ww.perm", class(max.ww))
+  qh.out <- list(max.lod.quant = matrix(NA, n.perms, Nmax),
+                 max.N = max.ww)
+  class(qh.out) <- c("hotperm", "list")
 
   i.perm <- seq(n.perm)
   for(i in seq(length(filenames))) {
@@ -291,21 +295,25 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
 
     ## Do any quality checking here.
     
-    max.N[i.perm, ] <- NLN$max.N
-    max.lod.quant[i.perm, ] <- NLN$max.lod.quant
-    max.WW[i.perm, ] <- WW
+    qh.out$max.N[i.perm, ] <- NLN$max.N
+    qh.out$max.lod.quant[i.perm, ] <- NLN$max.lod.quant
+    max.ww[i.perm, ] <- WW
     
     i.perm <- i.perm + n.perm
   }
+  attr(max.ww, "lod.thrs") <- lod.thrs
+  attr(max.ww, "alpha.levels") <- alpha.levels
+  attr(qh.out, "lod.thrs") <- lod.thrs
+  attr(qh.out, "alpha.levels") <- alpha.levels
 
-  NL.N.thrs <- NL.N.summary(max.lod.quant, max.N, alpha.levels)
-  WW.thrs <- WW.summary(max.WW, alpha.levels)
+  qh.thrs <- summary(qh.out, alpha.levels)
+  ww.thrs <- summary(max.ww, alpha.levels)
 
   ## Now compare permutations to original cross object from Phase1.
 
   out.sim <- filter.threshold(cross, n.phe, latent.eff, res.var,
                               lod.thrs, drop, seq(Nmax), n.perms, alpha.levels,
-                              NL.N.thrs, WW.thrs,
+                              qh.thrs, ww.thrs,
                               verbose)
 
   outfile <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")

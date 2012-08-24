@@ -18,11 +18,25 @@
 # Contains: hotsize, hotsize.scanone, hotsize.highlod,
 #           print.hotsize, summary.hotsize, plot.hotsize
 ######################################################################
+#############################################################################################################
+## Legacy routines to be purged.
+#############################################################################################################
+hotspot.scan <- function(cross, highobj, lod.thr = NULL, quant.level = NULL, window = NULL,
+                         verbose = FALSE)
+{
+  hotsize(highobj, lod.thr, window, quant.level)
+}
+#############################################################################################################
+hotspot.plot <- function(hotobj, quant.thr = NULL, maps = NULL, main = "")
+{
+  plot(hotobj, ..., by.chr = TRUE, quant.thr = quant.thr, maps = maps, title = main)
+}
+#############################################################################################################
 hotsize <- function(hotobject, ...) UseMethod("hotsize")
 
 hotsize.scanone <- function(hotobject, lod.thr = NULL, drop.lod = 1.5, ...)
 {
-  hotsize.highlod(highlod(hotobject, lod.thr, drop.lod), lod.thr, ...)
+  hotsize(highlod(hotobject, lod.thr, drop.lod), lod.thr, ...)
 }
 hotsize.highlod <- function(hotobject, lod.thr = NULL, window = NULL, quant.level = NULL, ...)
 {
@@ -31,14 +45,9 @@ hotsize.highlod <- function(hotobject, lod.thr = NULL, window = NULL, quant.leve
   
   scan <- hotobject$chr.pos
   
-  highlod <- hotobject$highlod
-  if(is.null(lod.thr))
-    lod.thr <- attr(hotobject, "lod.thr")
-  
-  if(!is.null(lod.thr)) {
-    highlod <- highlod[highlod$lod >= lod.thr,, drop = FALSE]
-    attr(scan, "lod.thr") <- lod.thr
-  }
+  highlod <- highlod.thr(hotobject, lod.thr)
+  attr(scan, "lod.thr") <- highlod$lod.thr
+  highlod <- highlod$highlod
   
   if(!nrow(highlod))
     return(NULL)
@@ -54,7 +63,7 @@ hotsize.highlod <- function(hotobject, lod.thr = NULL, window = NULL, quant.leve
   if(!is.null(window)) {
     window <- round(window)
     if(window > 0) {
-      scan$max.N.window <- smooth.neqtl(highlod, chr.pos, window = window)$nqtl
+      scan$max.N.window <- smooth.neqtl(highlod, scan, window = window)$nqtl
       attr(scan, "window") <- window
     }
   }
@@ -70,8 +79,6 @@ hotsize.highlod <- function(hotobject, lod.thr = NULL, window = NULL, quant.leve
       index <- rep(TRUE, nrow(highlod))
       hot.size <- rep(0, nrow(scan))
       for(hot.crit in rev(seq(length(quant.level)))) {
-        if(verbose)
-          cat(hot.crit, "\n")
         above <- highlod$lod[index] >= quant.level[hot.crit]
         if(!any(above))
           break;
@@ -115,31 +122,124 @@ summary.hotsize <- function(object, ...)
   NextMethod(object, format = format, ...)
 }    
 #############################################################################################
-plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(c(1, length(quant.level))),
-             col = 1:3, ...)
+plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
+                         col = c("black","red","blue"), by.chr = FALSE, maps = NULL,
+                         quant.thr = NULL, title = "", ...)
 {
+  if(by.chr) {
+    for(i in levels(x$chr)) {
+      tmp <- x$chr == i
+      if(any(tmp))
+        plot(x[tmp,], ylab, col = col, quant.thr = quant.thr,
+             title = paste("chr", i), ...)
+
+      if(!is.null(maps) & by.chr)
+        add.rug(i, "", maps, use.cM = TRUE)
+  
+    }
+  }
+
   ## Use NextMethod, but repeatedly.
   class(x) <- class(x)[-1]
   ## max.N
   plot(x, lodcolumn = 1, ylab = ylab, col = col[1], ...)
+  if(title != "")
+    title <- paste("raw (", col[1], ")", sep = "")
 
   ## max.N.window
   window <- attr(x, "window")
   if(!is.null(window)) {
-    plot(x, lodcolumn = 2, col = col[2], ...)
+    plot(x, lodcolumn = 2, col = col[2], add = TRUE, ...)
+    if(title != "")
+      title <- paste(title, " smoothed(", col[2], ")", sep = "")
   }
 
+  if(!is.null(quant.thr))
+    abline(h = quant.thr, lwd = 2, lty = 2, col = col[2])
+  
   ## quant
   quant.level <- attr(x, "quant.level")
   if(!is.null(quant.level)) {
     plot(x, lodcolumn = match("quant", names(x)) - 2, col = col[3],
                  add = TRUE, ...)
+    if(title != "")
+      title <- paste(title, " sliding(", col[3], ")", sep = "")
 
     ## Add right axis for quantile LOD level.
     if(length(quant.axis)) {
+      quant.axis <- pmax(1, quant.axis)
       axis(4, at = quant.axis, label = round(quant.level[quant.axis], 1), las = 1, cex = 0.35)
-      mtext("sliding LOD thresholds", 4, 1, cex = 1.5)
+      ## mtext("sliding LOD thresholds", 4, 1, cex = 1.5)
     }
   }
+  if(title != "")
+    mtext(title, 3, 1, cex = 1.5)
   invisible()
+}
+###################################################################################
+smooth.neqtl <- function(highobj, chr.pos, lod.thr = 0, window = 5)
+{
+  chr <- chr.pos$chr
+  pos <- chr.pos$pos
+  n.chr <- levels(chr.pos$chr)
+
+  max.hl <- make.maxlod(highobj, chr.pos)
+  maxlod.thr.pos <- max.hl$pos
+  for(k in seq(along=n.chr))
+    maxlod.thr.pos[[k]] <- max.hl$pos[[k]][max.hl$lod[[k]] >= lod.thr]
+  
+  out <- smoothall(maxlod.thr.pos,thechr = chr.pos$chr, thepos = chr.pos$pos, window = window)
+  ## Recover marker information.
+  rownames(out) <- rownames(chr.pos)
+  out
+}
+###################################################################################
+make.maxlod <- function(highobj, chr.pos)
+{
+  ## find high LOD and position per chromosome.
+  n.chr <- levels(chr.pos$chr)
+
+  tmpfn <- function(x) {
+    if(is.null(x))
+      0
+    else
+      max(x, na.rm = TRUE)
+  }
+  tmpfn2 <- function(x) {
+    if(is.null(x))
+      NA
+    else
+      median(x, na.rm=TRUE)
+  }
+  tmpfn3 <- function(a) {
+    is.nan(a) | a==max(a, na.rm=TRUE)
+  }
+
+  ## Highlod chromosome. Create it if not supplied.
+  hl.chr <- highobj$chr
+  if(is.null(hl.chr))
+    hl.chr <- chr.pos$chr[highobj$row]
+  
+  maxlod.hl <- maxlod.pos.hl <- vector("list", length(n.chr))
+  names(maxlod.pos.hl) <- n.chr
+  for(k in seq(along=n.chr)) {
+    ## Subset on chromosome.
+    is.chr <- hl.chr == n.chr[k]
+    scan.out.bychr <- highobj[is.chr, ]
+    
+    ## This is kludgey. How to make more efficient?
+    scan.out.bychr$phenos <- ordered(scan.out.bychr$phenos, unique(scan.out.bychr$phenos))
+    tmp <- unlist(tapply(scan.out.bychr$lod, scan.out.bychr$phenos, tmpfn3))
+    if(any(tmp)) {
+      scan.out.bychr <- scan.out.bychr[tmp,]
+      pos <- chr.pos$pos[highobj$row[is.chr]][tmp]
+      
+      scan.out.bychr$phenos <- ordered(scan.out.bychr$phenos, unique(scan.out.bychr$phenos))
+      ## Find high lod.
+      maxlod.hl[[k]] <- tapply(scan.out.bychr$lod, scan.out.bychr$phenos, tmpfn)
+      ## Find position of high lod.
+      maxlod.pos.hl[[k]] <- tapply(pos, scan.out.bychr$phenos, tmpfn2)
+    }
+  }
+  list(lod = maxlod.hl, pos = maxlod.pos.hl)
 }

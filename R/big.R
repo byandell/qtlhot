@@ -85,7 +85,7 @@ big.phase0 <- function(dirpath, cross, trait.file, trait.matrix,
 }
 #############################################################################################
 big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
-                       cross, lod.thrs, Nmax = 2000, n.perm = 1, n.split = 1,
+                       cross, lod.thrs, n.quant = 2000, n.perm = 1, n.split = 1,
                        batch.effect = NULL,
                        drop.lod = 1.5, lod.min = min(lod.thrs),
                        window = 5, seed = 0, big = TRUE, ...,
@@ -128,7 +128,7 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
   ## Big assumes n.split is n.perm and does one perm each run.
   n.split <- max(1, n.perm)
   
-  save(cross, n.perm, seeds, Nmax, drop.lod, lod.thrs, lod.min, batch.effect,
+  save(cross, n.perm, seeds, n.quant, drop.lod, lod.thrs, lod.min, batch.effect,
        trait.index, trait.names, all.traits, size.set, ## From Trait.0.RData
        window, cross.index, n.split, big,
        file = "Phase1.RData", compress = TRUE)
@@ -138,7 +138,7 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
 big.phase2 <- function(dirpath = ".", index, ...,
                        ## Following are loaded with Phase1.RData created in big.phase1.
                        batch.effect, all.traits, trait.index, lod.min,
-                       drop.lod, Nmax, lod.thrs, cross.index, seeds,
+                       drop.lod, n.quant, lod.thrs, cross.index, seeds,
                        ##
                        remove.files = TRUE, verbose = FALSE)
 {
@@ -159,7 +159,7 @@ big.phase2 <- function(dirpath = ".", index, ...,
   if(index <= 1) {
     ## Original data.
     do.big.phase2(dirpath, cross, covars, perms, 1, trait.index,
-                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index, verbose)
+                  lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index, verbose)
   }
   else {
     ## Random permutation. Use preset seed if provided.
@@ -173,11 +173,11 @@ big.phase2 <- function(dirpath = ".", index, ...,
     cross$pheno <- cross$pheno[perms,]
 
     do.big.phase2(dirpath, cross, covars, perms, index, trait.index,
-                  lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index, verbose)
+                  lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index, verbose)
   }
 }
 do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
-                          lod.min, drop.lod, remove.files, Nmax, lod.thrs, window, n.traits, cross.index,
+                          lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index,
                           verbose,
                           ## Following supplied by Trait.*.RData created in big.phase0.
                           trait.data, offset, pheno.set)
@@ -203,7 +203,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
     per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
                         addcovar=covars$addcovar, intcovar=covars$intcovar)
 
-    per.scan.hl <- pull.highlods(per.scan, lod = lod.min, drop.lod = drop.lod,
+    per.scan.hl <- highlod(per.scan, lod = lod.min, drop.lod = drop.lod,
                                  restrict.lod = TRUE)$highlod
 
     save(per.scan.hl, perms,
@@ -220,9 +220,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
   if(remove.files)
     file.remove(dirpath, filenames)
   
-  ## Has some problem with missing values for (any(diff(pos) < 0)) in runningmean.
-  ## problem is in calc of maxlod.hl[[k]]: NA should be 0
-  lod.sums <- lod.quantile.permutation(scan.hl,Nmax,lod.thrs,window,chr.pos,n.traits)
+  lod.sums <- lod.quantile.perm(scan.hl,n.quant,lod.thrs,window,chr.pos,n.traits)
   
   save(scan.hl, lod.sums, cross.index, index,
        file = paste("perm", ".", cross.index, "_", index, ".RData", sep = ""))
@@ -230,7 +228,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
 #############################################################################################
 big.phase3 <- function(dirpath = ".", index, cross.index, ...,
                        ## Following are loaded with Phase1.RData created in big.phase1.
-                       n.perm, lod.thrs, Nmax, lod.sums,
+                       n.perm, lod.thrs, n.quant, lod.sums,
                        ##
                        outfile = phase3name, verbose = FALSE)
 {
@@ -254,7 +252,7 @@ big.phase3 <- function(dirpath = ".", index, cross.index, ...,
   
   n.thrs <- length(lod.thrs)
   
-  max.lod.quant <- matrix(NA, n.file, Nmax)
+  max.lod.quant <- matrix(NA, n.file, n.quant)
   max.N <- max.N.window <- matrix(NA, n.file, n.thrs)
 
   for(i.perm in seq(n.file)) {
@@ -265,8 +263,15 @@ big.phase3 <- function(dirpath = ".", index, cross.index, ...,
     attach(file.path(dirpath, filenames[i.perm]), warn.conflicts = FALSE)
     n.quant <- length(lod.sums$max.lod.quant)
     max.lod.quant[i.perm, seq(n.quant)] <- lod.sums$max.lod.quant
-    max.N[i.perm,] <- lod.sums$max.N$max.N
-    max.N.window[i.perm,] <- lod.sums$max.N$max.N.win
+    ## legacy adjustment
+    if(length(lod.sum$max.N) == 2) {
+      max.N[i.perm,] <- lod.sums$max.N$max.N
+      max.N.window[i.perm,] <- lod.sums$max.N$max.N.win
+    }
+    else {
+      max.N[i.perm,] <- lod.sums$max.N
+      max.N.window[i.perm,] <- lod.sums$max.N.window
+    }
     detach()
   }
   phase3name <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")

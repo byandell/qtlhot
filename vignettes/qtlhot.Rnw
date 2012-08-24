@@ -151,84 +151,55 @@ We plot the hotspot architecture inferred using the single trait permutation thr
 \end{Sinput}
 \end{Schunk}
 
-Next, we perform permutation tests to assess the statistical significance of the hotspots detected on Figure \ref{plotex1counts}. We start with the $Q$-method permutations. The \texttt{WW.perm} function implements the $Q$-method's permutation scheme (see the Method's section of Chaibub Neto et a. 2012, for details). The \texttt{n.perm} parameter specifies the number of simulations. Here we set it to 100 in order to save time. In practice, we recommend at least 1,000 permutations. The function's output is a matrix with 100 rows representing the permutations, and 10 columns representing the QTL mapping thresholds. Each entry $ij$, represents the maximum number of significant linkages across the entire genome detected at permutation $i$, using the LOD threshold $j$. The \texttt{WW.summary} function computes the Q-method's hotspot size permutation thresholds, that is, the $1-\alpha$ quantiles for each one of the QTL mapping LOD thrsholds in \texttt{lod.thrs}. For instance, the entry at row 10 and column 1 of the \texttt{Q.1.thr} matrix tells us that the 99\% percentile of the permutation distribution of genome wide maximum hotspot size based on a QTL mapping threshold of 2.11 is 27.00. In other words, any hotspot greater than 27 is considered statistically significant at a 0.01 significance level when QTL mapping is done using a 2.11 LOD threshold.
+Next, we perform permutation tests to assess the statistical significance of the hotspots detected on Figure \ref{plotex1counts}. We consider the $N$- and $NL$-methods. [The $Q$ method of West and Wu is documented in the \texttt{ww.perm} manual page.] The \texttt{hotperm} function implements the $N$- and $NL$-methods' permutation schemes (see Chaibub Neto et al. 2012, for details). The parameter \texttt{n.quant} sets the maximum hotspot size to be analyzed by the $NL$-method. The parameter \texttt{drop} controls the magnitude of the LOD support interval computation during the LOD profile processing step. The function's output is a list with two elements: \texttt{max.lod.quant} and \texttt{max.N}.
 
 <<echo=FALSE>>=
-if(!exists("Q.1")) {
+if(!exists("hotperm1")) {
   set.seed(12345)
-  Q.1 <- WW.perm(scanmat = scandrop1,
-                 lod.thrs = lod.thrs,
-                 n.perm = 100,
-                 verbose = FALSE)
+  hotperm1 <- hotperm(cross = cross1,
+                  n.quant = 300,
+                  n.perm = 100,
+                  lod.thrs = lod.thrs,
+                  alpha.levels = alphas,
+                  drop.lod = 1.5,
+                  verbose = FALSE)
 }
 @
 \begin{Schunk}
 \begin{Sinput}
 > set.seed(12345)
-> Q.1 <- WW.perm(scanmat = scandrop1,
-+              lod.thrs = lod.thrs,
-+              n.perm = 100,
-+              verbose = FALSE)
+> hotperm1 <- hotperm(cross = cross1,
++                 n.quant = 300,
++                 n.perm = 100,
++                 lod.thrs = lod.thrs,
++                 alpha.levels = alphas,
++                 drop.lod = 1.5,
++                 verbose = FALSE)
 \end{Sinput}
 \end{Schunk}
 <<>>=
-Q.1.thr <- WW.summary(Q.1, alphas)
-Q.1.thr
-@
-
-In general, we are often interested in using the same error rates for the QTL mapping and hotspot analysis. That is, if we adopt a QTL mapping threshold that controls GWER at a 1\% level (in our case, 3.11) we will also want to consider $\alpha = 0.01$ for the hotspot analysis, leading to a hotspot threshold of 12.00. Therefore, we are usually more interested in the diagonal of ``Q.1.thr". For the hotspots depicted in Figure \ref{plotex1counts}, we adopted a GWER of 5\%, and the corresponding $Q$-method's permutation threshold is 18. According to this threshold, all hotspots on Figure \ref{plotex1counts} are significant.
-
-<<>>=
-diag(Q.1.thr)
-@
-
-Next we consider the $N$- and $NL$-methods. The \texttt{NL.N.perm} function implements the $N$- and $NL$-methods' permutation schemes (see Chaibub Neto et al. 2012, for details). The parameter \texttt{Nmax} sets the maximum hotspot size to be analyzed by the $NL$-method. The parameter \texttt{drop} controls the magnitude of the LOD support interval computation during the LOD profile processing step. The function's output is a list with two elements: \texttt{max.lod.quant} and \texttt{max.N}.
-
-<<echo=FALSE>>=
-if(!exists("NL.N.1")) {
-  set.seed(12345)
-  NL.N.1 <- NL.N.perm(cross = cross1,
-                      Nmax = 300,
-                      n.perm = 100,
-                      lod.thrs = lod.thrs,
-                      drop = 1.5,
-                      verbose = FALSE)
-}
-@
-\begin{Schunk}
-\begin{Sinput}
-> set.seed(12345)
-> NL.N.1 <- NL.N.perm(cross = cross1,
-+                    Nmax = 300,
-+                    n.perm = 100,
-+                    lod.thrs = lod.thrs,
-+                    drop = 1.5,
-+                    verbose = FALSE)
-\end{Sinput}
-\end{Schunk}
-<<>>=
-names(NL.N.1)
+names(hotperm1)
 @
 
 
 The \texttt{max.lod.quant} object stores the output of the $NL$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 300 columns representing the hotspot sizes analyzed. Entry $ij$ stores the maximum genome wide $qLOD(n)$ value computed at permutation $i$ using the QTL mapping threshold $j$. The statistic $qLOD(n)$ corresponds to the $n$th LOD score in a sample ordered from highest to lowest. For instance, consider the first 10 lines and 8 columns of \texttt{max.lod.quant}. At the 6th permutation, we have that the maximum LOD score across the genome is 3.58, the second maximum across the genome is 3.55, and so on.
 
 <<>>=
-NL.N.1[[1]][1:10, 1:8]
+hotperm1[[1]][1:10, 1:8]
 @
 
 The \texttt{max.N} stores the output of the $N$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 10 columns representing the QTL mapping thresholds. Entry $ij$ stores the maximum genome wide hotspot size detected at permutation $i$ using the QTL mapping threshold $j$. For illustration we show it's first 12 lines (note that we are transposing the output).
 
 <<>>=
-t(NL.N.1[[2]][1:12,])
+t(hotperm1[[2]][1:12,])
 @
 
-The \texttt{NL.N.summary} function computes the $N$- and $NL$-method's hotspot size permutation thresholds.
+The \texttt{summary} method for \texttt{hotperm} computes the $N$- and $NL$-method's hotspot size permutation thresholds.
 
 <<>>=
-NL.N.1.thrs <- NL.N.summary(NL.N.1[[1]], NL.N.1[[2]], alphas)
-NL.1.thr <- NL.N.1.thrs[[1]]
-N.1.thr <- NL.N.1.thrs[[2]]
+hotperm1.thrs <- summary(hotperm1)
+NL.1.thr <- hotperm1.thrs[[1]]
+N.1.thr <- hotperm1.thrs[[2]]
 @
 
 The \texttt{N.1.thr} object is a 10 by 10 matrix with rows indexing the QTL mapping thresholds and columns indexing the target genome wide error rates. Each entry $ij$ shows the hotspot size above which a hotspot is considered significant at a GWER $j$ using the QTL mapping threshold $i$. As before, our interest focus on the diagonal, and the $N$-method's threshold that controls the hotspot GWER at a 5\% level when the QTL mapping was controlled at a GWER of 5\% is 200.55. Note that according to the $N$-method, none of the hotspots on Figure \ref{plotex1counts} is significant.
@@ -270,7 +241,7 @@ To visualize these results, we plot on Figure \ref{plotex1slidingbar} the hotspo
 \begin{Schunk}
 \begin{Sinput}
 > N.1 <- round(N.1.thr[5, 5])
-. sliding.bar.plot(scan = data.frame(scan1[, 1:2], scandrop1),
+> sliding.bar.plot(scan = data.frame(scan1[, 1:2], scandrop1),
 +                 lod.thr = NL.1.thr[1:N.1, 5],
 +                 size.thr = 1:N.1,
 +                 gap = 50,
@@ -282,6 +253,21 @@ To visualize these results, we plot on Figure \ref{plotex1slidingbar} the hotspo
 Figure \ref{plotex1slidingbar} depicts a sliding window of hotspot size thresholds ranging from $n=1,\ldots,N$, where $N=201$ corresponds to the (approximate) hotspot size threshold derived from the $N$-method. For each genomic location this figure shows the hotspot sizes at which the hotspot was significant, that is, at which the hotspot locus had more traits than the hotspot size threshold on the left mapping to it with a LOD score higher than the threshold on the right than expected by chance. For example, the hotspot on chromosome 3 was significant up to size 20, meaning that more than 1 trait mapped to the hotspot locus with LOD higher than 3.99, more than 11 traits mapped to the hotspot locus with LOD higher than 3.36, and so on up to hotspot size 49 where more than 49 traits mapped to the hotspot locus with LOD higher than 2.84.
 
 Contrary to the $Q$-method that detected all the hotspots on Figure \ref{plotex1counts} as significant (including the spurious hotspots on chromosome 1), and the $N$-method that did not detect any hotspots, the $NL$-method's sliding window correctly detected the simulated hotspots and showed that the apparent hotspots on chromosome 1 were noisy artifacts.
+
+Here is another way to visualize this, using the sliding LOD threshold. We will also show a 5-cM smoothign window applied to the counts. Note that with the blue curve, no hotspots are detected on chr 1, and hotspots of size 20 are found on chr 2 and 4, with a large hotspot of size 50 on chr 3.
+
+\begin{figure}[!ht]
+\begin{center}
+<<label=plotex1quant,fig=TRUE>>=
+<<fig=TRUE>>=
+quant1 <- hotsize(high1, lod = lod.thr, window = 5, quant = quantile(hotperm1)$quant)
+plot(quant1)
+summary(quant1)
+@ 
+\caption{Hotspot size significance profile at 5\% level for example 1. Black is raw counts, red is counts smoothed over a 5cM window, blue is the sliding LOD threshold approach.}
+\label{plotex1slidingbar}
+\end{center}
+\end{figure}
 
 \section{Example with Uncorrelated Phenotypes}
 
@@ -328,56 +314,37 @@ plot(counts2, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
 \end{figure}
 
 <<echo=FALSE>>=
-if(!exists("Q.2")) {
+if(!exists("hotperm2")) {
   set.seed(12345)
-  Q.2 <- WW.perm(scanmat = scandrop2, 
-                 lod.thrs = lod.thrs, 
-                 n.perm = 100, 
-                 verbose = FALSE)
+  hotperm2 <- hotperm(cross = cross2, 
+                  n.quant = 300, 
+                  n.perm = 100, 
+                  lod.thrs = lod.thrs, 
+                  alpha.levels = alphas,
+                  drop.lod = 1.5, 
+                  verbose = FALSE) 
 }
 @
 \begin{Schunk}
 \begin{Sinput}
 > set.seed(12345)
-> Q.2 <- WW.perm(scanmat = scandrop2, 
-+                 lod.thrs = lod.thrs, 
+> hotperm2 <- hotperm(cross = cross2, 
++                 n.quant = 300, 
 +                 n.perm = 100, 
-+                 verbose = FALSE)
++                 lod.thrs = lod.thrs, 
++                 alpha.levels = alphas,
++                 drop.lod = 1.5, 
++                 verbose = FALSE) 
 \end{Sinput}
 \end{Schunk}
 <<>>=
-Q.2.thr <- WW.summary(Q.2, alphas)
-@ 
-<<echo=FALSE>>=
-if(!exists("NL.N.2")) {
-  set.seed(12345)
-  NL.N.2 <- NL.N.perm(cross = cross2, 
-                      Nmax = 300, 
-                      n.perm = 100, 
-                      lod.thrs = lod.thrs, 
-                      drop = 1.5, 
-                      verbose = FALSE) 
-}
-@
-\begin{Schunk}
-\begin{Sinput}
-> set.seed(12345)
-> NL.N.2 <- NL.N.perm(cross = cross2, 
-+                      Nmax = 300, 
-+                      n.perm = 100, 
-+                      lod.thrs = lod.thrs, 
-+                      drop = 1.5, 
-+                      verbose = FALSE) 
-\end{Sinput}
-\end{Schunk}
-<<>>=
-NL.N.2.thrs <- NL.N.summary(NL.N.2[[1]], NL.N.2[[2]], alphas)
-NL.2.thr <- NL.N.2.thrs[[1]]
-N.2.thr <- NL.N.2.thrs[[2]]
+hotperm2.thrs <- summary(hotperm2)
+NL.2.thr <- hotperm2.thrs[[1]]
+N.2.thr <- hotperm2.thrs[[2]]
 @
 <<echo=FALSE>>=
 if(!file.exists("savedperms.RData"))
-  save(pt, Q.1, NL.N.1, Q.2, NL.N.2, file = "savedperms.RData", compress = TRUE)
+  save(pt, hotperm1, hotperm2, file = "savedperms.RData", compress = TRUE)
 @
 
 The $Q$-method thresholds are quite similar to the previous example. This is not unexpected since the number of significant linkages detected in examples 1 and 2 were similar (respectively, 1438 and 1413 for a LOD threshold of 2.44), and the $Q$-method thresholds are a function of the number of significant QTLs (the higher the number of significant linkages, the higher the threshold) and not of the correlation among the phenotypes.
@@ -413,7 +380,7 @@ sliding.bar.plot(scan = data.frame(scan2[, 1:2], scandrop2),
 Figure \ref{plotex2slidingbar} presents the hotspot significance profile targeting 5\% GWER. For this second example, all methods correctly detected the simulated hotspots.
 
 <<label=plotex2sigct,width=6,height=6,fig=TRUE,echo=TRUE,include=FALSE>>=
-hot.scan2 <- qtlhot.scan(cross2, scan2, NL.N.2$max.lod.quant, lod.thrs, probs = seq(.01, .1, by = .01), level = 0.05)
+hot.scan2 <- qtlhot.scan(cross2, scan2, hotperm2$max.lod.quant, lod.thrs, probs = seq(.01, .1, by = .01), level = 0.05)
 par(mar = c(4.1,4.1,0.1,4.1))
 plot(out2, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
 plot(hot.scan2, lodcolumn = 2, add = TRUE, col = "red")

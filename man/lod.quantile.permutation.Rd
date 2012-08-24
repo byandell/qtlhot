@@ -1,5 +1,5 @@
-\name{lod.quantile.permutation}
-\alias{lod.quantile.permutation}
+\name{lod.quantile.perm}
+\alias{lod.quantile.perm}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Conduct permutations of LOD quantiles.
@@ -8,13 +8,13 @@ Conduct permutations of LOD quantiles.
 Conduct permutations of LOD quantiles.
 }
 \usage{
-lod.quantile.permutation(cat.scan.hl, N, lod.thr, window, chr.pos, n.phe)
+lod.quantile.permutation(highobj, n.quant, lod.thr, window, chr.pos, n.phe)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cat.scan.hl}{data frame with \code{row} index and high LOD interval
+  \item{highobj}{data frame with \code{row} index and high LOD interval
     retained by \code{\link{pull.highlods}}}
-  \item{N}{maximum size of hotspot examined (Nmax elsewhere)}
+  \item{n.quant}{maximum size of hotspot examined}
   \item{lod.thr}{vector of LOD thresholds}
   \item{window}{size of window (in cM) for running mean}
   \item{chr.pos}{data frame with \code{chr} and \code{pos} including pseudo-markers}
@@ -22,8 +22,10 @@ lod.quantile.permutation(cat.scan.hl, N, lod.thr, window, chr.pos, n.phe)
 }
 \value{
   List with items
-  \item{max.lod.quant}{}
-  \item{max.N}{list containing \code{max.N} and \code{max.N.window}}
+  \item{max.N}{vector of maximum number of traits above each value of \code{lod.thr}}
+  \item{max.N.window}{version of \code{max.N} smoothed by \code{window}}
+  \item{max.lod.quant}{vector of \code{LOD} quantiles by hotspot size
+    from 1 up to \code{min(n.quant, max.N)}}
 }
 \references{
 Chaibub Neto E, Keller MP, Broman AF, Attie AD, Jansen RC, Broman KW,
