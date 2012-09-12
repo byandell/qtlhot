@@ -53,6 +53,8 @@ Brian S Yandell and Elias Chaibub Neto
 \examples{
 example(include.hotspots)
 scan1 <- scanone(cross1, pheno.col = 1:1000, method = "hk")
-high1 <- highlod(scan1, lod.thr = 3.48, drop.lod = 1.5)
+high1 <- highlod(scan1, lod.thr = 2.11, drop.lod = 1.5)
+summary(high1, lod.thr = 2.44)
+max(high1, lod.thr = seq(2.11, 3.11, by = .1))
 }
 \keyword{utilities}

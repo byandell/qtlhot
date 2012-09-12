@@ -59,5 +59,6 @@ Brian S Yandell and Elias Chaibub Neto
 example(highlod)
 hots1 <- hotsize(high1)
 summary(hots1)
+plot(hots1)
 }
 \keyword{utilities}

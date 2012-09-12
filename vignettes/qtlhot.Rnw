@@ -111,6 +111,7 @@ if(!exists("pt")) {
 > pt <- scanone(ncross1, method = "hk", n.perm = 1000)
 \end{Sinput}
 \end{Schunk}
+
 <<>>=
 alphas <- seq(0.01, 0.10, by=0.01)
 lod.thrs <- summary(pt, alphas)
@@ -118,25 +119,31 @@ lod.thrs
 lod.thr <- lod.thrs[5]
 @
 
-We perform QTL mapping analysis for 1,000 phenotypes using Haley-Knott regression, and keep only the \texttt{drop.lod} = 1.5 LOD support interval (Manichaikul et al. 2006) around significant peaks (above \texttt{lod.thr}) at each chromosome for each trait. LOD support intervals are the most commonly used interval estimate for the location of a QTL. The routine \texttt{highlod} just saves the LOD support intervals for significant peaks, which dramatically reduces the object size from the result of \texttt{scanone}.
+We perform QTL mapping analysis for 1,000 phenotypes using Haley-Knott regression, and keep only the \texttt{drop.lod} = 1.5 LOD support interval (Manichaikul et al. 2006) around significant peaks (above \texttt{lod.thr}) at each chromosome for each trait. LOD support intervals are the most commonly used interval estimate for the location of a QTL.
 
 <<>>=
 scan1 <- scanone(cross1, pheno.col = 1:1000, method = "hk")
-high1 <- highlod(scan1, lod.thr = lod.thr, drop.lod = 1.5)
 @
 
-Next we infer the hotspot architecture at varying QTL mapping thresholds. In other words, for each genomic position, we count the number of traits that map to it with a LOD score equal or higher than the threshold in \texttt{lod.thrs}. The \texttt{counts1} object is a matrix with 204 rows representing the genetic markers, and 10 columns representing the varying QTL mapping thresholds. As an illustration, we show the counts for the 5 first markers on chromosome 2. The first column gives the counts associated with QTL mapping threshold of 3.11, whereas the last one shows the counts based on the more liberal threshold 2.11. Note how the counts increase as the QTL mapping thresholds decrease.
+The routine \texttt{highlod} just saves the LOD support intervals for significant peaks, which dramatically reduces the object size from the result of \texttt{scanone}. We can examine the maximum hotspot size for each possible single trait threshold using the \texttt{max} method for \texttt{highlod} objects. The first column gives the counts associated with QTL mapping threshold of 3.11, whereas the last one shows the counts based on the more liberal threshold 2.11. Note how the counts increase as the QTL mapping thresholds decrease.
 
 <<>>=
-counts1 <- hotsize(high1)
-summary(counts1)
+high1 <- highlod(scan1, lod.thr = min(lod.thrs), drop.lod = 1.5)
+max(high1, lod.thr = lod.thrs)
+@
+
+Next we infer the hotspot architecture at varying QTL mapping thresholds. In other words, for each genomic position, we count the number of traits that map to it with a LOD score equal or higher than the threshold in \texttt{lod.thr}. The \texttt{hots1} object is a \texttt{scanone} object with added attributes and specialized summary and plot methods. As an illustration, we show the counts for the 5 first markers on chromosome 2.
+
+<<>>=
+hots1 <- hotsize(high1, lod.thr = lod.thr)
+summary(hots1)
 @
 
 \begin{figure}[!ht]
 \begin{center}
 <<label=plotex1counts,width=6,height=6,fig=TRUE,echo=FALSE>>=
 par(mar=c(4.1,4.1,0.1,0.1))
-plot(counts1, cex.lab = 1.5, cex.axis = 1.5)
+plot(hots1, cex.lab = 1.5, cex.axis = 1.5)
 @ 
 \end{center}
 \caption{Hotspot architecture associated with QTL mapping threshold of \Sexpr{round(lod.thr, 2)} in example 1.}
@@ -147,7 +154,7 @@ We plot the hotspot architecture inferred using the single trait permutation thr
 
 \begin{Schunk}
 \begin{Sinput}
-> plot(counts1, cex.lab = 1.5, cex.axis = 1.5)
+> plot(hots1, cex.lab = 1.5, cex.axis = 1.5)
 \end{Sinput}
 \end{Schunk}
 
@@ -179,27 +186,18 @@ if(!exists("hotperm1")) {
 \end{Schunk}
 <<>>=
 names(hotperm1)
+summary(hotperm1)
 @
 
+[NEED MORE REWRITING BELOW.]
+The \texttt{max.N} element of the \texttt{hotperm1} object stores the output of the $N$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 10 columns representing the QTL mapping thresholds. Entry $ij$ stores the maximum genome wide hotspot size detected at permutation $i$ using the QTL mapping threshold $j$.
 
-The \texttt{max.lod.quant} object stores the output of the $NL$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 300 columns representing the hotspot sizes analyzed. Entry $ij$ stores the maximum genome wide $qLOD(n)$ value computed at permutation $i$ using the QTL mapping threshold $j$. The statistic $qLOD(n)$ corresponds to the $n$th LOD score in a sample ordered from highest to lowest. For instance, consider the first 10 lines and 8 columns of \texttt{max.lod.quant}. At the 6th permutation, we have that the maximum LOD score across the genome is 3.58, the second maximum across the genome is 3.55, and so on.
-
-<<>>=
-hotperm1[[1]][1:10, 1:8]
-@
-
-The \texttt{max.N} stores the output of the $N$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 10 columns representing the QTL mapping thresholds. Entry $ij$ stores the maximum genome wide hotspot size detected at permutation $i$ using the QTL mapping threshold $j$. For illustration we show it's first 12 lines (note that we are transposing the output).
-
-<<>>=
-t(hotperm1[[2]][1:12,])
-@
-
-The \texttt{summary} method for \texttt{hotperm} computes the $N$- and $NL$-method's hotspot size permutation thresholds.
+The \texttt{max.lod.quant} element of the \texttt{hotperm1} object stores the output of the $NL$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 300 columns representing the hotspot sizes analyzed. Entry $ij$ stores the maximum genome wide $qLOD(n)$ value--the $n$th LOD score in a sample ordered from highest to lowest--computed at permutation $i$ using the QTL mapping threshold $j$.
 
 <<>>=
 hotperm1.thrs <- summary(hotperm1)
-NL.1.thr <- hotperm1.thrs[[1]]
-N.1.thr <- hotperm1.thrs[[2]]
+NL.1.thr <- hotperm1.thrs$max.lod.quant
+N.1.thr <- hotperm1.thrs$max.N
 @
 
 The \texttt{N.1.thr} object is a 10 by 10 matrix with rows indexing the QTL mapping thresholds and columns indexing the target genome wide error rates. Each entry $ij$ shows the hotspot size above which a hotspot is considered significant at a GWER $j$ using the QTL mapping threshold $i$. As before, our interest focus on the diagonal, and the $N$-method's threshold that controls the hotspot GWER at a 5\% level when the QTL mapping was controlled at a GWER of 5\% is 200.55. Note that according to the $N$-method, none of the hotspots on Figure \ref{plotex1counts} is significant.
@@ -217,9 +215,8 @@ round(NL.1.thr[1:5,], 4)
 @
 
 <<label=figex1slidingbar,width=6,height=6,include=FALSE,echo=FALSE>>=
-N.1 <- round(N.1.thr[5, 5])
 par(mar=c(4.1,4.1,0.1,4.1))
-plot(high1, quant.level = NL.1.thr[1:N.1, 5], sliding = TRUE)
+plot(high1, quant.level = quantile(hotperm1, 0.05)$max.lod.quant, sliding = TRUE)
 @
 
 \begin{figure}[!ht]
@@ -236,8 +233,7 @@ To visualize these results, we plot on Figure \ref{plotex1slidingbar} the hotspo
 
 \begin{Schunk}
 \begin{Sinput}
-> N.1 <- round(N.1.thr[5, 5])
-> plot(high1, quant.level = NL.1.thr[1:N.1, 5], sliding = TRUE)
+> plot(high1, quant.level = quantile(hotperm1, 0.05)$max.lod.quant, sliding = TRUE)
 \end{Sinput}
 \end{Schunk}
 
@@ -291,14 +287,14 @@ summary(ncor2[lower.tri(ncor2)])
 rm(ncor2)
 scan2 <- scanone(cross2, pheno.col = 1:1000, method = "hk")
 high2 <- highlod(scan2, lod.thr = lod.thr, drop.lod = 1.5)
-counts2 <- hotsize(high2)
+hots2 <- hotsize(high2)
 @ 
 
 \begin{figure}[!ht]
 \begin{center}
 <<label=plotex2counts,width=6,height=6,fig=TRUE,echo=TRUE>>=
 par(mar=c(4.1,4.1,0.1,0.1))
-plot(counts2, cex.lab = 1.5, cex.axis = 1.5)
+plot(hots2, cex.lab = 1.5, cex.axis = 1.5)
 @ 
 \caption{Hotspot architecture targeting 5\% GWER for example 2.}
 \label{plotex2counts}

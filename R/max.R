@@ -120,7 +120,8 @@ get.tails <- function(highs, n.quant = 2000, s.quant = seq(n.quant))
   out
 }
 #####################################################################
-quantile.hotperm <- function(x, probs = 0.95, ..., lod.thr = NULL)
+quantile.hotperm <- function(x, probs = attr(x, "alpha.levels"),
+                             ..., lod.thr = NULL)
 {
   if(max(probs) <= 0.5)
     probs <- 1 - probs
