@@ -25,6 +25,7 @@ max.hotsize <- function(x, ...)
     return(NULL)
   
   class(x) <- class(x)[-1]
+  ## Uses max.scanone.
   tmpmax <- function(x, lc) max(x, lodcolumn = lc)[,c(1,2,2+lc)]
   lc <- 1
   out <- tmpmax(x, lc)
@@ -60,7 +61,9 @@ max.highlod <- function(x, lod.thr = NULL, ...)
   else
     max(hotsize(x, lod.thr, ...))
 }
-quantile.highlod <- function(x, probs = NULL, n.quant = 2000, n.phe, ...)
+################################################################################
+quantile.highlod <- function(x, probs = NULL, lod.thr = NULL, n.quant, n.pheno,
+                             max.quantile = TRUE, ...)
 {
   highlod <- highlod.thr(x, lod.thr)
   lod.thr <- highlod$lod.thr
@@ -70,17 +73,27 @@ quantile.highlod <- function(x, probs = NULL, n.quant = 2000, n.phe, ...)
   
   ## Probabilities if requested.
   if(!is.null(probs)) {
-    if(missing(n.phe))
-      stop("need to supply n.phe along with probs")
-    s.quant <- ceiling(probs * n.phe)
+    if(missing(n.pheno))
+      stop("need to supply n.pheno along with probs")
+    s.quant <- ceiling(max(probs) * n.pheno)
     n.quant <- max(s.quant)
   }
-  else
+  else {
+    if(missing(n.quant))
+      n.quant <- max(table(highlod[,"row"]))
     s.quant <- seq(n.quant)
+  }
   
   ## Quantiles from 1 to n.quant.
-  if(n.quant)
-    get.tails(highlod, n.quant, s.quant)
+  if(n.quant) {
+    out <- get.tails(highlod, n.quant, s.quant)
+    if(max.quantile) {
+      s.quant <- dimnames(out)[[1]]
+      out <- apply(out, 1, max, na.rm = TRUE)
+      names(out) <- s.quant
+    }
+    out
+  }
   else
     NULL
 }
@@ -98,10 +111,11 @@ get.tails <- function(highs, n.quant = 2000, s.quant = seq(n.quant))
   }
   
   out <- tapply(highs[,"lod"], highs[,"row"], tmpfn, s.quant)
+  highrow.names <- names(out)
+  
   ## Turn list of items of length n.quant into matrix. This step takes time!
   out <- matrix(unlist(out), n.quant)
-  out <- apply(out, 1, max, na.rm = TRUE)
-  names(out) <- s.quant
+  dimnames(out) <- list(s.quant, highrow.names)
 
   out
 }
@@ -113,7 +127,7 @@ quantile.hotperm <- function(x, probs = 0.95, ..., lod.thr = NULL)
   
   myquant <- function(x, probs) {
     x[is.na(x)] <- 0
-    out <- as.matrix(apply(x, 2, quantile, probs = probs))
+    out <- as.matrix(apply(x, 2, quantile.default, probs = probs))
     if(length(probs) > 1)
       out <- t(out)
     out

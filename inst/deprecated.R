@@ -1,3 +1,17 @@
+#############################################################################################################
+## Legacy routines to be purged.
+#############################################################################################################
+hotspot.scan <- function(cross, highobj, lod.thr = NULL, quant.level = NULL, window = NULL,
+                         verbose = FALSE)
+{
+  hotsize(highobj, lod.thr, window, quant.level)
+}
+#############################################################################################################
+hotspot.plot <- function(hotobj, quant.thr = NULL, maps = NULL, main = "")
+{
+  plot(hotobj, ..., by.chr = TRUE, quant.thr = quant.thr, maps = maps, title = main)
+}
+#############################################################################################################
 ##############################################################################
 OGetCisCandReg <- function(cand.reg, scan, lod.thr, drop = 1.5) {
   all.trait.nms <- cand.reg[, 1]

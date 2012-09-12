@@ -99,9 +99,10 @@ hotperm <- function(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1
   out
 }
 print.hotperm <- function(x, ...) print(summary(x, ...))
-summary.hotperm <- function(x, alpha.levels = attr(x, "alpha.levels"), ...)
+summary.hotperm <- function(object, ...)
 {
-  out <- quantile(x, alpha.levels)
+  alpha.levels <- attr(object, "alpha.levels")
+  out <- quantile(object, alpha.levels)
   list(NL.thrs = out$max.lod.quant, N.thrs = out$max.N, N.window.thrs = out$max.N.window)
 }
 plot.hotperm <- function(x, probs = seq(0.9, 0.99, by = 0.01), level = 0.95, ...)

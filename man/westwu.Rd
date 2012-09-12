@@ -65,7 +65,8 @@ Q.1.thr
 diag(Q.1.thr)
 
 set.seed(12345)
-Q.2 <- ww.perm(high2, 100, lod.thrs, alphas)}
+Q.2 <- ww.perm(high2, 100, lod.thrs, alphas)
 Q.2.thr <- summary(Q.2, alphas)
+}
 }
 \keyword{utilities}

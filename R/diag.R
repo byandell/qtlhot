@@ -17,32 +17,77 @@
 #
 # Contains: myplot.err, sliding.bar.plot
 ######################################################################
-
-myplot.err <- function(out.err, dim.num = 1, ylab = deparse(substitute(out.err)), jitter = FALSE)
+slidingbar.create <- function(highobj, quant.level = NULL,
+                              restrict.to.levels = FALSE, ...)
 {
-  mylevels <- lapply(dimnames(out.err), as.numeric)
-  mylen <- sapply(mylevels, length)
-  dim.two <- 3 - dim.num
+  if(is.null(quant.level))
+    stop("must supply quant.level for sliding bar plot")
+
+  ## Get matrix of seq(n.quant)
+  quant <- quantile(highobj, max.quantile = FALSE)
+  n.quant <- nrow(quant)
+  rows <- as.numeric(dimnames(quant)[[2]])
+
+  ## Make sure quant.level and quant have same "length".
+  l.level <- length(quant.level)
+  if(l.level < n.quant) {
+    if(restrict.to.levels) {
+      n.quant <- l.level
+      quant <- quant[seq(n.quant), ]
+    }
+    else
+      quant.level <- c(quant.level,
+                       rep(min(quant.level), n.quant - l.level))
+  }
+  else
+    quant.level <- quant.level[seq(n.quant)]
   
-  if(dim.num == 1) {
-    myfun <- function(i) i + mylen[1] * seq(0, mylen[2] - 1)
-    xlab <- "lod threshold by alpha level"
+  ## set to zero if below quant.level.
+  tmpfn <- function(x, q) {
+    tmp <- x < q
+    if(any(tmp))
+      x[tmp] <- 0
+    x
   }
-  else {
-    myfun <- function(i) seq(1, mylen[1]) + mylen[1] * (i - 1)
-    xlab <- "alpha level by lod threshold"
-  }
+  quant[is.na(quant)] <- 0
+  quant <- apply(quant, 2, tmpfn, quant.level)
 
-  plot(range(mylevels[[dim.num]]), range(c(out.err)), type = "n",
-       xlab = xlab, ylab = ylab)
-  for(i in seq(mylen[dim.num]))
-    lines(mylevels[[dim.num]],
-          if(jitter) jitter(out.err[myfun(i)]) else out.err[myfun(i)],
-          type = "b", pch = as.character(i))
+  ## expand quant to whole genome (or at least chr used).
+  chrs <- sort(unique(highobj$chr.pos$chr[rows]))
+  chr.pos <- highobj$chr.pos[highobj$chr.pos$chr %in% chrs, ]
+  expand <- matrix(0, nrow(chr.pos), n.quant)
+  expand[rows,] <- t(quant)
+
+  ## probably want to make this into some kind of object?
+  data.frame(chr.pos, expand)
 }
+slidingbar.plot <- function(x, ...)
+{
+  x[,-(1:2)] <- 1 * (x[,-(1:2)] > 0)
+  col <- c("white","black")
+  
+  ## want to borrow from qtlview:::plot.aug.scanone
+  image(seq(nrow(x)), seq(ncol(x) -2), as.matrix(x[,-(1:2)]),
+        col = col, xlab = "", ylab = "hotspot size",
+        xaxt = "n")
 
+  ## Add chr name
+  mtext("Chromosome", 1, 2)
+  chr <- levels(x$chr)
+  
+  n.mar <- table(x$chr)
+  wh <- c(0.5, cumsum(n.mar) + 0.5)
+  abline(v = wh, xpd = FALSE)
+  a <- par("usr")
+  abline(v = a[1:2], xpd = FALSE)
+  abline(h = a[3:4], xpd = FALSE)
+  for (i in 1:length(n.mar))
+    axis(side = 1, at = mean(wh[i + c(0, 1)]), labels = chr[i])
+
+  invisible()
+}
 ## Generates the sliding bar figure (not an image anymore)
-##
+## This is very slow. Rewrite using highlod.
 sliding.bar.plot <- function(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
 {
   ###
@@ -97,6 +142,7 @@ sliding.bar.plot <- function(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
   axis(side=2, labels=as.character(y.axes), at=y.axes, cex.axis=0.9, las=1)
   axis(side=4, labels=lod.thr[y.axes], at=y.axes, cex.axis=0.9, las=1)
   mtext("LOD threshold",side=4,cex=1.4,line=3.5,adj=0.545)
+  ## This is the slow part. Better to do as image?
   for(i in 1:N){
     for(j in 1:ncol(M)){
       if(M[i,j]) segments(x0=j, x1=j, y0=i-1/2, y1=i+1/2, lwd=0.1)

@@ -9,30 +9,29 @@
 Wrapper routine for simulations
 }
 \usage{
-sim.hotspot(nSim, cross, n.phe, latent.eff, res.var = 1, Ns, n.perm,
-  alpha.levels, lod.thrs, drop = 1.5, verbose = FALSE)
+sim.hotspot(nSim, cross, n.pheno, latent.eff, res.var = 1, n.quant, n.perm,
+  alpha.levels, lod.thrs, drop.lod = 1.5, verbose = FALSE)
 mySimulations(\dots)
 sim.null.cross(chr.len = rep(400, 16), n.mar = 185, n.ind = 112,
-  type = "bc", n.phe = 6000, latent.eff = 1.5, res.var = 1,
+  type = "bc", n.pheno = 6000, latent.eff = 1.5, res.var = 1,
   init.seed = 92387475)
-sim.null.pheno.data(cross, n.phe, latent.eff, res.var)
+sim.null.pheno.data(cross, n.pheno, latent.eff, res.var)
 include.hotspots(cross, hchr, hpos, hsize, Q.eff, latent.eff,
-  lod.range.1, lod.range.2, lod.range.3, res.var=1, n.phe, init.seed)
+  lod.range.1, lod.range.2, lod.range.3, res.var=1, n.pheno, init.seed)
 }
 \arguments{
   \item{nSim}{Number of simulated sets of phenotypes to create. See details.}
   \item{cross}{Object of class \code{cross}. See \code{\link[qtl]{read.cross}}.}
-  \item{n.phe}{Number of traits, or phenotypes, to simulate for cross object.}
+  \item{n.pheno}{Number of traits, or phenotypes, to simulate for cross object.}
   \item{latent.eff}{Strength of latent effect, which is included in all traits. See \code{\link{sim.null.cross}}.}
   \item{res.var}{Residual variance for traits. Should not affect results.}
-  \item{Ns}{Vector of sizes of hotspots, typically \code{1:Nmax}, with \code{Nmax}
-    determined to be large enough to exceed the largest Breitling alpha critical value.}
-  \item{n.perm}{Number of permutations to perform per realization. Good idea to do 1000,
+  \item{n.quant}{maximum size of hotspots examined; ideally large enough to exceed the largest Breitling alpha critical value.}
+\item{n.perm}{Number of permutations to perform per realization. Good idea to do 1000,
     but this takes time.}
   \item{alpha.levels}{Vector of significance levels.}
   \item{lod.thrs}{Vector of LOD thresholds, typically single-trait
     permutation thresholds for various significance levels.}
-  \item{drop}{Drop in LOD score examined. LODs below this drop from the maximum for a
+  \item{drop.lod}{Drop in LOD score examined. LODs below this drop from the maximum for a
     chromosome will not be scored.}
   \item{init.seed}{initial seed for pseudo-random number generation}
   \item{chr.len}{vector of chromosome lengths}
@@ -48,7 +47,7 @@ include.hotspots(cross, hchr, hpos, hsize, Q.eff, latent.eff,
   \item{\dots}{Arguments passed directly to \code{sim.hotspot}.}
 }
 \details{
-Simulate \code{nSim} realizations of cross object with \code{n.phe} phenotypes with correlation
+Simulate \code{nSim} realizations of cross object with \code{n.pheno} phenotypes with correlation
 \code{latent.eff}. All simulations use the same genotypes in the
 \code{cross} object.
 }
@@ -65,14 +64,25 @@ Elias Chaibub Neto and Brian S. Yandell
 \code{\link{sim.null.cross}}, \code{\link[qtl]{read.cross}}.
 }
 \examples{
-\dontrun{
-## This will take DAYS to run.
-cross <- sim.null.cross()
-lod.thrs <- c(4.63,4.17,3.93,3.76,3.65,3.56,3.47,3.39,3.34,3.30)
-out <- sim.hotspot(100, cross, n.phe, latent.eff = 1, res.var = 1,
-  Ns = 1:700, n.perm = 100,
-  alpha.levels = c(1:10)/100, lod.thrs = lod.thrs, drop = 1.5,
-  verbose = TRUE)
-}
+ncross1 <- sim.null.cross(chr.len = rep(100, 4),
+                          n.mar = 51,
+                          n.ind = 100,
+                          type = "bc",
+                          n.phe = 1000,
+                          latent.eff = 3,
+                          res.var = 1,
+                          init.seed = 123457)
+cross1 <- include.hotspots(cross = ncross1,
+                           hchr = c(2, 3, 4),
+                           hpos = c(25, 75, 50),
+                           hsize = c(100, 50, 20),
+                           Q.eff = 2,
+                           latent.eff = 3,
+                           lod.range.1 = c(2.5, 2.5),
+                           lod.range.2 = c(5, 8),
+                           lod.range.3 = c(10, 15),
+                           res.var = 1,
+                           n.phe = 1000,
+                           init.seed = 12345)
 }
 \keyword{utilities}

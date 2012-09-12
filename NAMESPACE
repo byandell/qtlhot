@@ -6,10 +6,13 @@
 useDynLib(qtlhot)
 export(add.phenos)
 
+importFrom(stats, quantile) ## needed for quantile S3 method
 export(highlod)
 S3method(plot, highlod)
 S3method(summary, highlod)
 S3method(print, highlod)
+S3method(max, highlod)
+S3method(quantile, highlod)
 
 export(hotsize)
 S3method(hotsize, highlod)
@@ -17,15 +20,12 @@ S3method(hotsize, scanone)
 S3method(plot, hotsize)
 S3method(summary, hotsize)
 S3method(print, hotsize)
-
 S3method(max, hotsize)
-S3method(max, highlod)
-S3method(quantile, highlod)
 
 export(big.phase0)
 export(qtlhot.phase0)
 export(parallel.qtlhot)
-export(sliding.bar.plot)
+## export(sliding.bar.plot)
 
 export(sim.null.cross)
 export(sim.null.pheno.data)

@@ -106,8 +106,8 @@ get.hotspot <- function(filenames,
        thrWW=thrWW)  
 }
 ########################################################################################
-filter.threshold <- function(cross, n.phe, latent.eff, res.var,
-                             lod.thrs, drop = 1.5,
+filter.threshold <- function(cross, n.pheno, latent.eff, res.var,
+                             lod.thrs, drop.lod = 1.5,
                              s.quant, n.perm, alpha.levels,
                              qh.thrs = summary(hotperm(cross, max(s.quant), n.perm, alpha.levels,
                                lod.thrs, verbose = verbose)),
@@ -115,11 +115,12 @@ filter.threshold <- function(cross, n.phe, latent.eff, res.var,
                              verbose = FALSE)
 {
   mycat("scanone", verbose)
-  scanmat <- scanone(cross, pheno.col=c(1:n.phe), method="hk")
+  ## This assumes all n.pheno phenotypes are used. Fragile.
+  scanmat <- scanone(cross, pheno.col = seq(n.pheno), method="hk")
 
   ## Reduce to high LOD scores.
   mycat("highlod", verbose)
-  highobj <- highlod(scanmat, min(lod.thrs), drop, restrict.lod = TRUE)
+  highobj <- highlod(scanmat, min(lod.thrs), drop.lod, restrict.lod = TRUE)
   rm(scanmat)
   gc()
   

@@ -219,11 +219,7 @@ round(NL.1.thr[1:5,], 4)
 <<label=figex1slidingbar,width=6,height=6,include=FALSE,echo=FALSE>>=
 N.1 <- round(N.1.thr[5, 5])
 par(mar=c(4.1,4.1,0.1,4.1))
-sliding.bar.plot(scan = data.frame(scan1[, 1:2], scandrop1),
-                 lod.thr = NL.1.thr[1:N.1, 5],
-                 size.thr = 1:N.1,
-                 gap = 50,
-                 y.axes = seq(1, N.1, by = 10))
+plot(high1, quant.level = NL.1.thr[1:N.1, 5], sliding = TRUE)
 @
 
 \begin{figure}[!ht]
@@ -241,11 +237,7 @@ To visualize these results, we plot on Figure \ref{plotex1slidingbar} the hotspo
 \begin{Schunk}
 \begin{Sinput}
 > N.1 <- round(N.1.thr[5, 5])
-> sliding.bar.plot(scan = data.frame(scan1[, 1:2], scandrop1),
-+                 lod.thr = NL.1.thr[1:N.1, 5],
-+                 size.thr = 1:N.1,
-+                 gap = 50,
-+                 y.axes = seq(1, N.1, by = 10))
+> plot(high1, quant.level = NL.1.thr[1:N.1, 5], sliding = TRUE)
 \end{Sinput}
 \end{Schunk}
 
@@ -258,9 +250,9 @@ Here is another way to visualize this, using the sliding LOD threshold. We will 
 
 \begin{figure}[!ht]
 \begin{center}
-<<label=plotex1quant,fig=TRUE>>=
 <<fig=TRUE>>=
-quant1 <- hotsize(high1, lod = lod.thr, window = 5, quant = quantile(hotperm1)$quant)
+quant1 <- hotsize(high1, lod = lod.thr, window = 5,
+                  quant.level = quantile(hotperm1, lod.thr = lod.thr)$quant)
 plot(quant1)
 summary(quant1)
 @ 
@@ -306,7 +298,7 @@ counts2 <- hotsize(high2)
 \begin{center}
 <<label=plotex2counts,width=6,height=6,fig=TRUE,echo=TRUE>>=
 par(mar=c(4.1,4.1,0.1,0.1))
-plot(counts2, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
+plot(counts2, cex.lab = 1.5, cex.axis = 1.5)
 @ 
 \caption{Hotspot architecture targeting 5\% GWER for example 2.}
 \label{plotex2counts}
@@ -347,14 +339,6 @@ if(!file.exists("savedperms.RData"))
   save(pt, hotperm1, hotperm2, file = "savedperms.RData", compress = TRUE)
 @
 
-The $Q$-method thresholds are quite similar to the previous example. This is not unexpected since the number of significant linkages detected in examples 1 and 2 were similar (respectively, 1438 and 1413 for a LOD threshold of 2.44), and the $Q$-method thresholds are a function of the number of significant QTLs (the higher the number of significant linkages, the higher the threshold) and not of the correlation among the phenotypes.
-
-<<>>=
-diag(Q.2.thr)
-apply(counts1, 2, sum)
-apply(counts2, 2, sum)
-@
-
 The $N$-method, as expected, gave rise to much smaller thresholds in this second example with uncorrelated phenotypes. Additionally, inspection of Figure \ref{plotex2counts} shows no spurious hotspots on chromosome 1.
 
 <<>>=
@@ -362,11 +346,7 @@ diag(N.2.thr)
 @
 <<label=plotex2slidingbar,width=6,height=6,fig=TRUE,echo=TRUE,include=FALSE>>=
 N.2 <- round(N.2.thr[5, 5], 0)
-sliding.bar.plot(scan = data.frame(scan2[, 1:2], scandrop2), 
-                 lod.thr = NL.2.thr[1:N.2, 5], 
-                 size.thr = 1:N.2, 
-                 gap = 50, 
-                 y.axes = seq(1, N.2, by = 1))
+plot(high2, quant.level = NL.2.thr[1:N.2, 5], sliding = TRUE)
 @
 
 \begin{figure}[!ht]
@@ -380,15 +360,7 @@ sliding.bar.plot(scan = data.frame(scan2[, 1:2], scandrop2),
 Figure \ref{plotex2slidingbar} presents the hotspot significance profile targeting 5\% GWER. For this second example, all methods correctly detected the simulated hotspots.
 
 <<label=plotex2sigct,width=6,height=6,fig=TRUE,echo=TRUE,include=FALSE>>=
-hot.scan2 <- qtlhot.scan(cross2, scan2, hotperm2$max.lod.quant, lod.thrs, probs = seq(.01, .1, by = .01), level = 0.05)
-par(mar = c(4.1,4.1,0.1,4.1))
-plot(out2, lodcolumn = 5, ylab = "counts", cex.lab = 1.5, cex.axis = 1.5)
-plot(hot.scan2, lodcolumn = 2, add = TRUE, col = "red")
-## Add right axis with 
-quant <- attr(hot.scan2, "quant")
-tmp <- seq(along = quant)
-axis(4, at = tmp, label = round(quant[tmp], 2), las = 1, cex = 0.35)
-mtext("sliding LOD thresholds",4, 1, cex=1.5)
+plot(high2, quant.level = quantile(high2))
 @
 
 \begin{figure}[!ht]

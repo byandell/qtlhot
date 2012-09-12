@@ -203,7 +203,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
     per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
                         addcovar=covars$addcovar, intcovar=covars$intcovar)
 
-    per.scan.hl <- highlod(per.scan, lod = lod.min, drop.lod = drop.lod,
+    per.scan.hl <- highlod(per.scan, lod.thr = lod.min, drop.lod = drop.lod,
                                  restrict.lod = TRUE)$highlod
 
     save(per.scan.hl, perms,
@@ -219,8 +219,9 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
 
   if(remove.files)
     file.remove(dirpath, filenames)
-  
-  lod.sums <- lod.quantile.perm(scan.hl,n.quant,lod.thrs,window,chr.pos,n.traits)
+
+  lod.sums <- as.list(max(scan.hl, lod.thrs, window), c("max.N", "max.N.window"))
+  lod.sums$max.lod.quant <- quantile(scan.hl, n.quant = n.quant)
   
   save(scan.hl, lod.sums, cross.index, index,
        file = paste("perm", ".", cross.index, "_", index, ".RData", sep = ""))
@@ -264,7 +265,7 @@ big.phase3 <- function(dirpath = ".", index, cross.index, ...,
     n.quant <- length(lod.sums$max.lod.quant)
     max.lod.quant[i.perm, seq(n.quant)] <- lod.sums$max.lod.quant
     ## legacy adjustment
-    if(length(lod.sum$max.N) == 2) {
+    if(length(lod.sums$max.N) == 2) {
       max.N[i.perm,] <- lod.sums$max.N$max.N
       max.N.window[i.perm,] <- lod.sums$max.N$max.N.win
     }

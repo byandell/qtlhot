@@ -95,18 +95,23 @@ highlod <- function(scans, lod.thr = 0, drop.lod = 1.5,
   attr(out, "drop.lod") <- drop.lod
   out
 }
-print.highlod <- function(object, ...) print(summary(object, ...))
+print.highlod <- function(x, ...) print(summary(x, ...))
 summary.highlod <- function(object, ...)
 {
   cat("frequency of high LOD entries by chromosome:\n")
-  print(addmargins(table(high1$chr.pos$chr[high1$highlod$row])))
+  print(addmargins(table(object$chr.pos$chr[object$highlod$row])))
   cat("\nfrequency of high LOD entries per phenotype:\n")
-  print(table(table(high1$highlod$pheno)))
+  print(table(table(object$highlod$pheno)))
   invisible()
 }
-plot.highlod <- function(x, ...)
+plot.highlod <- function(x, ..., quant.level = NULL, sliding = FALSE)
 {
-  plot(hotsize(x, ...), ...)
+  if(sliding) {
+    ## Need to supply quant.level as second argument.
+    slidingbar.plot(slidingbar.create(x, quant.level, ...))
+  }
+  else
+    plot(hotsize(x, ..., quant.level = quant.level), ...)
 }
 ###################################################################################
 highlod.thr <- function(highobj, lod.thr)
@@ -189,20 +194,10 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
     per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
                         addcovar=covars$addcovar, intcovar=covars$intcovar)
 
-    per.scan.hl <- pull.highlods(per.scan, lod = lod.min, drop.lod = drop.lod,
+    per.scan.hl <- highlod(per.scan, lod.thr = lod.min, drop.lod = drop.lod,
                                  restrict.lod = TRUE)$highlod
 
     save(per.scan.hl, perms,
          file=paste("per.scan",pheno.set, i,"RData",sep="."))
   }
-}
-###################################################################################
-lod.quantile.perm <- function(highobj,n.quant,lod.thr,window,chr.pos,n.phe)
-{
-  ## Jansen counts.
-  ## Count number of LODs per position and find max (raw or smoothed).
-  maxhi <- max(highobj, lod.thr, window)
-  
-  list(max.N=maxhi$max.N, max.N.window = maxhi$max.N.win,
-       max.lod.quant = quantile(highobj, n.quant = n.quant))
 }

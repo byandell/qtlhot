@@ -22,7 +22,7 @@
 ## Generates a "null dataset" cross
 ##
 sim.null.cross <- function(chr.len = rep(400,16), n.mar=185, n.ind = 112, type = "bc",
-                           n.phe = 6000, latent.eff = 1.5, res.var = 1,
+                           n.pheno = 6000, latent.eff = 1.5, res.var = 1,
                            init.seed = 92387475)
 {
   set.seed(init.seed)
@@ -30,15 +30,15 @@ sim.null.cross <- function(chr.len = rep(400,16), n.mar=185, n.ind = 112, type =
   scross <- sim.cross(map = mymap, n.ind = n.ind, type = type)
   scross <- calc.genoprob(scross, step=0)
 
-  sim.null.pheno.data(cross = scross, n.phe = n.phe, latent.eff = latent.eff, res.var = res.var)
+  sim.null.pheno.data(cross = scross, n.pheno = n.pheno, latent.eff = latent.eff, res.var = res.var)
 }
-sim.null.pheno.data <- function(cross, n.phe, latent.eff, res.var)
+sim.null.pheno.data <- function(cross, n.pheno, latent.eff, res.var)
 {
   n <- nind(cross)
   latent <- rnorm(n, 0, sqrt(res.var))
-  ErrorM <- matrix(rnorm(n * n.phe, 0, sqrt(res.var)), n, n.phe)
+  ErrorM <- matrix(rnorm(n * n.pheno, 0, sqrt(res.var)), n, n.pheno)
   pheno <- data.frame(latent*latent.eff + ErrorM)
-  names(pheno) <- paste("P", 1:n.phe, sep="")
+  names(pheno) <- paste("P", 1:n.pheno, sep="")
   cross$pheno <- pheno
   
   cross
@@ -55,7 +55,7 @@ include.hotspots <- function(cross,
                              lod.range.2,
                              lod.range.3,
                              res.var=1,
-                             n.phe,
+                             n.pheno,
                              init.seed)
 {
   get.closest.pos.nms <- function(pos, cross, chr)
@@ -109,15 +109,15 @@ include.hotspots <- function(cross,
 
   ## Why 50 for first, 500 for 2nd and 3rd?
   ## Why strange lod.range for 2nd?
-  index1 <- sample(1:n.phe, hsize[1], replace = FALSE)
+  index1 <- sample(1:n.pheno, hsize[1], replace = FALSE)
   cross <- update.pheno(cross, hchr[1], hpos[1], hsize[1], Q.eff, latent.eff,
                         lod.range.1, res.var, index1, hk.prob)
 
-  index2 <- sample((1:n.phe)[-index1], hsize[2], replace = FALSE)
+  index2 <- sample((1:n.pheno)[-index1], hsize[2], replace = FALSE)
   cross <- update.pheno(cross, hchr[2], hpos[2], hsize[2], Q.eff, latent.eff,
                         lod.range.2, res.var, index2, hk.prob)
 
-  index3 <- sample((1:n.phe)[-c(index1, index2)], hsize[3], replace = FALSE)
+  index3 <- sample((1:n.pheno)[-c(index1, index2)], hsize[3], replace = FALSE)
   cross <- update.pheno(cross, hchr[3], hpos[3], hsize[3], Q.eff, latent.eff,
                         lod.range.3, res.var, index3, hk.prob)
 
@@ -131,25 +131,25 @@ sim.hotspot <- function(nSim,
                         n.pheno,
                         latent.eff,
                         res.var = 1,
-                        Ns,
+                        n.quant,
                         n.perm,
                         alpha.levels,
                         lod.thrs,
-                        drop=1.5,
+                        drop.lod=1.5,
                         verbose = FALSE)
 {
-  Nmax <- length(Ns)
+  s.quant <- seq(n.quant)
 
   nalpha <- length(alpha.levels)
   nlod <- length(lod.thrs)
 
   ## outputs count the number of times we detected
   ## a hotspot using the respective method
-  outNL <- matrix(0, Nmax, nalpha)
+  outNL <- matrix(0, n.quant, nalpha)
   outN <- outWW <- matrix(0, nlod, nalpha)
 
   ## we are saving the thresholds of each simulation
-  thrNL <- array(dim=c(Nmax, nalpha, nSim))
+  thrNL <- array(dim=c(n.quant, nalpha, nSim))
   thrN <- array(dim=c(nlod, nalpha, nSim))
   thrWW <- array(dim=c(nlod, nalpha, nSim))
 
@@ -161,8 +161,8 @@ sim.hotspot <- function(nSim,
   
     ## Simulate correlated phenotypes and create threshold summaries.
     out.sim <- filter.threshold(ncross, n.pheno, latent.eff[k], res.var,
-                             lod.thrs, drop,
-                             Ns, n.perm, alpha.levels,
+                             lod.thrs, drop.lod,
+                             s.quant, n.perm, alpha.levels,
                              verbose)
 
     thrNL[,,k] <- out.sim$NL.thrs
@@ -175,7 +175,7 @@ sim.hotspot <- function(nSim,
 
   
   NL.err <- outNL/nSim
-  dimnames(NL.err) <- list(as.factor(Ns), as.factor(alpha.levels))
+  dimnames(NL.err) <- list(as.factor(s.quant), as.factor(alpha.levels))
   N.err <- outN / nSim
   dimnames(N.err) <- list(as.factor(lod.thrs), as.factor(alpha.levels))
   WW.err <- outWW / nSim

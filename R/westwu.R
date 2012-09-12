@@ -37,7 +37,7 @@ print.ww.perm <- function(x, ...) print(summary(x, ...))
 summary.ww.perm <- function(object, alpha.levels = attr(object, "alpha.levels"), ...)
 {
   nalpha <- length(alpha.levels)
-  ww.thrs <- t(apply(object, 2, quantile, 1 - alpha.levels))
+  ww.thrs <- t(apply(object, 2, quantile.default, 1 - alpha.levels))
   dimnames(ww.thrs) <- list(dimnames(object)[[2]], as.character(alpha.levels))
   ww.thrs
 }
@@ -55,7 +55,8 @@ ww.perm.highlod <- function(highobj, n.perm, lod.thrs, alpha.levels, verbose = F
 
   ## Both versions break up the support intervals with shuffling.
   ## This can lead to more peaks across genome.
-  ## ww.perm.maxlod (above) resolves this by focusing only on peaks.
+  ## ww.perm.maxlod (below) resolves this by focusing only on peaks,
+  ## but only makes sense if ww.perm is used with window = 0.
   
   highobj <- highlod.thr(highobj, min(lod.thrs))
   
@@ -103,7 +104,7 @@ ww.perm.highlod <- function(highobj, n.perm, lod.thrs, alpha.levels, verbose = F
   max.ww
 }
 ####################################################################################
-ww.perm.maxlod <- function(highobj, n.perm, lod.thrs, verbose = FALSE)
+ww.perm.maxlod <- function(highobj, n.perm, lod.thrs, alpha.levels, verbose = FALSE)
 {
   highobj <- highlod.thr(highobj, min(lod.thrs))
   maxobj <- pull.max(highobj)

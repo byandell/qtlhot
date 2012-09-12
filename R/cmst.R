@@ -915,6 +915,7 @@ FitAllTests <- function(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
   out <- CMSTtests(cross, pheno1, pheno2, Q.chr, Q.pos, 
                      NULL, NULL, NULL, NULL, "all", "both", FALSE)
 
+  nms <- pheno2
   out$pvals.cit <- matrix(NA, ntests, 2, dimnames = list(nms, c("pval.1", "pval.2")))
 
   ntests <- length(pheno2)
@@ -1368,7 +1369,7 @@ GetCis <- function(x, window = 10) {
 }
 ##############################################################################
 GetCisCandReg <- function(cross, highlod, cand.reg,
-                          all.trait.nms = names(cross$pheno),
+                          all.traits = names(cross$pheno),
                           chr.pos = get.chr.pos(cross))
 {
   ## Restric
@@ -1378,9 +1379,9 @@ GetCisCandReg <- function(cross, highlod, cand.reg,
 
   ## Subset highlod to those phenos in cand.reg.
   pheno.cols <- unique(highlod$phenos)
-  tmp <- match(as.character(cand.reg[,1]), all.trait.nms[pheno.cols])
+  tmp <- match(as.character(cand.reg[,1]), all.traits[pheno.cols])
   if(any(is.na(tmp)))
-    stop("cannot find cand.reg traits in all.trait.nms")
+    stop("cannot find cand.reg traits in all.traits")
   highlod <- highlod[highlod$phenos %in% tmp, ]
   
   ## Get start and end for each pheno. NB: may include multiple chr.
@@ -1405,7 +1406,7 @@ GetCisCandReg <- function(cross, highlod, cand.reg,
   out <- out[is.cis,, drop = FALSE]
   index <- NULL
   if(nrow(out))
-    index <- match(out[, 1], all.trait.nms)
+    index <- match(out[, 1], all.traits)
   list(cis.reg = out, cis.index = index)
 }
 ##############################################################################

@@ -12,11 +12,9 @@ chromosome where the peak is located (peak.chr). Some candidates may map to the
 same chromosome where they are physically located.
 }
 \usage{
-GetCandReg(cross, highlod, annot, traits, all.traits = names(cross$pheno),
-  chr.pos = get.chr.pos(cross))
-GetCisCandReg(cross, highlod, cand.reg, all.trait.nms = names(cross$pheno),
-  chr.pos = get.chr.pos(cross))
-GetCoMappingTraits(cand.reg, scan, lod.thr, drop = 1.5)
+GetCandReg(cross, highlod, annot, traits, all.traits, chr.pos)
+GetCisCandReg(cross, highlod, cand.reg, all.traits, chr.pos)
+GetCoMappingTraits(cross, highlod, cand.reg, all.traits, chr.pos)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -24,7 +22,7 @@ GetCoMappingTraits(cand.reg, scan, lod.thr, drop = 1.5)
 object of class \code{cross}; see \code{\link[qtl]{read.cross}}
 }
   \item{highlod}{
-data frame from \code{\link{pull.highlods}}, which is sparse summary of
+data frame from \code{\link{highlod}}, which is sparse summary of
 high LODs in large \code{\link[qtl]{scanone}} object
 }
   \item{cand.reg}{
@@ -39,12 +37,8 @@ cM; typically column 2 has gene name, and column 4 has position in Mb
 names of traits to examine as candidate regulators; names must
 correspond to phenotypes in \code{cross} object
 }
-  \item{lod.thr}{
-critical value for LOD threshold
-}
-  \item{drop}{
-allowably drop in LOD for support interval (default is 1.5)
-}
+\item{all.traits}{names of all traits (phenotypes) considered for
+  evaluation; default is all phenotype names in \code{cross}}
 \item{chr.pos}{
 first two columns of \code{\link[qtl]{scanone}} object with chromosome
 and position in cM
@@ -52,18 +46,18 @@ and position in cM
 }
 \details{
 Traits that map to positions close to their physical locations are said
-to map in cis (local linkages).
+to map in cis (local linkages). 
 Traits that map to positions away from their physical locations are said to map in
 trans (distal linkages). There is no unambiguous way to determine how close a trait needs to
 map to its physical location in order to be classified as cis. Our choice is to classify a trait as
 cis if the 1.5-LOD support interval (Manichaikul et al. 2006) around the LOD peak contains
-the trait’s physical location, and if the LOD score at its physical location is higher the the LOD
+the trait's physical location, and if the LOD score at its physical location is higher the the LOD
 threshold. The function \code{GetCisCandReg} determines which of the candidate regulators map in
 cis. The function \code{GetCoMappingTraits} returns a list with the putative
 targets of each trait. A trait is included in the putative target list of
 a trait when its LOD peak is greater than \code{lod.thr} and the
 \code{drop} LOD support interval around the peak contains the location
-of the trait’s QTL.
+of the trait's QTL.
 The function \code{JoinTestOutputs} currently relies on external files
 that contain results of \code{\link{FitAllTests}}. It needs to be
 rewritten to save space.

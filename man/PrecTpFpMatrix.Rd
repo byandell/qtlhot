@@ -9,7 +9,7 @@ Determine how well different tests do to predict candidates of regulation.
 }
 \usage{
 JoinTestOutputs(comap)
-PrecTpFpMatrix(alpha, nms, val.targets, all.orfs, to.load, cis.index)
+PrecTpFpMatrix(alpha, nms, val.targets, all.orfs, tests, cis.index)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -36,17 +36,17 @@ numeric index into \code{all.orfs} to identify cis traits
 \details{
 \code{JoinTestOutputs} joins files of results of \code{\link{FitAllTests}}.
 The joined tests are summarized with \code{PrecTpFpMatrix} using the
-``biologically validated'' true positives, false
+biologically validated true positives, false 
 positives and precision, for the inferred causal relations. We define a
 true positive as a statistically significant causal relation between a
 gene and a putative target gene when the putative target gene belongs to
 the known signature of the gene. Similarly, we define a false positive
 as a statistically significant causal relation between a gene and a
-putative target gene when the target gene doesn’t belong to the
+putative target gene when the target gene does not belong to the
 signature. (For the AIC and BIC methods that do not provide a p-value
 measuring the significance of the causal call, we simply use the
 detected causal relations in the computation of true and false
-positives). The “validated precision”, is computed as the ratio of true
+positives). The validated precision is computed as the ratio of true
 positives by the sum of true and false positives. The PrecTpFpMatrix
 computes these measures to both all ko-genes, and to cis ko-genes
 only.
