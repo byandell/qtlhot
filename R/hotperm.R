@@ -102,25 +102,30 @@ print.hotperm <- function(x, ...) print(summary(x, ...))
 summary.hotperm <- function(object, ...)
 {
   out <- quantile(object, ...)
+
   attr(out, "window") <- attr(object, "window")
+
+  ## 5-num summaries of sliding quantiles.
+  tmp <- apply(object$max.lod.quant, 2, fivenum)
+  tmp <- tmp[5:1,]
+  dimnames(tmp)[[1]] <- c("max","75%","median","25%","min")
+  out$max.lod.quant <- tmp
+  
   class(out) <- c("summary.hotperm", class(out))
   out
 }
 print.summary.hotperm <- function(x, ...)
 {
-  cat("hotspot threshold by single-trait LOD threshold and significance level\n")
+  cat("max.N: hotspot threshold by single-trait LOD threshold and significance level\n")
   print(x$max.N)
   window <- attr(x, "window")
   if(!is.null(window)) {
-    cat(paste("smoothed hotspot threshold by single-trait LOD threshold and significance level ",
+    cat(paste("\nmax.N.window: smoothed hotspot threshold by single-trait LOD threshold and significance level ",
               "(window = ", window, ")\n", sep = ""))
     print(x$max.N.window)
   }
-  cat("\nLOD threshold by hotspot size quantile and significance level\n")
-  tmp <- apply(x$max.lod.quant, 2, fivenum)
-  tmp <- tmp[5:1,]
-  dimnames(tmp)[[1]] <- c("max","75%","median","25%","min")
-  print(round(tmp, 2))
+  cat("\nmax.lod.quant: LOD threshold by hotspot size quantile and significance level\n")
+  print(round(x$max.lod.quant, 2))
   invisible()
 }
 plot.hotperm <- function(x, probs = seq(0.9, 0.99, by = 0.01), level = 0.95, ...)

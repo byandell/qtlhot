@@ -22,7 +22,7 @@ hotsize(hotobject, \dots)
 \method{summary}{hotsize}(object, \dots)
 \method{plot}{hotsize}(x, ylab = "counts", quant.axis = pretty(x$max.N),
   col = c("black", "red", "blue"), by.chr = FALSE, maps = NULL,
-  quant.thr = NULL, title = "",\dots)
+  title = "",\dots)
 }
 \arguments{
   \item{hotobject}{object of class \code{\link[qtl]{scanone}} or \code{\link{highlod}}}
@@ -41,7 +41,6 @@ hotsize(hotobject, \dots)
   \item{by.chr}{separate plot by chromosome if \code{TRUE}}
   \item{maps}{if not \code{NULL}, list of objects of class \code{map}
     to use for rugs on top and bottom of plot}
-  \item{quant.thr}{vector of sliding quantile thresholds}
   \item{title}{title for plot}
   \item{\dots}{arguments passed along}
 }

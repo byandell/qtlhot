@@ -106,7 +106,11 @@ summary.highlod <- function(object, ...)
 }
 plot.highlod <- function(x, ..., quant.level = NULL, sliding = FALSE)
 {
+  
   if(sliding) {
+    if(is.list(quant.level))
+      quant.level <- quant.level$max.lod.quant
+    
     ## Need to supply quant.level as second argument.
     slidingbar.plot(slidingbar.create(x, quant.level, ...))
   }

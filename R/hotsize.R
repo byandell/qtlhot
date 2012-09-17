@@ -55,9 +55,22 @@ hotsize.highlod <- function(hotobject, lod.thr = NULL, window = NULL, quant.leve
   }
   
   if(!is.null(quant.level)) {
+    if(is.list(quant.level)) {
+      quant.thr <- quant.level$max.N
+      lod.thrs <- as.numeric(row.names(quant.thr))
+      quant.level <- quant.level$max.lod.quant[,1]
+    }
+    else
+      quant.thr <- NULL
+    
     ## If sliding thresholds supplied.
-    if(!is.null(lod.thr))
+    if(!is.null(lod.thr)) {
+      if(!is.null(quant.thr)) {
+        m <- which.min(abs(lod.thr - lod.thrs))
+        quant.thr <- quant.thr[m,1]
+      }
       quant.level <- quant.level[quant.level >= lod.thr & !is.na(quant.level)]
+    }
     
     if(length(quant.level)) {
       ## Want to work down quant.level. One way is to see how many are above smallest
@@ -115,13 +128,13 @@ summary.hotsize <- function(object, ...)
 #############################################################################################
 plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
                          col = c("black","red","blue"), by.chr = FALSE, maps = NULL,
-                         quant.thr = NULL, title = "", ...)
+                         title = "", ...)
 {
   if(by.chr) {
     for(i in levels(x$chr)) {
       tmp <- x$chr == i
       if(any(tmp))
-        plot(x[tmp,], ylab, col = col, quant.thr = quant.thr,
+        plot(x[tmp,], ylab, col = col,
              title = paste("chr", i), ...)
 
       if(!is.null(maps) & by.chr)
@@ -145,6 +158,7 @@ plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
       title <- paste(title, " smoothed(", col[2], ")", sep = "")
   }
 
+  quant.thr <- attr(x, "quant.thr")
   if(!is.null(quant.thr))
     abline(h = quant.thr, lwd = 2, lty = 2, col = col[2])
   
