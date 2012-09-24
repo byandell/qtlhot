@@ -5,6 +5,7 @@
 \alias{plot.highlod}
 \alias{max.highlod}
 \alias{quantile.highlod}
+\alias{pull.highlod}
 \title{
 Pull high LOD values with chr and pos.
 }
@@ -14,6 +15,7 @@ Pull high LOD values with chr and pos.
 \usage{
 highlod(scans, lod.thr = 0, drop.lod = 1.5,
   extend = TRUE, restrict.lod = FALSE, \dots)
+pull.highlod(object, chr, pos, \dots)
 \method{print}{highlod}(x, \dots)
 \method{summary}{highlod}(object, \dots)
 \method{plot}{highlod}(x, \dots, quant.level = NULL, sliding = FALSE)
@@ -30,6 +32,8 @@ highlod(scans, lod.thr = 0, drop.lod = 1.5,
   \item{restrict.lod}{restrict to loci above LOD threshold if
     \code{TRUE}; matches behavior of \code{\link[qtl]{lodint}} when
     \code{FALSE} (default)}
+  \item{chr}{chromosome identifier}
+  \item{pos}{position, or range of positions, in cM}
   \item{x,object}{object of class \code{highlod}}
   \item{probs}{probability levels for quantiles (should be > 0.5)}
   \item{n.quant}{maximum of \code{s.quant}}
@@ -47,6 +51,13 @@ highlod(scans, lod.thr = 0, drop.lod = 1.5,
   \item{phenos}{phenotype column number}
   \item{lod}{LOD score for phenotype at locus indicated by \code{row}} 
 }
+\details{
+  The \code{highlod} condenses a \code{scanone} object to the peaks
+  above a \code{lod.thr} and/or within \code{drop.lod} of such
+  peaks. The \code{pull.highlod} pulls out the entries at a particular
+  genomic location or interval of locations. Summary, print, plot, max
+  and quantile methods provide ways to examine a \code{highlod} object.
+}
 \author{
 Brian S Yandell and Elias Chaibub Neto
 }
@@ -54,6 +65,7 @@ Brian S Yandell and Elias Chaibub Neto
 example(include.hotspots)
 scan1 <- scanone(cross1, pheno.col = 1:1000, method = "hk")
 high1 <- highlod(scan1, lod.thr = 2.11, drop.lod = 1.5)
+pull.highlod(high1, chr = 2, pos = 24)
 summary(high1, lod.thr = 2.44)
 max(high1, lod.thr = seq(2.11, 3.11, by = .1))
 }

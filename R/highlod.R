@@ -205,3 +205,15 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
          file=paste("per.scan",pheno.set, i,"RData",sep="."))
   }
 }
+###################################################################
+pull.highlod <- function(object, chr, pos, ...)
+{
+  wh.chr <- which(object$chr.pos$chr == chr)
+  ## Want to expand this to handle range of positions...
+  wh.pos <- which(object$chr.pos$pos[wh.chr] - min(pos) >= 0 &
+                  object$chr.pos$pos[wh.chr] - max(pos) <= 0)
+  wh.high <- which(object$highlod$row %in% wh.chr[wh.pos])
+  wh.row <- object$highlod[wh.high, "row"]
+
+  data.frame(object$chr.pos[wh.row,], object$highlod[wh.high, -1])
+}
