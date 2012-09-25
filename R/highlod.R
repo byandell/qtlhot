@@ -89,7 +89,8 @@ highlod <- function(scans, lod.thr = 0, drop.lod = 1.5,
   
   ## return data frame with genome row, trait column and lod value.
   out <- list(highlod = cbind.data.frame(row = rr, phenos = pheno.col[cc], lod = lod),
-              chr.pos = scans[,1:2])
+              chr.pos = scans[,1:2],
+              names = names(scans)[-(1:2)])
   class(out) <- c("highlod", "list")
   attr(out, "lod.thr") <- lod.thr
   attr(out, "drop.lod") <- drop.lod
@@ -208,6 +209,14 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
 ###################################################################
 pull.highlod <- function(object, chr, pos, ...)
 {
+  ## Kludge to get names if not in object
+  pheno.names <- object$names
+  if(is.null(pheno.names)) {
+    extra <- list(...)
+    m <- match("names", names(extra))
+    if(!is.na(m))
+      pheno.names <- extra[[m]]
+  }
   wh.chr <- which(object$chr.pos$chr == chr)
   ## Want to expand this to handle range of positions...
   wh.pos <- which(object$chr.pos$pos[wh.chr] - min(pos) >= 0 &
@@ -215,5 +224,9 @@ pull.highlod <- function(object, chr, pos, ...)
   wh.high <- which(object$highlod$row %in% wh.chr[wh.pos])
   wh.row <- object$highlod[wh.high, "row"]
 
-  data.frame(object$chr.pos[wh.row,], object$highlod[wh.high, -1])
+  out <- data.frame(object$chr.pos[wh.row,], object$highlod[wh.high, -1])
+  ## Add phenotype names if available.
+  if(!is.null(pheno.names))
+    out$phenos <- pheno.names[out$phenos]
+  out
 }
