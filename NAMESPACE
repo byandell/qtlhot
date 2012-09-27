@@ -8,6 +8,7 @@ export(add.phenos)
 
 importFrom(stats, quantile) ## needed for quantile S3 method
 export(highlod)
+export(pull.highlod)
 S3method(plot, highlod)
 S3method(summary, highlod)
 S3method(print, highlod)
