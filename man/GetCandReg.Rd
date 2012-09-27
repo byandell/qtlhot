@@ -12,16 +12,13 @@ chromosome where the peak is located (peak.chr). Some candidates may map to the
 same chromosome where they are physically located.
 }
 \usage{
-GetCandReg(cross, highlod, annot, traits, all.traits, chr.pos)
-GetCisCandReg(cross, highlod, cand.reg, all.traits, chr.pos)
-GetCoMappingTraits(cross, highlod, cand.reg, all.traits, chr.pos)
+GetCandReg(highobj, annot, traits)
+GetCisCandReg(highobj, cand.reg)
+GetCoMappingTraits(highobj, cand.reg)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{cross}{
-object of class \code{cross}; see \code{\link[qtl]{read.cross}}
-}
-  \item{highlod}{
+  \item{highobj}{
 data frame from \code{\link{highlod}}, which is sparse summary of
 high LODs in large \code{\link[qtl]{scanone}} object
 }
@@ -36,12 +33,6 @@ cM; typically column 2 has gene name, and column 4 has position in Mb
   \item{traits}{
 names of traits to examine as candidate regulators; names must
 correspond to phenotypes in \code{cross} object
-}
-\item{all.traits}{names of all traits (phenotypes) considered for
-  evaluation; default is all phenotype names in \code{cross}}
-\item{chr.pos}{
-first two columns of \code{\link[qtl]{scanone}} object with chromosome
-and position in cM
 }
 }
 \details{
@@ -87,8 +78,8 @@ Manichaikul et al. (2006) Genetics
 Elias Chaibub Neto
 }
 \seealso{
-  \code{\link[qtl]{scanone}},
-  \code{\link{GetCoMappingTraits}}
+  \code{\link{highlod}},
+  \code{\link[qtl]{scanone}}
 }
 \examples{
 \dontrun{

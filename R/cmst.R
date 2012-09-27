@@ -1,3 +1,4 @@
+## Modify to use names element of highlod object?
 CMSTtests <- function(cross, 
                       pheno1, 
                       pheno2,
@@ -1368,21 +1369,21 @@ GetCis <- function(x, window = 10) {
   list(cis.reg = xx, cis.index = index) 
 }
 ##############################################################################
-GetCisCandReg <- function(cross, highlod, cand.reg,
-                          all.traits = names(cross$pheno),
-                          chr.pos = get.chr.pos(cross))
+GetCisCandReg <- function(highobj, cand.reg)
 {
-  ## Restric
+  ## Restrict to being on same chromosome. This is fragile.
   cand.reg <- cand.reg[cand.reg[, 2] == cand.reg[, 4],]
   n <- nrow(cand.reg)
   trait.nms <- names(scan)[-c(1, 2)]
 
+  chr.pos <- highobj$chr.pos
+
   ## Subset highlod to those phenos in cand.reg.
-  pheno.cols <- unique(highlod$phenos)
-  tmp <- match(as.character(cand.reg[,1]), all.traits[pheno.cols])
+  pheno.cols <- unique(highobj$highlod$phenos)
+  tmp <- match(as.character(cand.reg[,1]), highobj$names[pheno.cols])
   if(any(is.na(tmp)))
-    stop("cannot find cand.reg traits in all.traits")
-  highlod <- highlod[highlod$phenos %in% tmp, ]
+    stop("cannot find cand.reg traits in highobj$names")
+  highlod <- highobj$highlod[highobj$highlod$phenos %in% pheno.cols[tmp], ]
   
   ## Get start and end for each pheno. NB: may include multiple chr.
   h.index <- cumsum(table(highlod$phenos))
@@ -1406,7 +1407,7 @@ GetCisCandReg <- function(cross, highlod, cand.reg,
   out <- out[is.cis,, drop = FALSE]
   index <- NULL
   if(nrow(out))
-    index <- match(out[, 1], all.traits)
+    index <- match(out[, 1], highobj$names)
   list(cis.reg = out, cis.index = index)
 }
 ##############################################################################
@@ -1545,12 +1546,8 @@ CreateTraitsLodInt <- function(scan, annot, traits, lod.thr, drop = 1.5)
   subset(out, !is.na(out[, 4]))
 }
 ##############################################################################
-GetCandReg <- function(cross, highlod, annot, traits,
-                       all.traits = names(cross$pheno),
-                       chr.pos = get.chr.pos(cross))
+GetCandReg <- function(highobj, annot, traits)
 {
-  ## want to use highlod instead of scan below.
-  ## need to decode highlod.
   ## currently this only gets max over genome; want max by chr, yes?
   traits <- unique(traits)
   n <- length(traits)
@@ -1565,17 +1562,18 @@ GetCandReg <- function(cross, highlod, annot, traits,
   ## Get LOD peak information
   m <- !is.na(out[,3])
 
-  pheno.cols <- match(traits[m], all.traits)
+  pheno.cols <- match(traits[m], highobj$names)
   if(any(is.na(pheno.cols)))
      stop("some traits do not have scans")
 
-  highlod <- highlod[highlod$phenos %in% pheno.cols,]
+  chr.pos <- highobj$chr.pos
+  highlod <- highobj$highlod[highobj$highlod$phenos %in% pheno.cols,]
   tmp <- cumsum(table(highlod[,"phenos"]))
   tmp <- c(0, tmp[-length(tmp)])
   peak.index <- tmp + tapply(highlod$lod, highlod$phenos, which.max)
 
   ## now relate to lod, chr, pos, but get order right with traits
-  m <- match(all.traits[highlod[peak.index, "phenos"]], as.character(out[,1]))
+  m <- match(highobj$names[highlod[peak.index, "phenos"]], as.character(out[,1]))
   if(any(is.na(m)))
     stop("cannot match highlod with pheno names")
   
@@ -1586,13 +1584,12 @@ GetCandReg <- function(cross, highlod, annot, traits,
   out[!is.na(out[,4]),, drop = FALSE]
 }
 ##############################################################################
-GetCoMappingTraits <- function(cross, highlod, cand.reg,
-                               all.traits = names(cross$pheno),
-                               chr.pos = get.chr.pos(cross))
+GetCoMappingTraits <- function(highobj, cand.reg)
 {
+  chr.pos <- highobj$chr.pos
   chrs <- levels(chr.pos$chr)
   chr <- ordered(cand.reg$peak.chr, chrs)
-  phys <- cbind(phenos = match(as.character(cand.reg[,1]), all.traits),
+  phys <- cbind(phenos = match(as.character(cand.reg[,1]), highobj$names),
                 chr = unclass(chr), pos = cand.reg$peak.pos)
 
   in.range <- function(pos, x.pos) {
@@ -1614,7 +1611,7 @@ GetCoMappingTraits <- function(cross, highlod, cand.reg,
   ## This list is too restrictive compared with earlier list of Elias.
   ## Try re-running deprecated code using scan.orf to compare.
 
-  out <- apply(phys, 1, find.comap, highlod, chr.pos, chrs, all.traits)
+  out <- apply(phys, 1, find.comap, highobj$highlod, chr.pos, chrs, highobj$names)
   names(out) <- as.character(cand.reg[,1])
 
   out
