@@ -1,6 +1,7 @@
 \name{PrecTpFpMatrix}
 \alias{PrecTpFpMatrix}
 \alias{JoinTestOutputs}
+\alias{p.adjust.np}
 \title{
 Determine false positive and true positive rates for known targets.
 }
@@ -10,6 +11,7 @@ Determine how well different tests do to predict candidates of regulation.
 \usage{
 JoinTestOutputs(comap)
 PrecTpFpMatrix(alpha, nms, val.targets, all.orfs, tests, cis.index)
+p.adjust.np(tests, method = "BH")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,6 +34,7 @@ list object of joined output created by \code{JoinTestsOutputs}
   \item{cis.index}{
 numeric index into \code{all.orfs} to identify cis traits
 }
+\item{method}{method for p-value adjustment; see \code{\link[stats]{p.adjust}}}
 }
 \details{
 \code{JoinTestOutputs} joins files of results of \code{\link{FitAllTests}}.
@@ -64,7 +67,7 @@ only.
 Elias Chaibub Neto
 }
 \seealso{
-\code{\link{GetCandReg}}, \code{\link{CMSTtests}}
+\code{\link{GetCandReg}}, \code{\link{CMSTtests}}, \code{\link[stats]{p.adjust}}
 }
 \examples{
 \dontrun{

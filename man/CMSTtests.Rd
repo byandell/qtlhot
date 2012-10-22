@@ -2,6 +2,7 @@
 \alias{CMSTtests}
 \alias{CMSTtestsList}
 \alias{FitAllTests}
+\alias{CitTests}
 \title{Perform CMST Tests on cross object}
 \description{Performs 6 separate CMST tests (3 versions, 2 penalties).
 }

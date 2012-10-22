@@ -42,7 +42,7 @@ hotsize(hotobject, \dots)
   \item{maps}{if not \code{NULL}, list of objects of class \code{map}
     to use for rugs on top and bottom of plot}
   \item{title}{title for plot}
-  \item{\dots}{arguments passed along}
+  \item{\dots}{arguments passed along to scanone methods}
 }
 \seealso{\code{\link{highlod}}, \code{\link{hotperm}}}
 \value{

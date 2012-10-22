@@ -99,14 +99,7 @@ highlod <- function(scans, lod.thr = 0, drop.lod = 1.5,
 print.highlod <- function(x, ...) print(summary(x, ...))
 summary.highlod <- function(object, ...)
 {
-  cat("frequency of high LOD entries by chromosome:\n")
-  print(addmargins(table(object$chr.pos$chr[object$highlod$row])))
-  cat("\nfrequency of high LOD entries per phenotype:\n")
-  tbl <- table(table(object$names[object$highlod$pheno]))
-  if(!is.null(object$names))
-    names(tbl) <- object$names[as.numeric(names(tbl))]
-  print(tbl)
-  invisible()
+  summary(hotsize(object, ...))
 }
 plot.highlod <- function(x, ..., quant.level = NULL, sliding = FALSE)
 {

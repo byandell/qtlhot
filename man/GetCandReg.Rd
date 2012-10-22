@@ -13,7 +13,7 @@ same chromosome where they are physically located.
 }
 \usage{
 GetCandReg(highobj, annot, traits)
-GetCisCandReg(highobj, cand.reg)
+GetCisCandReg(highobj, cand.reg, lod.thr = NULL)
 GetCoMappingTraits(highobj, cand.reg)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -21,9 +21,6 @@ GetCoMappingTraits(highobj, cand.reg)
   \item{highobj}{
 data frame from \code{\link{highlod}}, which is sparse summary of
 high LODs in large \code{\link[qtl]{scanone}} object
-}
-  \item{cand.reg}{
-data frame with candidate regulator; see value section below
 }
   \item{annot}{
 data frame with annotation information; must have first column as unique
@@ -34,6 +31,11 @@ cM; typically column 2 has gene name, and column 4 has position in Mb
 names of traits to examine as candidate regulators; names must
 correspond to phenotypes in \code{cross} object
 }
+  \item{cand.reg}{
+data frame with candidate regulator; see value section below
+}
+\item{lod.thr}{LOD threshold; restrict to intervals above this value if
+  not \code{NULL}}
 }
 \details{
 Traits that map to positions close to their physical locations are said
@@ -83,16 +85,14 @@ Elias Chaibub Neto
 }
 \examples{
 \dontrun{
-## scan = scanone object with all traits
-## annot = data frame with annotation of physical position
-cand.reg <- GetCandReg(scan = scan, annot = annot,
-  traits = names(ko.list.all), lod.thr = 3.47, drop = 1.5)
-cand.reg[1:10,]
-cis.cand.reg <- GetCisCandReg(cand.reg, scan, drop = 1.5, lod.thr = 3.47)
-cis.cand.reg[[1]][1:10,]
-comap.targets <- GetCoMappingTraits(traits = cand.reg, scan = scan,
-  lod.thr = 3.47, drop = 1.5)
-summary(unlist(lapply(comap.targets, length)))
+CMSTscan <- scanone(CMSTCross, pheno.col = 1:3, method = "hk")
+CMSThigh <- highlod(CMSTscan)
+traits <- names(CMSTCross$pheno)
+annot <- data.frame(name = traits, traits = traits, chr = rep(1, 3),
+ Mb.pos = c(55,10,100))
+annot$cM.pos <- annot$Mb.pos
+cand.reg <- GetCandReg(CMSThigh, annot, traits)
+cis.cand.reg <- GetCisCandReg(CMSThigh, cand.reg)
 }
 }
 \keyword{utilities}

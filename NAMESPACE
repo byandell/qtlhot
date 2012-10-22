@@ -60,5 +60,6 @@ export(GetCoMappingTraits)
 export(FitAllTests)
 export(JoinTestOutputs)
 export(PrecTpFpMatrix)
+export(p.adjust.np)
 
 ## export(mySimulations)
