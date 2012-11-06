@@ -40,17 +40,31 @@ max.hotsize <- function(x, ...)
   }
   out
 }
-max.highlod <- function(x, lod.thr = NULL, ...)
+max.highlod <- function(x, lod.thr = NULL, window = NULL, quant.level = NULL, ...)
 {
+  if(is.null(window))
+    window <- attr(x, "window")
+  if(is.null(quant.level))
+    window <- attr(x, "quant.level")
+  mymax <- function(x, window = NULL, quant.level = NULL) {
+    if(is.null(x)) {
+      out <- data.frame(chr = NA, pos = NA, max.N = 0)
+      if(!is.null(window))
+        out$max.N.window <- 0
+      if(!is.null(quant.level))
+        out$max.lod.quant <- 0
+      out
+    }
+    else
+      max(x)
+  }
   if(length(lod.thr) > 1) {
     out <- NULL
     out.thr <- NULL
     for(lod in lod.thr) {
       tmp <- hotsize(x, lod, ...)
-      if(!is.null(tmp)) {
-        out <- rbind(out, max(tmp))
-        out.thr <- c(out.thr, lod)
-      }
+      out <- rbind(out, mymax(tmp, window, quant.level))
+      out.thr <- c(out.thr, lod)
     }
     if(!is.null(out))
       out$lod.thr <- out.thr
@@ -59,7 +73,7 @@ max.highlod <- function(x, lod.thr = NULL, ...)
     out
   }
   else
-    max(hotsize(x, lod.thr, ...))
+    mymax(hotsize(x, lod.thr, window, quant.level, ...), window, quant.level)
 }
 ################################################################################
 quantile.highlod <- function(x, probs = NULL, lod.thr = NULL, n.quant, n.pheno,
@@ -135,7 +149,7 @@ quantile.hotperm <- function(x, probs = attr(x, "alpha.levels"),
   }
   
   out <- list()
-  prob.names <- as.character(signif(probs, 3))
+  prob.names <- paste(100 * signif(probs, 3), "%", sep = "")
 
   ## max.N
   out$max.N <- myquant(x$max.N, probs)
@@ -143,7 +157,7 @@ quantile.hotperm <- function(x, probs = attr(x, "alpha.levels"),
 
   ## max.N.window
   if(!is.null(x$max.N.window)) {
-    out$max.N.window <- myquant(x$max.N.window, probs)
+    out$max.N.window <- t(myquant(x$max.N.window, probs))
     dimnames(out$max.N.Window) <- dimnames(out$max.N)
   }
   
@@ -151,7 +165,7 @@ quantile.hotperm <- function(x, probs = attr(x, "alpha.levels"),
   if(!is.null(x$max.lod.quant)) {
     quant <- myquant(x$max.lod.quant, probs)
     if(!is.null(lod.thr)) {
-      tmp <- quant <= lod.thr & quant > 0
+      tmp <- quant <= min(lod.thr) & quant > 0
       if(any(tmp))
         quant[tmp] <- 0
       first.zero <- apply(quant, 2,
@@ -163,8 +177,8 @@ quantile.hotperm <- function(x, probs = attr(x, "alpha.levels"),
                               0
                           })
       offset <- nrow(quant) * (seq(ncol(quant)) - 1)
-      first.zero <- first.zero[first.zero>0] + offset[first.zero>0]
-      quant[first.zero] <- lod.thr
+      first.zero <- first.zero[first.zero > 0] + offset[first.zero > 0]
+      quant[first.zero] <- min(lod.thr)
     }
     dimnames(quant) <- list(as.character(dimnames(x$max.lod.quant)[[2]]), prob.names)
     quant <- quant[apply(quant, 1, function(x) any(x > 0)),, drop = FALSE]

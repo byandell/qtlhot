@@ -120,8 +120,8 @@ summary.hotperm <- function(object, quant.levels, ...)
   quant.levels <- quant.levels[quant.levels <= n.quant]
   if(max(quant.levels) < n.quant)
     quant.levels <- c(quant.levels, n.quant)
-  out$max.lod.quant <- apply(object$max.lod.quant[, quant.levels, drop = FALSE],
-                             2, quantile, probs = alpha.levels, na.rm = TRUE)
+  out$max.lod.quant <- t(apply(object$max.lod.quant[, quant.levels, drop = FALSE],
+                               2, quantile, probs = alpha.levels, na.rm = TRUE))
   
   class(out) <- c("summary.hotperm", class(out))
   out
@@ -129,12 +129,12 @@ summary.hotperm <- function(object, quant.levels, ...)
 print.summary.hotperm <- function(x, ...)
 {
   cat("max.N: hotspot threshold by single-trait LOD threshold and significance level\n")
-  print(x$max.N)
+  print(ceiling(x$max.N))
   window <- attr(x, "window")
   if(!is.null(window)) {
     cat(paste("\nmax.N.window: smoothed hotspot threshold by single-trait LOD threshold and significance level ",
               "(window = ", window, ")\n", sep = ""))
-    print(x$max.N.window)
+    print(ceiling(x$max.N.window))
   }
   cat("\nmax.lod.quant: LOD threshold by hotspot size quantile and significance level\n")
   print(round(x$max.lod.quant, 2))

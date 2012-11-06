@@ -117,7 +117,7 @@ We first use the \texttt{SimCrossCausal} function to simulate a \texttt{cross} o
 
 <<>>=
 set.seed(987654321)
-Cross <- SimCrossCausal(n.ind = 100,
+CMSTCross <- SimCrossCausal(n.ind = 100,
                         len = rep(100, 3),
                         n.mar = 101,
                         beta = rep(0.5, 2),
@@ -133,13 +133,13 @@ Cross <- SimCrossCausal(n.ind = 100,
 We compute the genotype conditional probabilities using Haldane's map function, genotype error rate of 0.0001, and setting the maximum distance between positions at which genotype probabilities were calculated to 1cM.
 
 <<>>=
-Cross <- calc.genoprob(Cross, step = 1)
+CMSTCross <- calc.genoprob(CMSTCross, step = 1)
 @ 
 
 We perform QTL mapping using Haley-Knott regression (Haley and Knott 1992), and summarize the results for the 3 phenotypes. Figure \ref{lod.profiles} presents the LOD score profiles for all 3 phenotypes. The black, blue and red curves represent the LOD profiles of phenotypes $y_1$, $y_2$ and $y_3$, respectively.
 
 <<>>=
-Scan <- scanone(Cross, pheno.col = 1 : 3, method = "hk")
+Scan <- scanone(CMSTCross, pheno.col = 1 : 3, method = "hk")
 summary(Scan[, c(1, 2, 3)], thr = 3)
 summary(Scan[, c(1, 2, 4)], thr = 3)
 summary(Scan[, c(1, 2, 5)], thr = 3)
@@ -158,7 +158,7 @@ plot(Scan, lodcolumn = 1 : 3, ylab = "LOD")
 Phenotypes $y_1$ and $y_2$ map to exactly same QTL at position 55 cM on chromosome 1. Phenotype $y_3$ maps to a QTL at position 55.5 cM. Whenever two phenotypes map to close, but not exactly identical, positions we are faced with the question of which QTL to use as causal anchor. Instead of making a (sometimes) arbitrary choice, our approach is to compute the joint LOD profile of both phenotypes and use the QTL detected by this joint mapping approach as the causal anchor. The function \texttt{GetCommonQtls} performs the joint QTL mapping for phenotypes whose marginal LOD peak positions are higher than a certain LOD threshold (\texttt{thr}), and are less than a fixed distance apart (\texttt{peak.dist}). The function can also handle separate additive and interacting covariates for each phenotype (\texttt{addcov1}, \texttt{intcov1}, \texttt{addcov2}, \texttt{intcov2}). In this simulated example the QTL detected by the joint analysis agreed with phenotype's $y_1$ QTL.
 
 <<>>=
-commqtls <- GetCommonQtls(Cross,
+commqtls <- GetCommonQtls(CMSTCross,
                           pheno1 = "y1",
                           pheno2 = "y3",
                           thr = 3,
@@ -173,8 +173,8 @@ commqtls
 Now, we fit our causal model selection tests for phenotypes $y_1$ and $y_2$ using the \texttt{CMSTtests} function. The \texttt{Q.chr} and \texttt{Q.pos} arguments specify the chromosome and position (in cM) of the QTL to be used as a causal anchor. The argument \texttt{method} specify which version of the CMST test should be used. The options \texttt{"par"}, \texttt{"non.par"} and \texttt{"joint"} represent, respectively, the parametric, non-parametric, joint parametric versions of the CMST test. The option \texttt{"all"} fits all three versions. The \texttt{penalty} argument specifies whether we should test statistics based on the AIC (\texttt{"aic"}), BIC (\texttt{"bic"}), or both (\texttt{"both"}) penalties. In this particular call we computed all 3 versions using both penalties fitting 6 separate CMST tests.
 
 <<>>=
-nms <- names(Cross$pheno)
-out1 <- CMSTtests(Cross,
+nms <- names(CMSTCross$pheno)
+out1 <- CMSTtests(CMSTCross,
                   pheno1 = nms[1],
                   pheno2 = nms[2],
                   Q.chr = 1,
@@ -246,7 +246,7 @@ out1[13:17]
 The function \texttt{CMSTtests} can also computes CMST tests of a single phenotype against a list of phenotypes. Its output is less detailed though. In this particular call we test $y_1$ against $y_2$ and $y_3$.
 
 <<>>=
-out2 <- CMSTtests(Cross,
+out2 <- CMSTtests(CMSTCross,
                   pheno1 = nms[1],
                   pheno2 = nms[-1],
                   Q.chr = 1,
@@ -262,7 +262,59 @@ out2
 
 \section{Other Functions}
 
-There are several other functions involved in simulation and in data analysis that are not well documented yet. They are in fact hidden behind the NAMESPACE. See for instance the \texttt{R/qtlyeast} for some analysis routines.
+There are several other functions involved in simulation and in data analysis that are not well documented yet.
+See \texttt{R/qtlyeast} available at \texttt{GITHUB} for further analysis.
+Here we do scans for the three traits, and create a reduced object with only high LOD values.
+
+<<>>=
+CMSTscan <- scanone(CMSTCross, pheno.col = 1:3, method = "hk")
+CMSThigh <- highlod(CMSTscan)
+@ 
+
+For our purposes, we place the three traits on chromosome 1 at some arbitrary positions, with trait \texttt{y1} having causal ``targets'' of the other two traits.
+
+<<>>=
+traits <- names(CMSTCross$pheno)
+annot <- data.frame(name = traits, traits = traits, chr = rep(1, 3),
+ Mb.pos = c(55,10,100))
+annot$cM.pos <- annot$Mb.pos
+annot
+targets <- list(y1 = c("y2","y3"))
+@ 
+
+Now we used the scans (via \texttt{CMSThigh}) and the annotation to identify candidate regulators, the subset of cis-acting candidate regulators, and co-mapping targets.
+
+<<>>=
+cand.reg <- GetCandReg(CMSThigh, annot, traits)
+cand.reg
+cis.cand.reg <- GetCisCandReg(CMSThigh, cand.reg)
+cis.cand.reg
+comap.targets <- GetCoMappingTraits(CMSThigh, cand.reg)
+comap.targets
+@ 
+
+Next, we perform tests to infer causal relationships.
+
+<<>>=
+tests <- list()
+for(k in seq(names(comap.targets))) {
+  tests[[k]] <- FitAllTests(CMSTCross, pheno1 = names(comap.targets)[k],
+                      pheno2 = comap.targets[[k]],
+                      Q.chr = cand.reg[k, 4],
+                      Q.pos = cand.reg[k, 5])
+}
+names(tests) <- names(comap.targets)
+tests <- JoinTestOutputs(comap.targets, tests)
+tests
+@ 
+
+Finaly, we compare the inferred causal relationships to the known \texttt{targets} to assess precision, true positive rate and false positive rate.
+
+<<>>=
+PrecTpFpMatrix(alpha = seq(0.01, 0.10, by = 0.01),
+  val.targets = targets, all.orfs = CMSThigh$names, tests = tests,
+  cand.reg = cand.reg, cis.cand.reg = cis.cand.reg)
+@
 
 \section{References}
 

@@ -4,7 +4,7 @@
 \alias{summary.hotperm}
 \alias{quantile.hotperm}
 \alias{print.summary.hotperm}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{hotperm1}
 \title{Conduct NL and N permutation tests}
 \description{
 Conduct NL and N permutation tests.
@@ -12,12 +12,12 @@ Conduct NL and N permutation tests.
 \usage{
 hotperm(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1.5,
   window = NULL, verbose = FALSE, init.seed = 0)
+data(hotperm1)
 \method{print}{hotperm}(x, \dots)
 \method{summary}{hotperm}(object, quant.levels, \dots)
 \method{quantile}{hotperm}(x, probs, \dots, lod.thr = NULL)
 \method{print}{summary.hotperm}(x, \dots)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cross}{object of class \code{cross}}
   \item{n.quant}{maximum of \code{s.quant}}
@@ -40,12 +40,13 @@ hotperm(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1.5,
   Elias Chaibub Neto and Brian S Yandell
 }
 \examples{
-\dontrun{
 example(include.hotspots)
 set.seed(123)
 pt <- scanone(ncross1, method = "hk", n.perm = 1000)
 alphas <- seq(0.01, 0.10, by=0.01)
 lod.thrs <- summary(pt, alphas)
+\dontrun{
+## This takes awhile, so we save the object.
 set.seed(12345)
 hotperm1 <- hotperm(cross = cross1,
                     n.quant = 300,
@@ -54,7 +55,8 @@ hotperm1 <- hotperm(cross = cross1,
                     alpha.levels = alphas,
                     drop.lod = 1.5,
                     verbose = FALSE)
-summary(hotperm1)
+save(hotperm1, file = "hotperm1.RData", compress = TRUE)
 }
+summary(hotperm1)
 }
 \keyword{utilities}

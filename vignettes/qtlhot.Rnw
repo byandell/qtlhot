@@ -125,14 +125,14 @@ We perform QTL mapping analysis for 1,000 phenotypes using Haley-Knott regressio
 scan1 <- scanone(cross1, pheno.col = 1:1000, method = "hk")
 @
 
-The routine \texttt{highlod} just saves the LOD support intervals for significant peaks, which dramatically reduces the object size from the result of \texttt{scanone}. We can examine the maximum hotspot size for each possible single trait threshold using the \texttt{max} method for \texttt{highlod} objects. The first column gives the counts associated with QTL mapping threshold of 3.11, whereas the last one shows the counts based on the more liberal threshold 2.11. Note how the counts increase as the QTL mapping thresholds decrease.
+The routine \texttt{highlod} just saves the LOD support intervals for significant peaks, which dramatically reduces the object size from the result of \texttt{scanone}. We can examine the maximum hotspot size for each possible single trait threshold using the \texttt{max} method for \texttt{highlod} objects. The first column gives the counts associated with QTL mapping threshold of \Sexpr{round(lod.thrs[1], 2)}, whereas the last one shows the counts based on the more liberal threshold \Sexpr{round(lod.thrs[10], 2)}. Note how the counts increase as the QTL mapping thresholds decrease.
 
 <<>>=
 high1 <- highlod(scan1, lod.thr = min(lod.thrs), drop.lod = 1.5)
 max(high1, lod.thr = lod.thrs)
 @
 
-Next we infer the hotspot architecture at varying QTL mapping thresholds. In other words, for each genomic position, we count the number of traits that map to it with a LOD score equal or higher than the threshold in \texttt{lod.thr}. The \texttt{hots1} object is a \texttt{scanone} object with added attributes and specialized summary and plot methods. As an illustration, we show the counts for the 5 first markers on chromosome 2.
+Next we infer the hotspot architecture at varying QTL mapping thresholds. In other words, for each genomic position, we count the number of traits that map to it with a LOD score equal or higher than the threshold in \texttt{lod.thr}. The \texttt{hots1} object is a \texttt{scanone} object with added attributes and specialized summary and plot methods. The summary shows the counts for the most significant loci per chromosome, essentially using the \texttt{summary} method for \texttt{scanone} objects.
 
 <<>>=
 hots1 <- hotsize(high1, lod.thr = lod.thr)
@@ -141,8 +141,8 @@ summary(hots1)
 
 \begin{figure}[!ht]
 \begin{center}
-<<label=plotex1counts,width=6,height=6,fig=TRUE,echo=FALSE>>=
-par(mar=c(4.1,4.1,0.1,0.1))
+<<label=plotex1counts,width=6,height=3.5,fig=TRUE,echo=FALSE>>=
+par(mar=c(4.1,4.1,0.5,0.1))
 plot(hots1, cex.lab = 1.5, cex.axis = 1.5)
 @ 
 \end{center}
@@ -158,7 +158,7 @@ We plot the hotspot architecture inferred using the single trait permutation thr
 \end{Sinput}
 \end{Schunk}
 
-Next, we perform permutation tests to assess the statistical significance of the hotspots detected on Figure \ref{plotex1counts}. We consider the $N$- and $NL$-methods. [The $Q$ method of West and Wu is documented in the \texttt{ww.perm} manual page.] The \texttt{hotperm} function implements the $N$- and $NL$-methods' permutation schemes (see Chaibub Neto et al. 2012, for details). The parameter \texttt{n.quant} sets the maximum hotspot size to be analyzed by the $NL$-method. The parameter \texttt{drop} controls the magnitude of the LOD support interval computation during the LOD profile processing step. The function's output is a list with two elements: \texttt{max.lod.quant} and \texttt{max.N}.
+Next, we perform permutation tests to assess the statistical significance of the hotspots detected on Figure \ref{plotex1counts}. We consider the $N$- and $NL$-methods. [The $Q$ method of West and Wu is documented in the \texttt{ww.perm} manual page but not shown here.] The \texttt{hotperm} function implements the $N$- and $NL$-methods' permutation schemes (see Chaibub Neto et al. 2012, for details). The parameter \texttt{n.quant} sets the maximum hotspot size to be analyzed by the $NL$-method. The parameter \texttt{drop.lod} controls the magnitude of the LOD support interval computation during the LOD profile processing step. The function's output is a list with two elements: \texttt{max.lod.quant} and \texttt{max.N}.
 
 <<echo=FALSE>>=
 if(!exists("hotperm1")) {
@@ -189,22 +189,22 @@ names(hotperm1)
 summary(hotperm1)
 @
 
-The \texttt{max.N} element of the \texttt{hotperm1} object stores the output of the $N$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 10 columns representing the QTL mapping thresholds. Entry $ij$ stores the maximum genome wide hotspot size detected at permutation $i$ using the QTL mapping threshold $j$. The \texttt{max.N} element of the \texttt{summary} is a 10 by 10 matrix with rows indexing the QTL mapping thresholds and columns indexing the target genome wide error rates. Each entry $ij$ shows the hotspot size above which a hotspot is considered significant at a GWER $j$ using the QTL mapping threshold $i$. As before, our interest focus on the diagonal, and the $N$-method's threshold that controls the hotspot GWER at a 5\% level when the QTL mapping was controlled at a GWER of 5\% is 200.55. Note that according to the $N$-method, none of the hotspots on Figure \ref{plotex1counts} is significant.
+The \texttt{max.N} element of the \texttt{hotperm1} object stores the output of the $N$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 10 columns representing the QTL mapping thresholds. Entry $ij$ stores the maximum genome wide hotspot size detected at permutation $i$ using the QTL mapping threshold $j$. The \texttt{max.N} element of the \texttt{summary} is a 10 by 10 matrix with rows indexing the QTL mapping thresholds and columns indexing the target genome wide error rates. Each entry $ij$ shows the hotspot size above which a hotspot is considered significant at a GWER $j$ using the QTL mapping threshold $i$. As before, our interest focus on the diagonal, and the $N$-method's threshold that controls the hotspot GWER at a 5\% level when the QTL mapping was controlled at a GWER of 5\% (single trait LOD threshold of \Sexpr{round(lod.thr, 2)}) is \Sexpr{ceiling(summary(hotperm1)$max.N[5,5])} traits per hotspot (rounded up). Note that according to the $N$-method, none of the hotspots on Figure \ref{plotex1counts} is significant.
 
 The \texttt{max.lod.quant} element of the \texttt{hotperm1} object stores the output of the $NL$-method's permutations and is given by a matrix with 100 rows representing the permutations, and 300 columns representing the hotspot sizes analyzed. Entry $ij$ stores the maximum genome wide $qLOD(n)$ value--the $n$th LOD score in a sample ordered from highest to lowest--computed at permutation $i$ using the QTL mapping threshold $j$. The \texttt{max.lod.quant} element of the \texttt{summary} shows just the extremes and quartiles.
 
 The \texttt{max.lod.quant} element of the \texttt{quantile} contains the sliding LOD quantiles from 1 up to 300 for each single trait LOD threshold. This can be used to plot how many traits pass the sliding LOD threshold, and are significant, at each locus in the genome. Figure \ref{plotex1slidingbar} shows the hotspot significance profile for the thresholds targeting GWER at a 5\% level. Note that we only consider LODs above \texttt{lod.thr}, and chromosome 1 has none.
 
 
-<<label=figex1slidingbar,width=6,height=6,include=FALSE,echo=FALSE>>=
-par(mar=c(4.1,4.1,0.1,4.1))
+<<label=figex1slidingbar,include=FALSE,echo=FALSE>>=
+par(mar=c(4.1,4.1,0.5,4.1))
 quant1 <- quantile(hotperm1, 0.05, lod.thr = lod.thr)
 plot(high1, quant.level = quant1, sliding = TRUE)
 @
 
 \begin{figure}[!ht]
 \begin{center}
-<<label=plotex1slidingbar,fig=TRUE,echo=FALSE>>=
+<<label=plotex1slidingbar,fig=TRUE,width=6,height=3.5,echo=FALSE>>=
 <<figex1slidingbar>>
 @ 
 \caption{Hotspot size significance profile targeting GWER at a 5\% level for example 1.}
@@ -219,30 +219,46 @@ plot(high1, quant.level = quant1, sliding = TRUE)
 \end{Sinput}
 \end{Schunk}
 
+<<echo=FALSE>>=
+hotsq1 <- hotsize(high1, lod = lod.thr, window = 5, quant.level = quant1)
+quant.axis <- pmax(1, pretty(c(0, qtl:::summary.scanone(hotsq1)[3,"quant"])))
+quant.level <- round(attr(hotsq1, "quant.level")[quant.axis], 2)
+@ 
 
-Figure \ref{plotex1slidingbar} depicts a sliding window of hotspot size thresholds ranging from $n=1,\ldots,N$, where $N=100$ corresponds to the (approximate) hotspot size threshold derived from the $N$-method. For each genomic location this figure shows the hotspot sizes at which the hotspot was significant, that is, at which the hotspot locus had more traits than the hotspot size threshold on the left mapping to it with a LOD score higher than the threshold on the right than expected by chance. For example, the hotspot on chromosome 3 was significant up to size 20, meaning that more than 1 trait mapped to the hotspot locus with LOD higher than 3.99, more than 11 traits mapped to the hotspot locus with LOD higher than 3.36, and so on up to hotspot size 49 where more than 49 traits mapped to the hotspot locus with LOD higher than 2.84.
-
-The $N$-method that did not detect any hotspots, but the $NL$-method's sliding window correctly detected the simulated hotspots and showed that the apparent hotspots on chromosome 1 were noisy artifacts.
-
-Here is another way to visualize this, using the sliding LOD threshold. We will also show a 5-cM smoothign window applied to the counts. Note that with the blue curve, no hotspots are detected on chr 1, and hotspots of size 20 are found on chr 2 and 4, with a large hotspot of size 50 on chr 3.
+<<label=figex1elias,include=FALSE,echo=FALSE>>=
+par(mar=c(4.1,4.1,0.5,4.1))
+plot(hotsq1)
+@
 
 \begin{figure}[!ht]
 \begin{center}
-<<fig=TRUE>>=
-hotsq1 <- hotsize(high1, lod = lod.thr, window = 5, quant.level = quant1)
-plot(hotsq1)
-summary(hotsq1)
+<<label=plotex1elias,fig=TRUE,width=6,height=3.5,echo=FALSE>>=
+<<figex1elias>>
 @ 
 \caption{Hotspot size significance profile at 5\% level for example 1. Black is raw counts, red is counts smoothed over a 5cM window, blue is the sliding LOD threshold approach.}
-\label{plotex1slidingbar}
+\label{plotex1elias}
 \end{center}
 \end{figure}
+
+Figure \ref{plotex1slidingbar} depicts a sliding window of hotspot size thresholds ranging from $n=1,\ldots,N$, where $N=100$ corresponds to the (approximate) hotspot size threshold derived from the $N$-method. For each genomic location this figure shows the hotspot sizes at which the hotspot was significant, that is, at which the hotspot locus had more traits than the hotspot size threshold on the left mapping to it with a LOD score higher than the threshold on the right than expected by chance. For example, the hotspot on chromosome 3 was significant at all sizes from 1 to \Sexpr{max(quant.axis)}, meaning that at least \Sexpr{quant.axis[1]} trait mapped to the hotspot locus with LOD higher than \Sexpr{quant.level[1]}, at least \Sexpr{quant.axis[3]} traits mapped to the hotspot locus with LOD higher than \Sexpr{quant.level[3]}, and so on up to hotspot size \Sexpr{max(quant.axis)}, all with LODs higher than \Sexpr{min(quant.level)}. The $N$-method that did not detect any hotspots, but the $NL$-method's sliding window correctly detected the simulated hotspots and showed that the apparent hotspots on chromosome 1 were noisy artifacts.
+
+Figure  \ref{plotex1elias} is another way to visualize this, using the sliding LOD threshold (blue cureve). We also show a 5-cM smoothing window applied to the counts (red curve). Note that with the sliding LOD threshold, no hotspots (or individual traits) are significant on chr 1, and hotspots of size 20 are found on chr 2 and 4, with a significant hotspot of size \Sexpr{max(quant.axis)} on chr 3.
+
+\begin{Schunk}
+\begin{Sinput}
+> hotsq1 <- hotsize(high1, lod = lod.thr, window = 5, quant.level = quant1)
+> plot(hotsq1)
+\end{Sinput}
+\end{Schunk}
+<<>>=
+summary(hotsq1)
+@ 
 
 \section{Example with Uncorrelated Phenotypes}
 
 Next we consider a second toy example with uncorrelated phenotype data. We repeat the simulation and analysis steps presented previously changing \texttt{latent.eff} to zero.
 
-<<>>=
+<<echo=FALSE>>=
 ncross2 <- sim.null.cross(chr.len = rep(100,4), 
                           n.mar = 51, 
                           n.ind = 100,
@@ -263,24 +279,63 @@ cross2 <- include.hotspots(cross = ncross2,
                            res.var = 1,
                            n.phe = 1000,
                            init.seed = 12345)
-ncor2 <- cor(cross2$pheno)
-summary(ncor2[lower.tri(ncor2)])
-rm(ncor2)
+@ 
+
+<<label=figex2counts,echo=FALSE,include=FALSE>>=
 scan2 <- scanone(cross2, pheno.col = 1:1000, method = "hk")
 high2 <- highlod(scan2, lod.thr = lod.thr, drop.lod = 1.5)
 hots2 <- hotsize(high2)
+par(mar=c(4.1,4.1,0.1,0.1))
+plot(hots2, cex.lab = 1.5, cex.axis = 1.5)
 @ 
 
 \begin{figure}[!ht]
 \begin{center}
-<<label=plotex2counts,width=6,height=6,fig=TRUE,echo=TRUE>>=
-par(mar=c(4.1,4.1,0.1,0.1))
-plot(hots2, cex.lab = 1.5, cex.axis = 1.5)
+<<label=plotex2counts,fig=TRUE,width=6,height=3.5,echo=FALSE>>=
+<<figex2counts>>
 @ 
 \caption{Hotspot architecture targeting 5\% GWER for example 2.}
 \label{plotex2counts}
 \end{center}
 \end{figure}
+
+\begin{Schunk}
+\begin{Sinput}
+> ncross2 <- sim.null.cross(chr.len = rep(100,4), 
++                           n.mar = 51, 
++                           n.ind = 100,
++                           type = "bc", 
++                           n.phe = 1000, 
++                           latent.eff = 0, 
++                           res.var = 1, 
++                           init.seed = 123457)
+> cross2 <- include.hotspots(cross = ncross2,
++                            hchr = c(2, 3, 4),
++                            hpos = c(25, 75, 50),
++                            hsize = c(100, 50, 20),
++                            Q.eff = 2,
++                            latent.eff = 0,
++                            lod.range.1 = c(2.5, 2.5),
++                            lod.range.2 = c(5, 8),
++                            lod.range.3 = c(10, 15),
++                            res.var = 1,
++                            n.phe = 1000,
++                            init.seed = 12345)
+\end{Sinput}
+\end{Schunk}
+<<>>=
+ncor2 <- cor(cross2$pheno)
+summary(ncor2[lower.tri(ncor2)])
+rm(ncor2)
+@ 
+\begin{Schunk}
+\begin{Sinput}
+> scan2 <- scanone(cross2, pheno.col = 1:1000, method = "hk")
+> high2 <- highlod(scan2, lod.thr = lod.thr, drop.lod = 1.5)
+> hots2 <- hotsize(high2)
+> plot(hots2, cex.lab = 1.5, cex.axis = 1.5)
+\end{Sinput}
+\end{Schunk}
 
 <<echo=FALSE>>=
 if(!exists("hotperm2")) {
@@ -294,29 +349,11 @@ if(!exists("hotperm2")) {
                   verbose = FALSE) 
 }
 @
-\begin{Schunk}
-\begin{Sinput}
-> set.seed(12345)
-> hotperm2 <- hotperm(cross = cross2, 
-+                 n.quant = 300, 
-+                 n.perm = 100, 
-+                 lod.thrs = lod.thrs, 
-+                 alpha.levels = alphas,
-+                 drop.lod = 1.5, 
-+                 verbose = FALSE) 
-\end{Sinput}
-\end{Schunk}
-<<>>=
+<<echo=FALSE>>=
 quant2 <- quantile(hotperm2, 0.05, lod.thr = lod.thr)
 @
-<<echo=FALSE>>=
-if(!file.exists("savedperms.RData"))
-  save(pt, hotperm1, hotperm2, file = "savedperms.RData", compress = TRUE)
-@
-
-The $N$-method, as expected, gave rise to much smaller thresholds in this second example with uncorrelated phenotypes. Additionally, inspection of Figure \ref{plotex2counts} shows no spurious hotspots on chromosome 1.
-
-<<label=plotex2slidingbar,width=6,height=6,fig=TRUE,echo=TRUE,include=FALSE>>=
+<<label=plotex2slidingbar,width=6,height=3.5,fig=TRUE,echo=FALSE,include=FALSE>>=
+par(mar=c(4.1,4.1,0.5,0.1))
 plot(high2, lod.thr = lod.thr, quant.level = quant2, sliding = TRUE)
 @
 
@@ -328,9 +365,8 @@ plot(high2, lod.thr = lod.thr, quant.level = quant2, sliding = TRUE)
 \end{center}
 \end{figure}
 
-Figure \ref{plotex2slidingbar} presents the hotspot significance profile targeting 5\% GWER. For this second example, all methods correctly detected the simulated hotspots.
-
-<<label=plotex2sigct,width=6,height=6,fig=TRUE,echo=TRUE,include=FALSE>>=
+<<label=plotex2sigct,width=6,height=3.5,fig=TRUE,echo=FALSE,include=FALSE>>=
+par(mar=c(4.1,4.1,0.5,0.1))
 plot(high2, quant.level = quant2)
 @
 
@@ -341,6 +377,41 @@ plot(high2, quant.level = quant2)
 \label{plotex2sigct}
 \end{center}
 \end{figure}
+
+\begin{Schunk}
+\begin{Sinput}
+> set.seed(12345)
+> hotperm2 <- hotperm(cross = cross2, 
++                 n.quant = 300, 
++                 n.perm = 100, 
++                 lod.thrs = lod.thrs, 
++                 alpha.levels = alphas,
++                 drop.lod = 1.5, 
++                 verbose = FALSE) 
+> quant2 <- quantile(hotperm2, 0.05, lod.thr = lod.thr)
+\end{Sinput}
+\end{Schunk}
+
+<<echo=FALSE>>=
+if(!file.exists("savedperms.RData"))
+  save(pt, hotperm1, hotperm2, file = "savedperms.RData", compress = TRUE)
+@
+
+The $N$-method, as expected, gave rise to much smaller thresholds in this second example with uncorrelated phenotypes. Additionally, inspection of Figure \ref{plotex2counts} shows no spurious hotspots on chromosome 1.
+
+\begin{Schunk}
+\begin{Sinput}
+> plot(high2, lod.thr = lod.thr, quant.level = quant2, sliding = TRUE)
+\end{Sinput}
+\end{Schunk}
+
+Figure \ref{plotex2slidingbar} presents the hotspot significance profile targeting 5\% GWER. For this second example, all methods correctly detected the simulated hotspots.
+
+\begin{Schunk}
+\begin{Sinput}
+> plot(high2, quant.level = quant2)
+\end{Sinput}
+\end{Schunk}
 
 Figure \ref{plotex2sigct} shows another way to represent significant hotspots. We overlay the largest significant hotspot counts using the sliding quantiles in red on top of the curve on Figure \ref{plotex2counts}. Notice that the large sizes are all significant, but only small sizes corresponding to larger LOD scores are significant. We add a right axis with the sliding LOD thresholds.
 

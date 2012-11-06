@@ -684,7 +684,7 @@ CMSTtestsList <- function(cross,
         out[[4]][k,] <- aux$pvals.p.BIC
         out[[5]][k,] <- aux$pvals.p.AIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "non.par") {
@@ -710,7 +710,7 @@ CMSTtestsList <- function(cross,
         out[[4]][k,] <- aux$pvals.np.BIC
         out[[5]][k,] <- aux$pvals.np.AIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "joint") {
@@ -736,7 +736,7 @@ CMSTtestsList <- function(cross,
         out[[4]][k,] <- aux$pvals.j.BIC
         out[[5]][k,] <- aux$pvals.j.AIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
   }
@@ -764,7 +764,7 @@ CMSTtestsList <- function(cross,
         out[[4]][k,] <- aux$pvals.p.BIC
         out[[5]][k,] <- aux$pvals.np.BIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "joint") {
@@ -783,7 +783,7 @@ CMSTtestsList <- function(cross,
         out[[2]][k,] <- c(aux$BICs, zb[!is.na(zb)])
         out[[3]][k,] <- aux$pvals.j.BIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "par") {
@@ -802,7 +802,7 @@ CMSTtestsList <- function(cross,
         out[[2]][k,] <- c(aux$BICs, zb[!is.na(zb)])
         out[[3]][k,] <- aux$pvals.p.BIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "non.par") {
@@ -820,7 +820,7 @@ CMSTtestsList <- function(cross,
         out[[1]][k,] <- aux$R2
         out[[2]][k,] <- c(aux$BICs, zb[!is.na(zb)])
         out[[3]][k,] <- aux$pvals.np.BIC
-        cat("pheno2 = ", k, "\n")   
+        cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
   } 
@@ -848,7 +848,7 @@ CMSTtestsList <- function(cross,
         out[[4]][k,] <- aux$pvals.p.AIC
         out[[5]][k,] <- aux$pvals.np.AIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "joint") {
@@ -867,7 +867,7 @@ CMSTtestsList <- function(cross,
         out[[2]][k,] <- c(aux$AICs, za[!is.na(za)])
         out[[3]][k,] <- aux$pvals.j.AIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "par") {
@@ -886,7 +886,7 @@ CMSTtestsList <- function(cross,
         out[[2]][k,] <- c(aux$AICs, za[!is.na(za)])
         out[[3]][k,] <- aux$pvals.p.AIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
     else if (method == "non.par") {
@@ -905,7 +905,7 @@ CMSTtestsList <- function(cross,
         out[[2]][k,] <- c(aux$AICs, za[!is.na(za)])
         out[[3]][k,] <- aux$pvals.np.AIC
         if(verbose)
-          cat("pheno2 = ", k, "\n")   
+          cat("pheno2 = ", pheno2[k], "\n")   
       }
     }
   } 
@@ -915,7 +915,7 @@ CMSTtestsList <- function(cross,
 FitAllTests <- function(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
 {
   out <- CMSTtests(cross, pheno1, pheno2, Q.chr, Q.pos, 
-                     NULL, NULL, NULL, NULL, "all", "both", FALSE)
+                     NULL, NULL, NULL, NULL, "all", "both", verbose)
 
   nms <- pheno2
   ntests <- length(pheno2)
@@ -931,7 +931,7 @@ FitAllTests <- function(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
       out$pvals.cit[k,] <- aux2
     }
     if(verbose)
-      cat("CIT pheno2 = ", k, "\n")   
+      cat("CIT pheno2 = ", pheno2[k], "\n")   
   }
   out
 }
@@ -1412,21 +1412,30 @@ get.power.type1.prec.matrix.2 <- function(out, models, alpha)
   list(Power=Power, Type1=Type1, Prec=Prec)
 }
 ##############################################################################
-JoinTestOutputs <- function(comap)
+CombineTests <- function(comap, file)
 {
-  ## This is one of Elias's routines that relies on external files.
-  ## It should be parallelized.
-  
   reg.nms <- names(comap)
   out <- NULL
-  load(paste("output_ko_validation", reg.nms[1], "RData", sep = "."))
-  join.out <- out
+  join.out <- list()
+  for (k in 1 : length(comap)) {
+    load(paste(file, reg.nms[k], "Rdata", sep="."))
+    join.out[[k]] <- out
+  }
+  names(join.out) <- reg.nms
+  join.out
+}
+JoinTestOutputs <- function(comap, tests, file = NULL)
+{
+  if(!is.null(file) & missing(tests))
+    tests <- CombineTests(comap, file)
+  
+  reg.nms <- names(comap)
+  join.out <- tests[[1]]
   ## Add extra element to join.out: phenos.
   join.out$phenos <- cbind(rep(reg.nms[1], length(comap[[1]])), comap[[1]])
 
   for (k in 2 : length(comap)) {
-    load(paste("output_ko_validation", reg.nms[k], "Rdata", sep="."))
-
+    out <- tests[[k]]
     if (length(out) != 10) { ## CMSTtests if length(pheno2) == 1
       tmp <- t(out$Z.aic)
       AIC.stats <- c(out$AICs, tmp[!is.na(tmp)])
@@ -1467,6 +1476,8 @@ GetCis <- function(x, window = 10) {
 ##############################################################################
 GetCisCandReg <- function(highobj, cand.reg, lod.thr = NULL)
 {
+  cand.names <- as.character(cand.reg[, 1])
+  
   ## Restrict to being on same chromosome. This is fragile.
   cand.reg <- cand.reg[cand.reg[, 2] == cand.reg[, 4],]
 
@@ -1508,7 +1519,7 @@ GetCisCandReg <- function(highobj, cand.reg, lod.thr = NULL)
   ## Keep cis traits, but leave off peak.chr (since it == phys.chr).
   out <- out[is.cis, -4, drop = FALSE]
   if(nrow(out))
-    attr(out, "cis.index") <- match(out[, 1], highobj$names)
+    attr(out, "cis.index") <- match(out[, 1], cand.names)
   out
 }
 ##############################################################################
@@ -1525,6 +1536,13 @@ PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs,
   names(TP) <- names(FP) <- names(TN) <- names(FN) <- names(NC) <- nms
   row.names(TP) <- row.names(FP) <- row.names(TN) <- row.names(FN) <- row.names(NC) <- rnms
   Causal <- NotCausal <- vector(mode = "list", length = 9)
+  length.intersect <- function(a, b) {
+    ints <- intersect(a, b)
+    if(is.null(ints))
+      0
+    else
+      length(!is.na(ints))
+  }
   for (k in 1 : nt) {
       aux <- which(tests[[11]][,1] == nms[k])
       aux.nms <- tests[[11]][aux, 2]
@@ -1549,12 +1567,12 @@ PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs,
         aux.nms[c(which(tests[[10]][aux, 1] > alpha & tests[[10]][aux, 2] <= alpha),
                   which(tests[[10]][aux, 1] >= alpha & tests[[10]][aux, 2] >= alpha))]
       val <- val.targets[[match(nms[k], names(val.targets))]]
-      not.val <- all.orfs[-match(unique(c(nms[k], val)), all.orfs)]
+      not.val <- all.orfs[-match(unique(c(as.character(nms[k]), val)), all.orfs)]
       for (i in 1 : 9) {
-        TP[i, k] <- length(!is.na(intersect(Causal[[i]], val)))
-        FP[i, k] <- length(!is.na(intersect(Causal[[i]], not.val)))
-        TN[i, k] <- length(!is.na(intersect(NotCausal[[i]], not.val)))
-        FN[i, k] <- length(!is.na(intersect(NotCausal[[i]], val)))
+        TP[i, k] <- length.intersect(Causal[[i]], val)
+        FP[i, k] <- length.intersect(Causal[[i]], not.val)
+        TN[i, k] <- length.intersect(NotCausal[[i]], not.val)
+        FN[i, k] <- length.intersect(NotCausal[[i]], val)
       }
       for (i in 4 : 9) {
         NC[i - 1, k] <- length(c(which(tests[[i]][aux, 1] > alpha),
@@ -1574,11 +1592,11 @@ PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs,
   tpr <- tp/(tp + fn)
   fpr <- fp/(fp + tn)
   overall.1 <- data.frame(prec, tp, fp, tpr, fpr, tn, fn, nc)
-  tp <- apply(TP[, cis.index], 1, sum)
-  fp <- apply(FP[, cis.index], 1, sum)
-  tn <- apply(TN[, cis.index], 1, sum)
-  fn <- apply(FN[, cis.index], 1, sum)
-  nc <- apply(NC[, cis.index], 1, sum)
+  tp <- apply(TP[, cis.index, drop = FALSE], 1, sum)
+  fp <- apply(FP[, cis.index, drop = FALSE], 1, sum)
+  tn <- apply(TN[, cis.index, drop = FALSE], 1, sum)
+  fn <- apply(FN[, cis.index, drop = FALSE], 1, sum)
+  nc <- apply(NC[, cis.index, drop = FALSE], 1, sum)
   prec <- tp/(tp + fp)
   tpr <- tp/(tp + fn)
   fpr <- fp/(fp + tn)
@@ -1586,8 +1604,11 @@ PerformanceSummariesKo <- function(alpha, nms, val.targets, all.orfs,
   list(overall.1, overall.2, tar)
 }
 ##############################################################################
-PrecTpFpMatrix <- function(alpha, nms, val.targets, all.orfs, tests, cis.index)
+PrecTpFpMatrix <- function(alpha, val.targets, all.orfs, tests, cand.reg, cis.cand.reg)
 {
+  nms <- as.character(cand.reg[,1])
+  cis.index <- attr(cis.cand.reg, "cis.index")
+  
   le <- length(alpha)
   Prec1 <- Tp1 <- Fp1 <- matrix(NA, 9, le, 
     dimnames=list(c("aic", "bic", "j.bic", "p.bic", "np.bic", "j.aic", 
@@ -1605,7 +1626,6 @@ PrecTpFpMatrix <- function(alpha, nms, val.targets, all.orfs, tests, cis.index)
     Tp2[,i] <- aux[[2]][, 2]
     Fp1[,i] <- aux[[1]][, 3]
     Fp2[,i] <- aux[[2]][, 3]
-    cat("", i, "\n")
   }
   list(Prec1 = Prec1,
        Prec2 = Prec2,
@@ -1713,7 +1733,9 @@ GetCoMappingTraits <- function(highobj, cand.reg)
   ## Try re-running deprecated code using scan.orf to compare.
 
   out <- apply(phys, 1, find.comap, highobj$highlod, chr.pos, chrs, highobj$names)
+  if(is.matrix(out))
+    out <- as.data.frame(out)
   names(out) <- as.character(cand.reg[,1])
 
-  out
+  lapply(out, as.character)
 }

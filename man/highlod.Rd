@@ -19,7 +19,7 @@ pull.highlod(object, chr, pos, \dots)
 \method{print}{highlod}(x, \dots)
 \method{summary}{highlod}(object, \dots)
 \method{plot}{highlod}(x, \dots, quant.level = NULL, sliding = FALSE)
-\method{max}{highlod}(x, lod.thr = NULL, \dots)
+\method{max}{highlod}(x, lod.thr = NULL, window = NULL, quant.level = NULL, \dots)
 \method{quantile}{highlod}(x, probs = NULL, lod.thr = NULL, n.quant,
   n.pheno, max.quantile = TRUE, \dots)
 }
@@ -38,7 +38,9 @@ pull.highlod(object, chr, pos, \dots)
   \item{probs}{probability levels for quantiles (should be > 0.5)}
   \item{n.quant}{maximum of \code{s.quant}}
   \item{n.pheno}{number of phenotypes considered}
-  \item{max.quantile}{return only quantiles of max LOD across genome if \code{TRUE}}
+  \item{max.quantile}{return only quantiles of max LOD across genome if
+    \code{TRUE}}
+  \item{window}{size of window for smoothing hotspot size}
   \item{quant.level}{vector of LOD levels for 1 up to
     \code{length(quant.level)} size hotspots}
   \item{sliding}{plot as sliding hotspot if \code{TRUE}}

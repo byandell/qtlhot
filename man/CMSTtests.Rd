@@ -1,8 +1,6 @@
 \name{CMSTtests}
 \alias{CMSTtests}
 \alias{CMSTtestsList}
-\alias{FitAllTests}
-\alias{CitTests}
 \title{Perform CMST Tests on cross object}
 \description{Performs 6 separate CMST tests (3 versions, 2 penalties).
 }
@@ -15,7 +13,6 @@ CMSTtestsList(cross, pheno1, pheno2, Q.chr, Q.pos,
   addcov1 = NULL, addcov2 = NULL, intcov1 = NULL, intcov2 = NULL, 
   method = c("par", "non.par", "joint", "all"),
   penalty = c("bic", "aic", "both"), verbose = TRUE)
-FitAllTests(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
 }
 \arguments{
   \item{cross}{object of class \code{cross}}
@@ -40,7 +37,8 @@ Chaibub Neto E, Broman AT, Keller MP, Attie AD, Zhang B, Zhu J, Yandell BS,
 Causal model selection hypothesis tests in systems genetics.
 Genetics (in review).
 }
-\seealso{\code{\link{CMSTCross}}, \code{\link{PrecTpFpMatrix}}}
+\seealso{\code{\link{CMSTCross}}, \code{\link{PrecTpFpMatrix}},
+\code{\link{FitAllTests}}}
 \examples{
 data(CMSTCross)
 nms <- names(CMSTCross$pheno)

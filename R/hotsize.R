@@ -114,7 +114,7 @@ summary.hotsize <- function(object, ...)
   quant.level <- attr(object, "quant.level")
   if(!is.null(quant.level)) {
     cat("quantile level summary:\n")
-    summary(quant.level)
+    print(summary(quant.level))
   }
   cat("\n")
   format <- ifelse(ncol(object ==3), "onepheno", "allpeaks")
@@ -173,7 +173,7 @@ plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
     ## Add right axis for quantile LOD level.
     if(length(quant.axis)) {
       quant.axis <- pmax(1, quant.axis)
-      axis(4, at = quant.axis, labels = round(quant.level[quant.axis], 1), las = 1, cex = 0.35)
+      axis(4, at = quant.axis, labels = round(quant.level[quant.axis], 2), las = 1, cex.axis = 0.9)
       ## mtext("sliding LOD thresholds", 4, 1, cex = 1.5)
     }
   }

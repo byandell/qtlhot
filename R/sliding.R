@@ -59,7 +59,10 @@ slidingbar.create <- function(highobj, quant.level = NULL,
   expand[rows,] <- t(quant)
 
   ## probably want to make this into some kind of object?
-  data.frame(chr.pos, expand)
+  out <- data.frame(chr.pos, expand)
+  attr(out, "quant.level") <- quant.level
+
+  out
 }
 slidingbar.plot <- function(x, ...)
 {
@@ -84,6 +87,9 @@ slidingbar.plot <- function(x, ...)
   for (i in 1:length(n.mar))
     axis(side = 1, at = mean(wh[i + c(0, 1)]), labels = chr[i])
 
+  y.axes <- pmax(1, pretty(seq(ncol(x) - 2)))
+  quant.level <- round(attr(x, "quant.level"), 2)
+  axis(side=4, labels = quant.level[y.axes], at = y.axes, cex.axis = 0.9, las=1)
   invisible()
 }
 ## Generates the sliding bar figure (not an image anymore)
