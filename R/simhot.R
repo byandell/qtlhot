@@ -160,7 +160,7 @@ sim.hotspot <- function(nSim,
     ncross <- sim.null.pheno.data(cross, n.pheno, latent.eff, res.var)
   
     ## Simulate correlated phenotypes and create threshold summaries.
-    out.sim <- filter.threshold(ncross, n.pheno, latent.eff[k], res.var,
+    out.sim <- filter.threshold(ncross, seq(n.pheno), latent.eff[k], res.var,
                              lod.thrs, drop.lod,
                              s.quant, n.perm, alpha.levels,
                              verbose)

@@ -137,9 +137,10 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
 #############################################################################################
 big.phase2 <- function(dirpath = ".", index, ...,
                        ## Following are loaded with Phase1.RData created in big.phase1.
-                       batch.effect, all.traits, trait.index, lod.min,
+                       batch.effect = NULL, all.traits, trait.index, lod.min,
                        drop.lod, n.quant, lod.thrs, cross.index, seeds,
                        ##
+                       addcovar = NULL, intcovar = NULL,
                        remove.files = TRUE, verbose = FALSE)
 {
   ## Phase 2.
@@ -151,7 +152,10 @@ big.phase2 <- function(dirpath = ".", index, ...,
 
   if(verbose)
     cat("compute covariates\n")
-  covars <- sexbatch.covar(cross, batch.effect, verbose = TRUE)
+  if(!is.null(batch.effect))
+    covars <- sexbatch.covar(cross, batch.effect, verbose = TRUE)
+  else
+    covars <- list(addcovar = addcovar, intcovar = intcovar)
 
   n.traits <- length(all.traits)
   perms <- NULL
@@ -159,7 +163,8 @@ big.phase2 <- function(dirpath = ".", index, ...,
   if(index <= 1) {
     ## Original data.
     do.big.phase2(dirpath, cross, covars, perms, 1, trait.index,
-                  lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index, verbose)
+                  lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index,
+                  ..., verbose)
   }
   else {
     ## Random permutation. Use preset seed if provided.
@@ -173,12 +178,13 @@ big.phase2 <- function(dirpath = ".", index, ...,
     cross$pheno <- cross$pheno[perms,]
 
     do.big.phase2(dirpath, cross, covars, perms, index, trait.index,
-                  lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index, verbose)
+                  lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index,
+                  ..., verbose)
   }
 }
 do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
                           lod.min, drop.lod, remove.files, n.quant, lod.thrs, window, n.traits, cross.index,
-                          verbose,
+                          ..., verbose,
                           ## Following supplied by Trait.*.RData created in big.phase0.
                           trait.data, offset, pheno.set)
 {
@@ -201,7 +207,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
     detach()
 
     per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
-                        addcovar=covars$addcovar, intcovar=covars$intcovar)
+                        addcovar=covars$addcovar, intcovar=covars$intcovar, ...)
 
     per.scan.hl <- highlod(per.scan, lod.thr = lod.min, drop.lod = drop.lod,
                                  restrict.lod = TRUE)$highlod

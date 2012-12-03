@@ -174,15 +174,18 @@ sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
 scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
                                  n.perm, seed=123456789, batch.effect = NULL,
                                  pheno.set = 1,
-                                 lod.min, drop.lod = 1.5)
+                                 lod.min, drop.lod = 1.5,
+                                 addcovar = NULL, intcovar = NULL, ...)
 {
   set.seed(seed[[1]])
 
-  if(!is.null(batch.effect))
+  if(!is.null(batch.effect)) {
     cross <- subset(cross, ind = !is.na(cross$pheno[[batch.effect]]))
-
-  covars <- sexbatch.covar(cross, batch.effect)
-
+    covars <- sexbatch.covar(cross, batch.effect)
+  }
+  else
+    covars <- list(addcovar = addcovar, intcovar = intcovar)
+  
   n.ind <- nind(cross)
 
   perms <- matrix(NA, n.ind, n.perm)
@@ -193,7 +196,7 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
     perm.cross$pheno <- cross$pheno[tmp,]
 
     per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
-                        addcovar=covars$addcovar, intcovar=covars$intcovar)
+                        addcovar=covars$addcovar, intcovar=covars$intcovar, ...)
 
     per.scan.hl <- highlod(per.scan, lod.thr = lod.min, drop.lod = drop.lod,
                                  restrict.lod = TRUE)$highlod

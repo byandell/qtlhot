@@ -31,10 +31,12 @@
 ## permutation significance (alpha levels). 
 ##
 hotperm <- function(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1.5,
-                    window = NULL, verbose = FALSE, init.seed = 0) 
+                    window = NULL, verbose = FALSE, init.seed = 0,
+                    addcovar = NULL, intcovar = NULL, ...) 
 {
   set.seed(init.seed)
   n.phe <- nphe(cross)
+  pheno.col <- seq(n.phe)
   n.ind <- nind(cross)
   n.quant <- min(n.quant, n.phe)
 
@@ -68,7 +70,8 @@ hotperm <- function(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1
     ## perform mapping analysis in the permuted data
     mycat("scanone...", verbose, last = "")
     ## NB: scanone groups phenos in batches based on missing data patterns.
-    scanmat <- scanone(perm.cross, pheno.col = c(1:n.phe), method = "hk")
+    scanmat <- scanone(perm.cross, pheno.col = pheno.col, method = "hk", 
+                        addcovar = addcovar, intcovar = intcovar, ...)
 
     ## Reduce to high LOD scores.
     mycat("highlod...", verbose, last = "")

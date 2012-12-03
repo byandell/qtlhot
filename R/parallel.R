@@ -114,6 +114,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
                           n.phe = nphe(cross), ## Number of traits.
                           nruns = 1,
                           big = FALSE,
+                          pheno.col = seq(n.phe), ## Traits used for hotspots.
                           ...)
 {
   ## PHASE 1: Set up cross object. Needed in phases 2.
@@ -149,7 +150,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
                n.split, ...)
   }
   else {
-    ## Used for studying properties of qtlhot.
+    ## Used for studying properties of qtlhot. Not compatible with covariates.
 
     n.perm <- ceiling(n.perm / n.split)
       
@@ -169,7 +170,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
     
     ## Save all relevant objects for later phases.
     save(cross, n.phe, latent.eff, res.var, Nmax, n.perm, n.split,
-         alpha.levels, lod.thrs, cross.index, big,
+         alpha.levels, lod.thrs, cross.index, big, pheno.col,
          file = file.path(dirpath, "Phase1.RData"),
          compress = TRUE)
   }
@@ -185,6 +186,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
                           ## Following are loaded with Phase1.RData created in big.phase1.
                           n.split, cross, Nmax, n.perm, lod.thrs, n.phe, alpha.levels,
                           ##
+                          batch.effect = NULL, addcovar = NULL, intcovar = NULL,
                           big = FALSE, verbose = FALSE)
 {
   ## PHASE 2: NL,N and WW permutations. 
@@ -199,6 +201,8 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
   ##
 
   cross.index <- scan("groups.txt", 0)[1]
+  ## Just to fool R build.
+  pheno.col <- 0
 
   ## Load Phase 1 computations.
   infile <- "Phase1.RData"
@@ -214,10 +218,16 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
     parallel.error(4, 2, index)
 
   if(big)
-    return(big.phase2(dirpath, index))
+    return(big.phase2(dirpath, index, batch.effect = batch.effect,
+                      addcovar = addcovar, intcovar = intcovar, ..., verbose = verbose))
 
   outfile <- paste("perm", ".", cross.index, "_", index, ".RData", sep = "")
 
+  if(!is.null(batch.effect)) ## This may not be enough for some traits...
+    covars <- sexbatch.covar(cross, batch.effect, verbose = TRUE)
+  else
+    covars <- list(addcovar = addcovar, intcovar = intcovar)
+  
   ## Following is in hotperm stuff.
   ## filter.threshold is big loop. Have perm loop within it. n.phe*n.perm runs of scanone per dataset.
   ## For simulation study, have many datasets!
@@ -228,7 +238,8 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
   NLN <- hotperm(cross, Nmax, n.perm, alpha.levels, lod.thrs, drop, verbose)
 
   mycat("scanone", verbose)
-  scanmat <- scanone(cross, pheno.col = seq(n.phe), method = "hk")
+  scanmat <- scanone(cross, pheno.col = pheno.col, method = "hk",
+                     addcovar=covars$addcovar, intcovar=covars$intcovar, ...)
 
   ## Reduce to high LOD scores.
   mycat("highlod", verbose)
@@ -238,7 +249,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
   
   WW <- ww.perm(highobj, n.perm, alpha.levels, lod.thrs, n.perm)
   
-  save(NLN, WW, index, lod.thrs, alpha.levels, drop,
+  save(NLN, WW, index, lod.thrs, alpha.levels, drop, covars,
        file = outfile, compress = TRUE)
 }
 ####################################################################################
@@ -263,6 +274,10 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
   ##
   ## See Phase 2 for explanation of NLNpermi.RData files.
   ## All NLNpermi.RData files are combined to make max.N, max.lod.quant.
+
+  ## Just to fool R build.
+  pheno.col <- 0
+  covars <- NULL
 
   ## Load Phase 1 computations.
   load(file.path(dirpath, "Phase1.RData"))
@@ -311,10 +326,11 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
 
   ## Now compare permutations to original cross object from Phase1.
 
-  out.sim <- filter.threshold(cross, n.phe, latent.eff, res.var,
+  out.sim <- filter.threshold(cross, pheno.col, latent.eff, res.var,
                               lod.thrs, drop, seq(Nmax), n.perms, alpha.levels,
                               qh.thrs, ww.thrs,
-                              verbose)
+                              addcovar = covars$addcovar, intcovar = covars$intcovar,
+                              verbose = verbose, ...)
 
   outfile <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")
   

@@ -11,7 +11,8 @@ Conduct NL and N permutation tests.
 }
 \usage{
 hotperm(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1.5,
-  window = NULL, verbose = FALSE, init.seed = 0)
+  window = NULL, verbose = FALSE, init.seed = 0,
+  addcovar = NULL, intcovar = NULL, \dots)
 data(hotperm1)
 \method{print}{hotperm}(x, \dots)
 \method{summary}{hotperm}(object, quant.levels, \dots)
@@ -34,7 +35,9 @@ data(hotperm1)
   \item{probs}{probability levels for quantiles (\code{1-probs} if all > 0.5);
     default is \code{alpha.levels}}
   \item{lod.thr}{restrict to values above this if not \code{NULL}}
-  \item{\dots}{ignored}
+  \item{addcovar}{additive covariates as vector or matrix; see \code{\link[qtl]{scanone}}}
+  \item{intcovar}{interactive covariates as vector or matrix; see \code{\link[qtl]{scanone}}}
+  \item{\dots}{arguments passed along to \code{scanone}}
 }
 \author{
   Elias Chaibub Neto and Brian S Yandell
