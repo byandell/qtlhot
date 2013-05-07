@@ -22,7 +22,7 @@
 
 \date{\today}
 
-\SweaveOpts{keep.source=TRUE}
+\SweaveOpts{eps=FALSE,keep.source=TRUE}
 
 \title{Quantile-based permutation thresholds for QTL hotspot analysis: a tutorial}
 

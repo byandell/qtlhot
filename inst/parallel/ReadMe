@@ -5,8 +5,9 @@ While we have running versions, it is not currently in "user friendly" format. T
 later releases of R/qtlhot. Brian Yandell 17 may 2012
 
 ===========================================================================================
-The runparallel.sh shell script is a mockup of what could be done on a parallel system. We use SOAR from CHTC,
-which automates use of Conder. See http://submit.chtc.wisc.edu/SOAR/SOAR.html .
+The runparallel.sh shell script is a mockup of what could be done on a parallel system.
+We use SOAR from CHTC, which automates use of HTConder.
+See http://submit.chtc.wisc.edu/SOAR/SOAR.html .
 
 Phase0.R	Initialization of dataset (done off line)
 Phase1.R	Initialization of run. Use cross.RData and params.txt.
@@ -18,6 +19,26 @@ Phase3.R	Wrapup. Wait for all the Phase2 jobs to complete. Use Phase1.RData and 
 		
 ===========================================================================================
 There are actually two ways this is used, depending on the hidden parameter "big".
+The first approach (big=FALSE) works for smaller data sets, such as yeast.
+For larger data sets (say mouse, with 40K traits), use big=TRUE.
+
+The main difference is that with big=TRUE, the sets of traits are divided up into batches,
+say of size.set=250, run with the random permutation, then stitched back together.
+This is not explained in the vignette.
+You can do is run in parallel n.perm permutations on num.sets = [n.traits/size.set] batches.
+That is, there are n.perm * num.sets parallel sandbox runs, rather than just n.perm.
+I first create the n.perm random seeds and save them, so that each permutation is done with
+the same rearrangement of labels. Try the setting in your params.txt file of:
+
+big = TRUE;
+size.set = 250;
+n.perm = 1000;
+
+The number 250 was based on a reasonable sized job using our parallel setup
+on a 64-bit Linux. This keeps the size of R below 2GB.
+R and HTCondor get bogged down if the running R object gets too big,
+which happens with large numbers of traits.
+
 ===========================================================================================
 big = FALSE (use routines in parallel.R)
     Used for studying properties of qtlhot. Can do double resampling: nruns * (n.split * n.perm)

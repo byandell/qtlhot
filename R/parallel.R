@@ -114,6 +114,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
                           n.phe = nphe(cross), ## Number of traits.
                           nruns = 1,
                           big = FALSE,
+                          drop.lod = 1.5, ## LOD drop to keep.
                           pheno.col = seq(n.phe), ## Traits used for hotspots.
                           ...)
 {
@@ -147,7 +148,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
     ## Make sure n.split is equal to n.perm. n.perm set to 1 in big.phase1.
     n.split <- max(1, n.perm)
     big.phase1(dirpath, cross.index, params.file, cross, lod.thrs, Nmax, n.perm,
-               n.split, ...)
+               n.split, drop.lod = drop.lod, ...)
   }
   else {
     ## Used for studying properties of qtlhot. Not compatible with covariates.
@@ -185,6 +186,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
 qtlhot.phase2 <- function(dirpath, index = NULL, ...,
                           ## Following are loaded with Phase1.RData created in big.phase1.
                           n.split, cross, Nmax, n.perm, lod.thrs, n.phe, alpha.levels,
+                          drop.lod,
                           ##
                           batch.effect = NULL, addcovar = NULL, intcovar = NULL,
                           big = FALSE, verbose = FALSE)
@@ -235,7 +237,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
   ## Creates max.N of size n.perm x n.lod and max.lod.quant of size n.perm x Nmax.
   ## Size of n.perm determines the run time.
   mycat("hotperm", verbose)
-  NLN <- hotperm(cross, Nmax, n.perm, alpha.levels, lod.thrs, drop, verbose)
+  NLN <- hotperm(cross, Nmax, n.perm, alpha.levels, lod.thrs, drop.lod, verbose)
 
   mycat("scanone", verbose)
   scanmat <- scanone(cross, pheno.col = pheno.col, method = "hk",
@@ -243,13 +245,13 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
 
   ## Reduce to high LOD scores.
   mycat("highlod", verbose)
-  highobj <- highlod(scanmat, min(lod.thrs), drop, restrict.lod = TRUE)
+  highobj <- highlod(scanmat, min(lod.thrs), drop.lod, restrict.lod = TRUE)
   rm(scanmat)
   gc()
   
   WW <- ww.perm(highobj, n.perm, alpha.levels, lod.thrs, n.perm)
   
-  save(NLN, WW, index, lod.thrs, alpha.levels, drop, covars,
+  save(NLN, WW, index, lod.thrs, alpha.levels, drop.lod, covars,
        file = outfile, compress = TRUE)
 }
 ####################################################################################
@@ -257,6 +259,7 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
                           ## Following are loaded with Phase1.RData created in big.phase1.
                           cross.index, n.split, n.perm, lod.thrs, Nmax, NLN, WW,
                           alpha.levels, cross, n.phe, latent.eff, res.var,
+                          drop.lod,
                           ##
                           dirpath.save = dirpath, big = FALSE, verbose = FALSE)
 {
@@ -327,7 +330,7 @@ qtlhot.phase3 <- function(dirpath, index = NULL, ...,
   ## Now compare permutations to original cross object from Phase1.
 
   out.sim <- filter.threshold(cross, pheno.col, latent.eff, res.var,
-                              lod.thrs, drop, seq(Nmax), n.perms, alpha.levels,
+                              lod.thrs, drop.lod, seq(Nmax), n.perms, alpha.levels,
                               qh.thrs, ww.thrs,
                               addcovar = covars$addcovar, intcovar = covars$intcovar,
                               verbose = verbose, ...)
