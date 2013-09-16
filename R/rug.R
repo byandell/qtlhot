@@ -123,7 +123,6 @@ myapprox <- function(Mb, cM,
   tmp <- pmin(max(c(Mb)), pmax(min(c(Mb)), tmp))
 
   ## Linear interpolation between SNPs.
-  require(stats)
   p <- approx(c(Mb), c(cM), tmp)
 
   ## Reset x to be pos.

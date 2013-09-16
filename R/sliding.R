@@ -15,14 +15,15 @@
 #     A copy of the GNU General Public License, version 3, is available
 #     at http://www.r-project.org/Licenses/GPL-3
 #
-# Contains: myplot.err, sliding.bar.plot
+# Contains: slidingbar.create, slidingbar.plot, myplot.err, sliding.bar.plot
 ######################################################################
 slidingbar.create <- function(highobj, quant.level = NULL,
                               restrict.to.levels = FALSE, ...)
 {
   if(is.null(quant.level))
     stop("must supply quant.level for sliding bar plot")
-
+  quant.level <- unclass(quant.level)
+  
   ## Get matrix of seq(n.quant)
   quant <- quantile(highobj, max.quantile = FALSE)
   n.quant <- nrow(quant)
@@ -69,7 +70,7 @@ slidingbar.plot <- function(x, ...)
   x[,-(1:2)] <- 1 * (x[,-(1:2)] > 0)
   col <- c("white","black")
   
-  ## want to borrow from qtlview:::plot.aug.scanone
+  ## Want to borrow from qtlview:::plot.aug.scanone.
   image(seq(nrow(x)), seq(ncol(x) -2), as.matrix(x[,-(1:2)]),
         col = col, xlab = "", ylab = "hotspot size",
         xaxt = "n")

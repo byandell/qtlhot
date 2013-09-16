@@ -109,7 +109,7 @@ plot.highlod <- function(x, ..., quant.level = NULL, sliding = FALSE)
       quant.level <- quant.level$max.lod.quant
     
     ## Need to supply quant.level as second argument.
-    slidingbar.plot(slidingbar.create(x, quant.level, ...))
+    slidingbar.plot(slidingbar.create(x, quant.level, ...), ...)
   }
   else
     plot(hotsize(x, ..., quant.level = quant.level), ...)

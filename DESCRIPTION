@@ -1,10 +1,10 @@
 Package: qtlhot
-Version: 0.8.6
-Date: 2013-05-07
-Author: Elias Chaibub Neto <echaibub@hotmail.com> and Brian S Yandell <yandell@stat.wisc.edu>
+Version: 0.8.8
+Date: 2013-09-16
+Author: Elias Chaibub Neto <echaibub@hotmail.com> and Brian S Yandell <byandell@wisc.edu>
 Title: Inference for QTL Hotspots
 Description: Functions to infer co-mapping trait hotspots and causal models
-Maintainer: Brian S. Yandell <yandell@stat.wisc.edu>
+Maintainer: Brian S. Yandell <byandell@wisc.edu>
 Depends: stats,qtl,lattice,corpcor,mnormt
 LazyLoad: yes
 LazyData: yes

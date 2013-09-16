@@ -142,7 +142,7 @@ quantile.hotperm <- function(x, probs = attr(x, "alpha.levels"),
   
   myquant <- function(x, probs) {
     x[is.na(x)] <- 0
-    out <- as.matrix(apply(x, 2, quantile.default, probs = probs))
+    out <- as.matrix(apply(x, 2, quantile, probs = probs))
     if(length(probs) > 1)
       out <- t(out)
     out

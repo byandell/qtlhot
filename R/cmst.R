@@ -926,7 +926,7 @@ FitAllTests <- function(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
     LL <- pull.geno(cross)[, cit.mar]
     GG <- cross$pheno[, pheno1]
     TT <- cross$pheno[, pheno2[k]]
-    aux2 <- try(qtlhot:::CitTests(LL, GG, TT), silent = TRUE)
+    aux2 <- try(CitTests(LL, GG, TT), silent = TRUE)
     if(class(aux2) != "try-error") {
       out$pvals.cit[k,] <- aux2
     }

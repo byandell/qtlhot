@@ -6,6 +6,11 @@
 useDynLib(qtlhot)
 export(add.phenos)
 
+import(qtl)
+import(corpcor)
+import(mnormt)
+import(lattice)
+
 importFrom(stats, quantile) ## needed for quantile S3 method
 export(highlod)
 export(pull.highlod)

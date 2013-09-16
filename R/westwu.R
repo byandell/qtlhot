@@ -37,7 +37,7 @@ print.ww.perm <- function(x, ...) print(summary(x, ...))
 summary.ww.perm <- function(object, alpha.levels = attr(object, "alpha.levels"), ...)
 {
   nalpha <- length(alpha.levels)
-  ww.thrs <- t(apply(object, 2, quantile.default, 1 - alpha.levels))
+  ww.thrs <- t(apply(object, 2, quantile, 1 - alpha.levels))
   dimnames(ww.thrs) <- list(dimnames(object)[[2]], as.character(alpha.levels))
   ww.thrs
 }
