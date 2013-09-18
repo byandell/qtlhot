@@ -46,7 +46,7 @@ big.phase0 <- function(dirpath, cross, trait.file, trait.matrix,
   save(cross, lod.thrs, file = "cross.RData", compress = TRUE)
 
   ## Get trait values for selected traits.
-  attach(file.path(dirpath, trait.file))
+  load(file.path(dirpath, trait.file))
   trait.names <- dimnames(get(trait.matrix))[[2]]
   all.traits <- seq(trait.names)
   if(!is.null(droptrait.names))
@@ -81,7 +81,6 @@ big.phase0 <- function(dirpath, cross, trait.file, trait.matrix,
     ## Get next size.set traits.
     trait.nums <- trait.nums + size.set
   }
-  detach()
 }
 #############################################################################################
 big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
@@ -194,20 +193,21 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
   filenames <- list.files(dirpath, "Trait.[1-9][0-9]*.RData")
   if(!length(filenames))
     parallel.error(5, 5, index)
-  
+
   for(pheno.index in seq(length(filenames))) {
     if(verbose)
       cat(pheno.index, "\n")
 
     if(exists("trait.data"))
       rm("trait.data")
-    attach(file.path(dirpath, filenames[pheno.index]))
-    perm.cross <- add.phenos(cross, trait.data, index = trait.index)
-    pheno.col <- find.pheno(perm.cross, dimnames(trait.data)[[2]])
-    detach()
+    ## Uses trait.data from Trait*.RData file.
+    out <- with(file.path(dirpath, filenames[pheno.index]), {
+      list(perm.cross = add.phenos(cross, trait.data, index = trait.index),
+           pheno.col = find.pheno(perm.cross, dimnames(trait.data)[[2]]))
+    })
 
-    per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
-                        addcovar=covars$addcovar, intcovar=covars$intcovar, ...)
+    per.scan <- scanone(out$perm.cross, pheno.col = out$pheno.col, method = "hk", 
+                        addcovar = covars$addcovar, intcovar = covars$intcovar, ...)
 
     per.scan.hl <- highlod(per.scan, lod.thr = lod.min, drop.lod = drop.lod,
                                  restrict.lod = TRUE)$highlod
@@ -267,19 +267,23 @@ big.phase3 <- function(dirpath = ".", index, cross.index, ...,
       cat(i.perm, "\n")
     if(exists("lod.sums"))
       rm("lod.sums")
-    attach(file.path(dirpath, filenames[i.perm]), warn.conflicts = FALSE)
-    n.quant <- length(lod.sums$max.lod.quant)
-    max.lod.quant[i.perm, seq(n.quant)] <- lod.sums$max.lod.quant
-    ## legacy adjustment
-    if(length(lod.sums$max.N) == 2) {
-      max.N[i.perm,] <- lod.sums$max.N$max.N
-      max.N.window[i.perm,] <- lod.sums$max.N$max.N.win
-    }
-    else {
-      max.N[i.perm,] <- lod.sums$max.N
-      max.N.window[i.perm,] <- lod.sums$max.N.window
-    }
-    detach()
+    out <- with(file.path(dirpath, filenames[i.perm]), {
+      n.quant <- length(lod.sums$max.lod.quant)
+      max.lod.quant <- lod.sums$max.lod.quant
+      ## legacy adjustment
+      if(length(lod.sums$max.N) == 2) {
+        max.N <- lod.sums$max.N$max.N
+        max.N.window <- lod.sums$max.N$max.N.win
+      }
+      else {
+        max.N <- lod.sums$max.N
+        max.N.window <- lod.sums$max.N.window
+      }
+      list(max.lod.quant = max.lod.quant, max.N = max.N, max.N.window = max.N.window)
+    })
+    max.lod.quant[i.perm, seq(length(out$max.lod.quant))] <- out$max.lod.quant
+    max.N[i.perm,] <- out$max.N[i.perm,]
+    max.N.window[i.perm,] <- out$max.N.window[i.perm,]
   }
   phase3name <- paste("Phase3", ifelse(cross.index > 0, cross.index, ""), ".RData", sep = "")
 
