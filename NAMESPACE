@@ -3,7 +3,7 @@
 # classes declared in the package should be declared with the "S3method"
 # directive.
 #
-useDynLib(qtlhot)
+useDynLib(qtlhot, .registration = TRUE)
 export(add.phenos)
 
 import(qtl)
