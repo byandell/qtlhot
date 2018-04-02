@@ -112,7 +112,7 @@ plot.highlod <- function(x, ..., quant.level = NULL, sliding = FALSE)
     slidingbar.plot(slidingbar.create(x, quant.level, ...), ...)
   }
   else
-    plot(hotsize(x, ..., quant.level = quant.level), ...)
+    graphics::plot(hotsize(x, ..., quant.level = quant.level), ...)
 }
 ###################################################################################
 highlod.thr <- function(highobj, lod.thr)
@@ -154,12 +154,12 @@ sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
   
   if(!is.null(batch.effect)){
     batch <- cross$pheno[,batch.effect, drop = FALSE]
-    tmp <- formula(paste("~ factor(", batch.effect, ")"))
+    tmp <- stats::formula(paste("~ factor(", batch.effect, ")"))
     if(verbose)
       cat("sexbatch.covar", names(tmp), levels(factor(batch[[1]])), "\n")
     if(verbose)
       cat("sexbatch.covar", dim(batch), "\n")
-    batch <- model.matrix(tmp,batch)[,-1, drop = FALSE]
+    batch <- stats::model.matrix(tmp,batch)[,-1, drop = FALSE]
     if(verbose)
       cat("sexbatch.covar", dim(batch), "\n")
     ac <- cbind(batch,ic)

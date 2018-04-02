@@ -22,11 +22,11 @@ MyMultipleTestingSim <- function(nSim,
   pvals.np.AIC <- vector(mode = "list", length = nSim)
   k <- 1
   while (k <= nSim) { 
-    beta <- runif(1, beta.range[1], beta.range[2])
-    add.eff <- runif(1, add.eff.range[1], add.eff.range[2])
-    dom.eff <- runif(1, dom.eff.range[1], dom.eff.range[2])
-    sig2.1 <- runif(1, sig2.1.range[1], sig2.1.range[2])
-    sig2.2 <- runif(1, sig2.2.range[1], sig2.2.range[2])
+    beta <- stats::runif(1, beta.range[1], beta.range[2])
+    add.eff <- stats::runif(1, add.eff.range[1], add.eff.range[2])
+    dom.eff <- stats::runif(1, dom.eff.range[1], dom.eff.range[2])
+    sig2.1 <- stats::runif(1, sig2.1.range[1], sig2.1.range[2])
+    sig2.2 <- stats::runif(1, sig2.2.range[1], sig2.2.range[2])
     Cross <- SimCrossCausal(n.ind, rep(100, 3),  101,
                             rep(beta, n.pheno + 1), add.eff, dom.eff, 
                             sig2.1, sig2.2, eq.spacing, cross.type, 
@@ -103,14 +103,14 @@ MyMultipleTestingSim2 <- function(nSim,
   pvals.np.AIC <- vector(mode = "list", length = nSim)
   k <- 1
   while (k <= nSim) { 
-    beta <- runif(1, beta.range[1], beta.range[2])
-    add.eff.1 <- runif(1, add.eff.1.range[1], add.eff.1.range[2])
-    dom.eff.1 <- runif(1, dom.eff.1.range[1], dom.eff.1.range[2])
-    add.eff.h <- runif(1, add.eff.h.range[1], add.eff.h.range[2])
-    dom.eff.h <- runif(1, dom.eff.h.range[1], dom.eff.h.range[2])
-    sig2.1 <- runif(1, sig2.1.range[1], sig2.1.range[2])
-    sig2.2 <- runif(1, sig2.2.range[1], sig2.2.range[2])
-    sig2.h <- runif(1, sig2.h.range[1], sig2.h.range[2])
+    beta <- stats::runif(1, beta.range[1], beta.range[2])
+    add.eff.1 <- stats::runif(1, add.eff.1.range[1], add.eff.1.range[2])
+    dom.eff.1 <- stats::runif(1, dom.eff.1.range[1], dom.eff.1.range[2])
+    add.eff.h <- stats::runif(1, add.eff.h.range[1], add.eff.h.range[2])
+    dom.eff.h <- stats::runif(1, dom.eff.h.range[1], dom.eff.h.range[2])
+    sig2.1 <- stats::runif(1, sig2.1.range[1], sig2.1.range[2])
+    sig2.2 <- stats::runif(1, sig2.2.range[1], sig2.2.range[2])
+    sig2.h <- stats::runif(1, sig2.h.range[1], sig2.h.range[2])
     Cross <- SimCrossIndep(n.ind, rep(100, 3),  101, rep(beta, n.pheno + 1), 
                            add.eff.1, dom.eff.1, add.eff.h, dom.eff.h, 
                            sig2.1, sig2.2, sig2.h, eq.spacing, cross.type, 
@@ -170,18 +170,18 @@ SimCrossIndep <- function(n.ind, len, n.mar, beta, add.eff.1, dom.eff.1,
   if (cross.type == "bc") {
     add.q1 <- q1 - 1.5
     add.q2 <- q2 - 1.5
-    y1 <- add.q1 * add.eff.1 + rnorm(n.ind, 0, sqrt(sig2.1))
-    h <- add.q2 * add.eff.h + rnorm(n.ind, 0, sqrt(sig2.h))
+    y1 <- add.q1 * add.eff.1 + stats::rnorm(n.ind, 0, sqrt(sig2.1))
+    h <- add.q2 * add.eff.h + stats::rnorm(n.ind, 0, sqrt(sig2.h))
   }
   if (cross.type == "f2") {
     add.q1 <- q1 - 2
     dom.q1 <- (1 + add.q1) * (1 - add.q1) - 0.5
-    y1 <- add.q1 * add.eff.1 + dom.q1 * dom.eff.1 + rnorm(n.ind, 0, sqrt(sig2.1))
+    y1 <- add.q1 * add.eff.1 + dom.q1 * dom.eff.1 + stats::rnorm(n.ind, 0, sqrt(sig2.1))
     add.q2 <- q2 - 2
     dom.q2 <- (1 + add.q2) * (1 - add.q2) - 0.5
-    h <- add.q2 * add.eff.h + dom.q2 * dom.eff.h + rnorm(n.ind, 0, sqrt(sig2.h))
+    h <- add.q2 * add.eff.h + dom.q2 * dom.eff.h + stats::rnorm(n.ind, 0, sqrt(sig2.h))
   }
-  y <- beta * h + matrix(rnorm(n.ind * n.traits, 0, sqrt(sig2.2)), n.ind, n.traits)
+  y <- beta * h + matrix(stats::rnorm(n.ind * n.traits, 0, sqrt(sig2.2)), n.ind, n.traits)
   y <- data.frame(y1, y)
   names(y) <- paste("y", 1 : (n.traits + 1), sep = "")
   if (normalize) {
@@ -292,12 +292,12 @@ FDRplot <- function(r2s.list,
                     cex.main = 1.5) {
   xaxis <- seq(xlim[1], xlim[2], length.out = 100)
   yaxis <- seq(ylim[1], ylim[2], length.out = 100)
-  par(mar = c(5, 6, 4, 2) + 0.1)
-  plot(xaxis, yaxis, type = "n", cex = 0.1, xlim = xlim, ylim = ylim, 
+  graphics::par(mar = c(5, 6, 4, 2) + 0.1)
+  graphics::plot(xaxis, yaxis, type = "n", cex = 0.1, xlim = xlim, ylim = ylim, 
      main = main, cex.axis = cex.axis, cex.lab = cex.lab, cex.main = cex.main,
      xlab = expression(paste(R^{2}*(list(Y[1],Q)))),
      ylab = expression(paste(R^{2}*(list(Y[k],Q)))))
-  abline(a=0, b = 1, col = "grey", lwd = 3)
+  graphics::abline(a=0, b = 1, col = "grey", lwd = 3)
   if (!is.null(pvals.list) & is.null(scores.list)) {
     le1 <- length(pvals.list)
     for (i in 1:le1) {
@@ -305,19 +305,19 @@ FDRplot <- function(r2s.list,
       le2 <- nrow(pvals.list[[i]])
       for (j in 1:le2) {
         if (pvals.list[[i]][j, 1] <= alpha) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "blue")
         }
         if (pvals.list[[i]][j, 2] <= alpha) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "red")
         }
         if (pvals.list[[i]][j, 3] <= alpha) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "green")
         }
         if (pvals.list[[i]][j, 4] <= alpha) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "black")
         }
       }
@@ -331,19 +331,19 @@ FDRplot <- function(r2s.list,
       for (j in 1:le2) {
         aux <- which.min(scores.list[[i]][j, 1:4])
         if (aux == 1) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "blue")
         }
         if (aux == 2) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "red")
         }
         if (aux == 3) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "green")
         }
         if (aux == 4) {
-          points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
+          graphics::points(r2s.list[[i]][j, 1], r2s.list[[i]][j, 2], cex = cex, 
                  col = "black")
         }
       }

@@ -49,12 +49,12 @@ mySimulations <- function(
   if(model=="A"){
     k <- 1
     while(k <= nSim){
-      mu <- runif(1,mu.range[1],mu.range[2])
-      beta21 <- runif(1,beta21.range[1],beta21.range[2])
-      add.eff1 <- runif(1,add.eff1.range[1],add.eff1.range[2])
-      dom.eff1 <- runif(1,dom.eff1.range[1],dom.eff1.range[2])
-      sig2.1 <- runif(1,sig2.1.range[1],sig2.1.range[2])
-      sig2.2 <- runif(1,sig2.2.range[1],sig2.2.range[2])
+      mu <- stats::runif(1,mu.range[1],mu.range[2])
+      beta21 <- stats::runif(1,beta21.range[1],beta21.range[2])
+      add.eff1 <- stats::runif(1,add.eff1.range[1],add.eff1.range[2])
+      dom.eff1 <- stats::runif(1,dom.eff1.range[1],dom.eff1.range[2])
+      sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
+      sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
       Cross <- sim.cross.1(n.ind, mu, beta21, add.eff1, dom.eff1, sig2.1, 
         sig2.2, eq.spacing, cross.type, normalize)
       Cross <- calc.genoprob(Cross, step=2)
@@ -91,15 +91,15 @@ mySimulations <- function(
   if(model=="B"){
     k <- 1
     while(k <= nSim){
-      mu <- runif(1,mu.range[1],mu.range[2])
-      beta21 <- runif(1,beta21.range[1],beta21.range[2])
-      beta1h <- runif(1,beta1h.range[1],beta1h.range[2])
-      beta2h <- runif(1,beta2h.range[1],beta2h.range[2])
-      add.eff1 <- runif(1,add.eff1.range[1],add.eff1.range[2])
-      dom.eff1 <- runif(1,dom.eff1.range[1],dom.eff1.range[2])
-      sig2.1 <- runif(1,sig2.1.range[1],sig2.1.range[2])
-      sig2.2 <- runif(1,sig2.2.range[1],sig2.2.range[2])
-      sig2.h <- runif(1,sig2.h.range[1],sig2.h.range[2])
+      mu <- stats::runif(1,mu.range[1],mu.range[2])
+      beta21 <- stats::runif(1,beta21.range[1],beta21.range[2])
+      beta1h <- stats::runif(1,beta1h.range[1],beta1h.range[2])
+      beta2h <- stats::runif(1,beta2h.range[1],beta2h.range[2])
+      add.eff1 <- stats::runif(1,add.eff1.range[1],add.eff1.range[2])
+      dom.eff1 <- stats::runif(1,dom.eff1.range[1],dom.eff1.range[2])
+      sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
+      sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
+      sig2.h <- stats::runif(1,sig2.h.range[1],sig2.h.range[2])
       Cross <- sim.cross.2(n.ind, mu, beta21, beta1h, beta2h, add.eff1, 
         dom.eff1, sig2.1, sig2.2, sig2.h, eq.spacing, cross.type, normalize)
       Cross <- calc.genoprob(Cross, step=2)
@@ -136,14 +136,14 @@ mySimulations <- function(
   if(model=="C"){
     k <- 1
     while(k <= nSim){
-      mu <- runif(1,mu.range[1],mu.range[2])
-      beta21 <- runif(1,beta21.range[1],beta21.range[2])
-      add.eff1 <- runif(1,add.eff1.range[1],add.eff1.range[2])
-      dom.eff1 <- runif(1,dom.eff1.range[1],dom.eff1.range[2])
-      add.eff2 <- runif(1,add.eff2.range[1],add.eff2.range[2])
-      dom.eff2 <- runif(1,dom.eff2.range[1],dom.eff2.range[2])
-      sig2.1 <- runif(1,sig2.1.range[1],sig2.1.range[2])
-      sig2.2 <- runif(1,sig2.2.range[1],sig2.2.range[2])
+      mu <- stats::runif(1,mu.range[1],mu.range[2])
+      beta21 <- stats::runif(1,beta21.range[1],beta21.range[2])
+      add.eff1 <- stats::runif(1,add.eff1.range[1],add.eff1.range[2])
+      dom.eff1 <- stats::runif(1,dom.eff1.range[1],dom.eff1.range[2])
+      add.eff2 <- stats::runif(1,add.eff2.range[1],add.eff2.range[2])
+      dom.eff2 <- stats::runif(1,dom.eff2.range[1],dom.eff2.range[2])
+      sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
+      sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
       Cross <- sim.cross.3(n.ind, mu, beta21, add.eff1, dom.eff1, add.eff2, 
         dom.eff2, sig2.1, sig2.2, eq.spacing, cross.type, normalize)
       Cross <- calc.genoprob(Cross, step=2)
@@ -180,13 +180,13 @@ mySimulations <- function(
   if(model=="D"){
     k <- 1
     while(k <= nSim){
-      mu <- runif(1,mu.range[1],mu.range[2])
-      add.eff1 <- runif(1,add.eff1.range[1],add.eff1.range[2])
-      dom.eff1 <- runif(1,dom.eff1.range[1],dom.eff1.range[2])
-      add.eff2 <- runif(1,add.eff2.range[1],add.eff2.range[2])
-      dom.eff2 <- runif(1,dom.eff2.range[1],dom.eff2.range[2])
-      sig2.1 <- runif(1,sig2.1.range[1],sig2.1.range[2])
-      sig2.2 <- runif(1,sig2.2.range[1],sig2.2.range[2])
+      mu <- stats::runif(1,mu.range[1],mu.range[2])
+      add.eff1 <- stats::runif(1,add.eff1.range[1],add.eff1.range[2])
+      dom.eff1 <- stats::runif(1,dom.eff1.range[1],dom.eff1.range[2])
+      add.eff2 <- stats::runif(1,add.eff2.range[1],add.eff2.range[2])
+      dom.eff2 <- stats::runif(1,dom.eff2.range[1],dom.eff2.range[2])
+      sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
+      sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
       Cross <- sim.cross.4(n.ind, mu, add.eff1, dom.eff1, add.eff2, 
         dom.eff2, sig2.1, sig2.2, eq.spacing, cross.type, normalize)
       Cross <- calc.genoprob(Cross, step=2)
@@ -223,16 +223,16 @@ mySimulations <- function(
   if(model=="E"){
     k <- 1
     while(k <= nSim){
-      mu <- runif(1,mu.range[1],mu.range[2])
-      add.eff1 <- runif(1,add.eff1.range[1],add.eff1.range[2])
-      dom.eff1 <- runif(1,dom.eff1.range[1],dom.eff1.range[2])
-      add.eff2 <- runif(1,add.eff2.range[1],add.eff2.range[2])
-      dom.eff2 <- runif(1,dom.eff2.range[1],dom.eff2.range[2])
-      beta1h <- runif(1,beta1h.range[1],beta1h.range[2])
-      beta2h <- runif(1,beta2h.range[1],beta2h.range[2])
-      sig2.1 <- runif(1,sig2.1.range[1],sig2.1.range[2])
-      sig2.2 <- runif(1,sig2.2.range[1],sig2.2.range[2])
-      sig2.h <- runif(1,sig2.h.range[1],sig2.h.range[2])
+      mu <- stats::runif(1,mu.range[1],mu.range[2])
+      add.eff1 <- stats::runif(1,add.eff1.range[1],add.eff1.range[2])
+      dom.eff1 <- stats::runif(1,dom.eff1.range[1],dom.eff1.range[2])
+      add.eff2 <- stats::runif(1,add.eff2.range[1],add.eff2.range[2])
+      dom.eff2 <- stats::runif(1,dom.eff2.range[1],dom.eff2.range[2])
+      beta1h <- stats::runif(1,beta1h.range[1],beta1h.range[2])
+      beta2h <- stats::runif(1,beta2h.range[1],beta2h.range[2])
+      sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
+      sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
+      sig2.h <- stats::runif(1,sig2.h.range[1],sig2.h.range[2])
       Cross <- sim.cross.5(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2, 
         beta1h, beta2h, sig2.1, sig2.2, sig2.h, eq.spacing, cross.type,
         normalize)
@@ -295,14 +295,14 @@ SimCrossCausal <- function(n.ind, len, n.mar, beta, add.eff, dom.eff,
   cross.type <- match.arg(cross.type)
   if (cross.type == "bc") {
     add.q <- q - 1.5
-    y1 <- add.q * add.eff + rnorm(n.ind, 0, sqrt(sig2.1))
+    y1 <- add.q * add.eff + stats::rnorm(n.ind, 0, sqrt(sig2.1))
   }
   if (cross.type == "f2") {
     add.q <- q - 2
     dom.q <- (1 + add.q) * (1 - add.q) - 0.5
-    y1 <- add.q * add.eff + dom.q * dom.eff + rnorm(n.ind, 0, sqrt(sig2.1))
+    y1 <- add.q * add.eff + dom.q * dom.eff + stats::rnorm(n.ind, 0, sqrt(sig2.1))
   }
-  y <- beta * y1 + matrix(rnorm(n.ind * n.traits, 0, sqrt(sig2.2)), n.ind, n.traits)
+  y <- beta * y1 + matrix(stats::rnorm(n.ind * n.traits, 0, sqrt(sig2.2)), n.ind, n.traits)
   y <- data.frame(y1, y)
   names(y) <- paste("y", 1 : (n.traits + 1), sep = "")
   if (normalize) {
@@ -322,15 +322,15 @@ SimCross1 <- function(n.ind, mu, beta21, add.eff1, dom.eff1,
   q <- mygeno[, "D1M51"]
   if (cross.type == "bc") {
     add.q <- q - 1.5
-    y1 <- mu + add.q * add.eff1 + rnorm(n.ind, 0, sqrt(sig2.1))
+    y1 <- mu + add.q * add.eff1 + stats::rnorm(n.ind, 0, sqrt(sig2.1))
   }
   if (cross.type == "f2") {
     add.q <- q - 2
     dom.q <- (1 + add.q) * (1 - add.q) - 0.5
     y1 <- mu + add.q * add.eff1 + dom.q * dom.eff1 + 
-          rnorm(n.ind, 0, sqrt(sig2.1))
+          stats::rnorm(n.ind, 0, sqrt(sig2.1))
   }
-  y2 <- mu + beta21 * y1 + rnorm(n.ind, 0, sqrt(sig2.2))
+  y2 <- mu + beta21 * y1 + stats::rnorm(n.ind, 0, sqrt(sig2.2))
   if (normalize) {
     y1 <- normal.trans(y1)
     y2 <- normal.trans(y2)
@@ -348,18 +348,18 @@ SimCross2 <- function(n.ind, mu, beta21, beta1h, beta2h, add.eff1, dom.eff1,
   Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
   mygeno <- pull.geno(Cross)
   q <- mygeno[, "D1M80"]
-  h <- mu + rnorm(n.ind, 0, sqrt(sig2.h))
+  h <- mu + stats::rnorm(n.ind, 0, sqrt(sig2.h))
   if (cross.type == "bc") {
     add.q <- q - 1.5
-    y1 <- mu + add.q * add.eff1 + beta1h * h + rnorm(n.ind, 0, sqrt(sig2.1))
+    y1 <- mu + add.q * add.eff1 + beta1h * h + stats::rnorm(n.ind, 0, sqrt(sig2.1))
   }
   if (cross.type == "f2") {
     add.q <- q - 2
     dom.q <- (1 + add.q) * (1 - add.q) - 0.5
     y1 <- mu + add.q * add.eff1 + dom.q * dom.eff1 + beta1h * h + 
-          rnorm(n.ind, 0, sqrt(sig2.1))
+          stats::rnorm(n.ind, 0, sqrt(sig2.1))
   }
-  y2 <- mu + beta21 * y1 + beta2h * h + rnorm(n.ind, 0, sqrt(sig2.2))
+  y2 <- mu + beta21 * y1 + beta2h * h + stats::rnorm(n.ind, 0, sqrt(sig2.2))
   if (normalize) {
     y1 <- normal.trans(y1)
     y2 <- normal.trans(y2)
@@ -379,16 +379,16 @@ SimCross3 <- function(n.ind, mu, beta21, add.eff1, dom.eff1, add.eff2,
   q <- mygeno[, "D1M80"]
   if (cross.type == "bc") {
     add.q <- q - 1.5
-    y1 <- mu + add.q * add.eff1 + rnorm(n.ind, 0, sqrt(sig2.1))
-    y2 <- mu + add.q * add.eff2 + beta21 * y1 + rnorm(n.ind, 0, sqrt(sig2.2))
+    y1 <- mu + add.q * add.eff1 + stats::rnorm(n.ind, 0, sqrt(sig2.1))
+    y2 <- mu + add.q * add.eff2 + beta21 * y1 + stats::rnorm(n.ind, 0, sqrt(sig2.2))
   }
   if (cross.type == "f2") {
     add.q <- q - 2
     dom.q <- (1 + add.q) * (1 - add.q) - 0.5
     y1 <- mu + add.q * add.eff1 + dom.q * dom.eff1 + 
-          rnorm(n.ind, 0, sqrt(sig2.1))
+          stats::rnorm(n.ind, 0, sqrt(sig2.1))
     y2 <- mu + add.q * add.eff2 + dom.q * dom.eff2 + beta21 * y1 + 
-          rnorm(n.ind, 0, sqrt(sig2.2))
+          stats::rnorm(n.ind, 0, sqrt(sig2.2))
   }
   if (normalize) {
     y1 <- normal.trans(y1)
@@ -409,16 +409,16 @@ SimCross4 <- function(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2,
   q <- mygeno[, "D1M80"]
   if (cross.type == "bc") {
     add.q <- q - 1.5
-    y1 <- mu + add.q * add.eff1 + rnorm(n.ind, 0, sqrt(sig2.1))
-    y2 <- mu + add.q * add.eff2 + rnorm(n.ind, 0, sqrt(sig2.2))
+    y1 <- mu + add.q * add.eff1 + stats::rnorm(n.ind, 0, sqrt(sig2.1))
+    y2 <- mu + add.q * add.eff2 + stats::rnorm(n.ind, 0, sqrt(sig2.2))
   }
   if (cross.type == "f2") {
     add.q <- q - 2
     dom.q <- (1 + add.q) * (1 - add.q) - 0.5
     y1 <- mu + add.q * add.eff1 + dom.q * dom.eff1 + 
-          rnorm(n.ind, 0, sqrt(sig2.1))
+          stats::rnorm(n.ind, 0, sqrt(sig2.1))
     y2 <- mu + add.q * add.eff2 + dom.q * dom.eff2 + 
-          rnorm(n.ind, 0, sqrt(sig2.2))
+          stats::rnorm(n.ind, 0, sqrt(sig2.2))
   }
   if (normalize) {
     y1 <- normal.trans(y1)
@@ -438,19 +438,19 @@ SimCross5 <- function(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2,
   Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
   mygeno <- pull.geno(Cross)
   q <- mygeno[, "D1M80"]
-  h <- mu + rnorm(n.ind, 0, sqrt(sig2.h))
+  h <- mu + stats::rnorm(n.ind, 0, sqrt(sig2.h))
   if (cross.type == "bc") {
     add.q <- q - 1.5
-    y1 <- mu + add.q * add.eff1 + h * beta1h + rnorm(n.ind, 0, sqrt(sig2.1))
-    y2 <- mu + add.q * add.eff2 + h * beta2h + rnorm(n.ind, 0, sqrt(sig2.2))
+    y1 <- mu + add.q * add.eff1 + h * beta1h + stats::rnorm(n.ind, 0, sqrt(sig2.1))
+    y2 <- mu + add.q * add.eff2 + h * beta2h + stats::rnorm(n.ind, 0, sqrt(sig2.2))
   }
   if (cross.type == "f2") {
     add.q <- q - 2
     dom.q <- (1 + add.q) * (1 - add.q) - 0.5
     y1 <- mu + add.q * add.eff1 + dom.q * dom.eff1 + h * beta1h + 
-          rnorm(n.ind, 0, sqrt(sig2.1))
+          stats::rnorm(n.ind, 0, sqrt(sig2.1))
     y2 <- mu + add.q * add.eff2 + dom.q * dom.eff2 + h * beta2h + 
-          rnorm(n.ind, 0, sqrt(sig2.2))
+          stats::rnorm(n.ind, 0, sqrt(sig2.2))
   }
   if (normalize) {
     y1 <- normal.trans(y1)
@@ -471,16 +471,16 @@ SimCross6 <- function(n.ind, mu, add.eff, dom.eff, beta1h, beta2h,
   q <- mygeno[, "D1M80"]
   if (cross.type == "bc") {
     add.q <- q - 1.5
-    h <- mu + add.q * add.eff + rnorm(n.ind, 0, sqrt(sig2.h))
+    h <- mu + add.q * add.eff + stats::rnorm(n.ind, 0, sqrt(sig2.h))
   }
   if (cross.type == "f2") {
     add.q <- q - 2
     dom.q <- (1 + add.q) * (1 - add.q) - 0.5
     h <- mu + add.q * add.eff + dom.q * dom.eff + 
-         rnorm(n.ind, 0, sqrt(sig2.h))
+         stats::rnorm(n.ind, 0, sqrt(sig2.h))
   }
-  y1 <- mu + h * beta1h + rnorm(n.ind, 0, sqrt(sig2.1))
-  y2 <- mu + h * beta2h + rnorm(n.ind, 0, sqrt(sig2.2))
+  y1 <- mu + h * beta1h + stats::rnorm(n.ind, 0, sqrt(sig2.1))
+  y2 <- mu + h * beta2h + stats::rnorm(n.ind, 0, sqrt(sig2.2))
   if (normalize) {
     y1 <- normal.trans(y1)
     y2 <- normal.trans(y2)

@@ -171,27 +171,27 @@ plot.hotperm <- function(x, probs = seq(0.9, 0.99, by = 0.01), level = 0.95, ...
     if(is.quantile)
       xlabs <- paste(xlabs, "quantile")
     
-    plot(range(x.vals), c(0, max(quant)), type = "n", xlab = "", ylab = "")
-    mtext(xlabs, 1, 2)
-    mtext("hotspot size", 2, 2)
-    abline(v = x.crit, col = "darkgray", lty = 2)
-    abline(h = quant.thr, col = "darkgray", lty = 2)
-    mtext(ceiling(quant.thr), 2, at = quant.thr, las = 2, cex = 1)
+    graphics::plot(range(x.vals), c(0, max(quant)), type = "n", xlab = "", ylab = "")
+    graphics::mtext(xlabs, 1, 2)
+    graphics::mtext("hotspot size", 2, 2)
+    graphics::abline(v = x.crit, col = "darkgray", lty = 2)
+    graphics::abline(h = quant.thr, col = "darkgray", lty = 2)
+    graphics::mtext(ceiling(quant.thr), 2, at = quant.thr, las = 2, cex = 1)
     for(i in seq(n.probs)) {
-      lines(rev(sort(x.vals)), quant[,i],
+      graphics::lines(rev(sort(x.vals)), quant[,i],
             lwd = 1 + 2 * (round(probs[i] - level, 2) == 0))
     }
 
-    text(x.crit, quant[wh.thr, n.probs] + 5, 1 - max(probs), adj = 0)
-    text(x.crit, quant[wh.thr, 1] - 5, 1 - min(probs), adj = 1)
-    text(par("usr")[1], quant.thr + 5, 1 - level, adj = 0)
+    graphics::text(x.crit, quant[wh.thr, n.probs] + 5, 1 - max(probs), adj = 0)
+    graphics::text(x.crit, quant[wh.thr, 1] - 5, 1 - min(probs), adj = 1)
+    graphics::text(graphics::par("usr")[1], quant.thr + 5, 1 - level, adj = 0)
 
     if(add.level)
       main <- paste(main, "\n hotspot size significance level =", 1 - max(probs), "to", 1 - min(probs))
-    mtext(main, 3, 0.5)
+    graphics::mtext(main, 3, 0.5)
   }
 
-  tmpar <- par(mfrow = c(1 + !is.null(out$max.N.window),2), mar = c(3.1,3.1,2.1,0.1))
+  tmpar <- graphics::par(mfrow = c(1 + !is.null(out$max.N.window),2), mar = c(3.1,3.1,2.1,0.1))
   if(!is.null(out$max.N.window)) {
     ## Jansen method, smoothing.
     tmp.plot(lod.thrs, out$max.N.window, lod.thr, probs, level, wh.thr, FALSE,
@@ -205,7 +205,7 @@ plot.hotperm <- function(x, probs = seq(0.9, 0.99, by = 0.01), level = 0.95, ...
            "Jansen method per locus")
   tmp.plot(probs, out$max.N, level, probs, level, wh.thr, TRUE,
            "Jansen method per locus")
-  par(tmpar)
+  graphics::par(tmpar)
 
   if(!is.null(out$max.lod.quant)) {
     n.quant <- nrow(out$max.lod.quant)
@@ -213,24 +213,24 @@ plot.hotperm <- function(x, probs = seq(0.9, 0.99, by = 0.01), level = 0.95, ...
     quant.thr <- max(which(out$max.lod.quant[,wh.level] >= lod.thr), na.rm = TRUE)
     
     ## Chaibub Neto method.
-    plot(c(1,n.quant), range(out$max.lod.quant, na.rm = TRUE), type = "n",
+    graphics::plot(c(1,n.quant), range(out$max.lod.quant, na.rm = TRUE), type = "n",
          xlab = "significant hotspot size with given threshold",
          ylab = "hotspot LOD score threshold",
          log = "xy")
-    abline(h = lod.thr, col = "darkgray", lty = 2)
-    abline(v = quant.thr, col = "darkgray", lty = 2)
-    mtext(ceiling(quant.thr), 1, at = quant.thr, las = 2)
+    graphics::abline(h = lod.thr, col = "darkgray", lty = 2)
+    graphics::abline(v = quant.thr, col = "darkgray", lty = 2)
+    graphics::mtext(ceiling(quant.thr), 1, at = quant.thr, las = 2)
     for(i in seq(n.probs)) {
       if(any(!is.na(out$max.lod.quant[,i])))
-        lines(seq(n.quant), out$max.lod.quant[,i],
+        graphics::lines(seq(n.quant), out$max.lod.quant[,i],
               lwd = 1 + 2 * (round(probs[i] - level, 2) == 0))
     }
     
     n.thr2 <- length(lod.thrs) / 2
-    text(n.thr2 + 1, out$max.lod.quant[n.thr2, n.probs], 1 - max(probs), adj = 0)
-    text(n.thr2 - 1, out$max.lod.quant[n.thr2, 1], 1 - min(probs), adj = 1)
-    text(par("usr")[1], lod.thr, level, adj = 0)
-    title(paste("hotspot LOD threshold by hotspot size\nsignificance level =",
+    graphics::text(n.thr2 + 1, out$max.lod.quant[n.thr2, n.probs], 1 - max(probs), adj = 0)
+    graphics::text(n.thr2 - 1, out$max.lod.quant[n.thr2, 1], 1 - min(probs), adj = 1)
+    graphics::text(graphics::par("usr")[1], lod.thr, level, adj = 0)
+    graphics::title(paste("hotspot LOD threshold by hotspot size\nsignificance level =",
                 1 - max(probs), "to", 1 - min(probs)))
   }
 }

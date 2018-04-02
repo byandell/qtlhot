@@ -12,6 +12,11 @@ import(mnormt)
 import(lattice)
 
 importFrom(stats, quantile) ## needed for quantile S3 method
+importFrom("graphics", "abline", "image", "lines", "plot", "rug",
+             "segments", "text", "title")
+importFrom("stats", "approx", "median", "p.adjust", "rnorm", "window")
+importFrom("utils", "write.table")
+  
 export(highlod)
 export(pull.highlod)
 S3method(plot, highlod)
@@ -27,10 +32,10 @@ S3method(plot, hotsize)
 S3method(summary, hotsize)
 S3method(print, hotsize)
 S3method(max, hotsize)
+S3method(parallel, qtlhot)
 
 export(big.phase0)
 export(qtlhot.phase0)
-export(parallel.qtlhot)
 ## export(sliding.bar.plot)
 
 export(sim.null.cross)

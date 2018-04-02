@@ -147,6 +147,7 @@ big.phase2 <- function(dirpath = ".", index, ...,
   ## Loop on permutations internal to scanone.permutations.
 
   ## This loads cross object and many other things from phase1.
+  window <- 5
   load(file.path(dirpath, "Phase1.RData"))
 
   if(verbose)

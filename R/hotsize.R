@@ -134,7 +134,7 @@ plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
     for(i in levels(x$chr)) {
       tmp <- x$chr == i
       if(any(tmp))
-        plot(x[tmp,], ylab, col = col,
+        graphics::plot(x[tmp,], ylab, col = col,
              title = paste("chr", i), ...)
 
       if(!is.null(maps) & by.chr)
@@ -146,26 +146,26 @@ plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
   ## Use NextMethod, but repeatedly.
   class(x) <- class(x)[-1]
   ## max.N
-  plot(x, lodcolumn = 1, ylab = ylab, col = col[1], ...)
+  graphics::plot(x, lodcolumn = 1, ylab = ylab, col = col[1], ...)
   if(title != "")
     title <- paste("raw (", col[1], ")", sep = "")
 
   ## max.N.window
   window <- attr(x, "window")
   if(!is.null(window)) {
-    plot(x, lodcolumn = 2, col = col[2], add = TRUE, ...)
+    graphics::plot(x, lodcolumn = 2, col = col[2], add = TRUE, ...)
     if(title != "")
       title <- paste(title, " smoothed(", col[2], ")", sep = "")
   }
 
   quant.thr <- attr(x, "quant.thr")
   if(!is.null(quant.thr))
-    abline(h = quant.thr, lwd = 2, lty = 2, col = col[2])
+    graphics::abline(h = quant.thr, lwd = 2, lty = 2, col = col[2])
   
   ## quant
   quant.level <- attr(x, "quant.level")
   if(!is.null(quant.level)) {
-    plot(x, lodcolumn = match("quant", names(x)) - 2, col = col[3],
+    graphics::plot(x, lodcolumn = match("quant", names(x)) - 2, col = col[3],
                  add = TRUE, ...)
     if(title != "")
       title <- paste(title, " sliding(", col[3], ")", sep = "")
@@ -173,12 +173,14 @@ plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
     ## Add right axis for quantile LOD level.
     if(length(quant.axis)) {
       quant.axis <- pmax(1, quant.axis)
-      axis(4, at = quant.axis, labels = round(quant.level[quant.axis], 2), las = 1, cex.axis = 0.9)
-      ## mtext("sliding LOD thresholds", 4, 1, cex = 1.5)
+      graphics::axis(4, at = quant.axis,
+                     labels = round(quant.level[quant.axis], 2), 
+                     las = 1, cex.axis = 0.9)
+      ## graphics::mtext("sliding LOD thresholds", 4, 1, cex = 1.5)
     }
   }
   if(title != "")
-    mtext(title, 3, 1, cex = 1.5)
+    graphics::mtext(title, 3, 1, cex = 1.5)
   invisible()
 }
 ###################################################################################
@@ -216,7 +218,7 @@ make.maxlod <- function(highobj, chr.pos)
     if(is.null(x))
       NA
     else
-      median(x, na.rm=TRUE)
+      stats::median(x, na.rm=TRUE)
   }
   tmpfn3 <- function(a) {
     is.nan(a) | a==max(a, na.rm=TRUE)

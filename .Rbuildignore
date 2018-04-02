@@ -5,3 +5,5 @@
 \.\.Rcheck
 \.git$
 \.gitignore$
+^.*\.Rproj$
+^\.Rproj\.user$

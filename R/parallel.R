@@ -49,7 +49,7 @@ parallel.error <- function(num, phase = 0, index = 1)
     outname <- "RESULT"
   else
     outname <- paste("RESULT", phase, index, sep = ".")
-  write.table(num, file = outname,
+  utils::write.table(num, file = outname,
               quote = FALSE, row.names = FALSE, col.names = FALSE)
   if(num)
     stop(parallel.message(num))
@@ -72,7 +72,7 @@ parallel.message <- function(num)
                      "number of BIC runs does not match groups"))
   dimnames(msg)[[1]] <- seq(0, nrow(msg) - 1)
   if(missing(num))
-    write.table(msg, file = "errorcodes.txt",
+    utils::write.table(msg, file = "errorcodes.txt",
                 quote = FALSE, col.names = FALSE)
   else
     msg[as.character(num), 1]
@@ -178,7 +178,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
 
   ## Need to write a file with n.groups lines and group.size columns.
   ## The file groups.txt is examined by parallelizer (SOAR).
-  write.table(c(cross.index, n.split),
+  utils::write.table(c(cross.index, n.split),
               file = file.path(dirpath, "groups.txt"),
               row.names = FALSE, col.names = FALSE, quote = FALSE)
 }

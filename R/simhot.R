@@ -35,8 +35,8 @@ sim.null.cross <- function(chr.len = rep(400,16), n.mar=185, n.ind = 112, type =
 sim.null.pheno.data <- function(cross, n.pheno, latent.eff, res.var)
 {
   n <- nind(cross)
-  latent <- rnorm(n, 0, sqrt(res.var))
-  ErrorM <- matrix(rnorm(n * n.pheno, 0, sqrt(res.var)), n, n.pheno)
+  latent <- stats::rnorm(n, 0, sqrt(res.var))
+  ErrorM <- matrix(stats::rnorm(n * n.pheno, 0, sqrt(res.var)), n, n.pheno)
   pheno <- data.frame(latent*latent.eff + ErrorM)
   names(pheno) <- paste("P", 1:n.pheno, sep="")
   cross$pheno <- pheno
@@ -81,7 +81,7 @@ include.hotspots <- function(cross,
   }
   get.qtl.eff <- function(n, lod, res.var, latent.eff, Q.eff)
   {
-##    lod <- runif(hsize, lod.range[1], lod.range[2])
+##    lod <- stats::runif(hsize, lod.range[1], lod.range[2])
 ##    r2 <- 1 - 10 ^ (-2 * lod / nind(cross))
 ##    beta <- sqrt(r2 * res.var * (1 + latent.eff ^ 2) / (Q.eff ^ 2 * (1 - r2) - res.var * r2))
     r2 <- 1 - 10^(-2*lod/n)
@@ -92,10 +92,10 @@ include.hotspots <- function(cross,
   {
     M.pos <- get.closest.pos.nms(hpos, cross, hchr)[[1]]
     M.dummy <- hk.prob[[hchr]][, M.pos, 1] - hk.prob[[hchr]][, M.pos, 2]
-    M <- M.dummy * Q.eff + rnorm(nind(cross), 0, sqrt(res.var))
+    M <- M.dummy * Q.eff + stats::rnorm(nind(cross), 0, sqrt(res.var))
 
     ## QTL effect
-    beta <- get.qtl.eff(n=nind(cross), lod=runif(hsize, lod.range[1], 
+    beta <- get.qtl.eff(n=nind(cross), lod=stats::runif(hsize, lod.range[1], 
       lod.range[2]), res.var, latent.eff, Q.eff)
 
     for(j in seq(length(index)))

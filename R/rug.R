@@ -38,43 +38,43 @@ add.rug <- function(chr, main, maps,
     ticksize <- ifelse(outer, -0.02, 0.02)
 
     ## Get plot limits in plotting units.
-    usr <- par("usr")
+    usr <- graphics::par("usr")
 
     ## Add grey ticks for non-segregating markers (if available).
     non.seg <- maps[[paste(base, "same", sep = ".")]]
     if(!is.null(non.seg)) {
       non.seg <- non.seg[[chr]]
-      rug(non.seg, 0.75 * ticksize, quiet = TRUE, side = side, col = "gray")
-      rug(non.seg, 0.75 * ticksize, quiet = TRUE, side = side + 2, col = "gray")
+      graphics::rug(non.seg, 0.75 * ticksize, quiet = TRUE, side = side, col = "gray")
+      graphics::rug(non.seg, 0.75 * ticksize, quiet = TRUE, side = side + 2, col = "gray")
       if(side == 1)
-        abline(h = usr[3:4])
+        graphics::abline(h = usr[3:4])
       else
-        abline(v = usr[1:2])
+        graphics::abline(v = usr[1:2])
     }
 
-    rug(map, ticksize, quiet = TRUE, side = side)
+    graphics::rug(map, ticksize, quiet = TRUE, side = side)
     if(bottom.axis) {
-      axis(side, pretty(xlim, n = 30), line = ifelse(outer, 0.6, 0))
+      graphics::axis(side, pretty(xlim, n = 30), line = ifelse(outer, 0.6, 0))
     }
 
-    rug(map, ticksize, quiet = TRUE, side = side + 2)
+    graphics::rug(map, ticksize, quiet = TRUE, side = side + 2)
     ## This is the culprit.
-    axis(side + 2, p$y, p$x, line = ifelse(outer, 0.6, 0))
+    graphics::axis(side + 2, p$y, p$x, line = ifelse(outer, 0.6, 0))
 
     usr <- usr[2 * side - c(1,0)]
     usr <- usr[1] - 0.01 * diff(usr[1:2])
     if(use.cM) {
-      mtext("cM", side,     1.6, at = usr, adj = 1)
-      mtext("Mb", side + 2, 1.6, at = usr, adj = 1)
+      graphics::mtext("cM", side,     1.6, at = usr, adj = 1)
+      graphics::mtext("Mb", side + 2, 1.6, at = usr, adj = 1)
     }
     else {
       
-      mtext("cM", side + 2, 1.6, at = usr, adj = 1)
-      mtext("Mb", side,     1.6, at = usr, adj = 1)
+      graphics::mtext("cM", side + 2, 1.6, at = usr, adj = 1)
+      graphics::mtext("Mb", side,     1.6, at = usr, adj = 1)
     }
-    mtext(paste("Chromosome", chr), side, 1.35 + outer)
+    graphics::mtext(paste("Chromosome", chr), side, 1.35 + outer)
   }
-  title(main, line = 0.5 + 2 * (length(chr) == 1))
+  graphics::title(main, line = 0.5 + 2 * (length(chr) == 1))
 }
 ################################################################
 ## My approximation routine. Use qm.approx, hide myapprox.
@@ -123,7 +123,7 @@ myapprox <- function(Mb, cM,
   tmp <- pmin(max(c(Mb)), pmax(min(c(Mb)), tmp))
 
   ## Linear interpolation between SNPs.
-  p <- approx(c(Mb), c(cM), tmp)
+  p <- stats::approx(c(Mb), c(cM), tmp)
 
   ## Reset x to be pos.
   p$x <- pos

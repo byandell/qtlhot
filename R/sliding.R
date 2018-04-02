@@ -71,26 +71,26 @@ slidingbar.plot <- function(x, ...)
   col <- c("white","black")
   
   ## Want to borrow from qtlview:::plot.aug.scanone.
-  image(seq(nrow(x)), seq(ncol(x) -2), as.matrix(x[,-(1:2)]),
+  graphics::image(seq(nrow(x)), seq(ncol(x) -2), as.matrix(x[,-(1:2)]),
         col = col, xlab = "", ylab = "hotspot size",
         xaxt = "n")
 
   ## Add chr name
-  mtext("Chromosome", 1, 2)
+  graphics::mtext("Chromosome", 1, 2)
   chr <- levels(x$chr)
   
   n.mar <- table(x$chr)
   wh <- c(0.5, cumsum(n.mar) + 0.5)
-  abline(v = wh, xpd = FALSE)
-  a <- par("usr")
-  abline(v = a[1:2], xpd = FALSE)
-  abline(h = a[3:4], xpd = FALSE)
+  graphics::abline(v = wh, xpd = FALSE)
+  a <- graphics::par("usr")
+  graphics::abline(v = a[1:2], xpd = FALSE)
+  graphics::abline(h = a[3:4], xpd = FALSE)
   for (i in 1:length(n.mar))
-    axis(side = 1, at = mean(wh[i + c(0, 1)]), labels = chr[i])
+    graphics::axis(side = 1, at = mean(wh[i + c(0, 1)]), labels = chr[i])
 
   y.axes <- pmax(1, pretty(seq(ncol(x) - 2)))
   quant.level <- round(attr(x, "quant.level"), 2)
-  axis(side=4, labels = quant.level[y.axes], at = y.axes, cex.axis = 0.9, las=1)
+  graphics::axis(side=4, labels = quant.level[y.axes], at = y.axes, cex.axis = 0.9, las=1)
   invisible()
 }
 ## Generates the sliding bar figure (not an image anymore)
@@ -122,11 +122,11 @@ sliding.bar.plot <- function(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
     nchrs <- length(chrs)
     maxpos <- rep(NA,nchrs)
     myrug <- map[map[,1]==1,2]
-    chr.legend.pos <- median(myrug)
+    chr.legend.pos <- stats::median(myrug)
     for(i in 2:length(chrs)){
       aux <- max(myrug) + gap
       myrug <- c(myrug, map[map[,1]==i,2] + aux)
-      chr.legend.pos <- c(chr.legend.pos, median(map[map[,1]==i,2] + aux))
+      chr.legend.pos <- c(chr.legend.pos, stats::median(map[map[,1]==i,2] + aux))
     }
     list(myrug=myrug, chr.legend.pos=chr.legend.pos)
   }
@@ -138,21 +138,21 @@ sliding.bar.plot <- function(scan, lod.thr, size.thr, gap=50, y.axes=NULL)
   M <- matrix.to.plot(sbm, map, myrug[[1]])
   lod.thr <- as.character(round(lod.thr,2))
   xaxis <- c(1:ncol(M))
-  par(mar=c(5, 4, 4, 5) + 0.1) 
-  plot(xaxis, xaxis, type="n", ylim=c(0,N), xaxt="n", xlab="Chromosome",
+  graphics::par(mar=c(5, 4, 4, 5) + 0.1) 
+  graphics::plot(xaxis, xaxis, type="n", ylim=c(0,N), xaxt="n", xlab="Chromosome",
        yaxt="n", ylab="Hotspot size", cex.lab=1.5)
-  rug(myrug[[1]], 0.02, quiet=TRUE)
-  axis(side=1, labels=as.character(unique(map[,1])), at=myrug[[2]], 
+  graphics::rug(myrug[[1]], 0.02, quiet=TRUE)
+  graphics::axis(side=1, labels=as.character(unique(map[,1])), at=myrug[[2]], 
        cex.axis=1.5, tick=FALSE)
   if(is.null(y.axes))
     y.axes <- quantile(c(1:N), c(0, 0.25, 0.50, 0.75, 1))
-  axis(side=2, labels=as.character(y.axes), at=y.axes, cex.axis=0.9, las=1)
-  axis(side=4, labels=lod.thr[y.axes], at=y.axes, cex.axis=0.9, las=1)
-  mtext("LOD threshold",side=4,cex=1.4,line=3.5,adj=0.545)
+  graphics::axis(side=2, labels=as.character(y.axes), at=y.axes, cex.axis=0.9, las=1)
+  graphics::axis(side=4, labels=lod.thr[y.axes], at=y.axes, cex.axis=0.9, las=1)
+  graphics::mtext("LOD threshold",side=4,cex=1.4,line=3.5,adj=0.545)
   ## This is the slow part. Better to do as image?
   for(i in 1:N){
     for(j in 1:ncol(M)){
-      if(M[i,j]) segments(x0=j, x1=j, y0=i-1/2, y1=i+1/2, lwd=0.1)
+      if(M[i,j]) graphics::segments(x0=j, x1=j, y0=i-1/2, y1=i+1/2, lwd=0.1)
     }
   }
 }

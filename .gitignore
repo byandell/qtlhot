@@ -4,3 +4,5 @@
 *.rds
 *.aux
 *.Rhistory
+.Rproj.user
+*.Rproj
