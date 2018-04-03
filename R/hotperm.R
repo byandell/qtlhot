@@ -35,9 +35,9 @@ hotperm <- function(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1
                     addcovar = NULL, intcovar = NULL, ...) 
 {
   set.seed(init.seed)
-  n.phe <- nphe(cross)
+  n.phe <- qtl::nphe(cross)
   pheno.col <- seq(n.phe)
-  n.ind <- nind(cross)
+  n.ind <- qtl::nind(cross)
   n.quant <- min(n.quant, n.phe)
 
   tmp <- table(sapply(cross$pheno, class))
@@ -68,9 +68,9 @@ hotperm <- function(cross, n.quant, n.perm, lod.thrs, alpha.levels, drop.lod = 1
     perm.cross$pheno <- cross$pheno[tmp,]
 
     ## perform mapping analysis in the permuted data
-    mycat("scanone...", verbose, last = "")
-    ## NB: scanone groups phenos in batches based on missing data patterns.
-    scanmat <- scanone(perm.cross, pheno.col = pheno.col, method = "hk", 
+    mycat("nind...", verbose, last = "")
+    ## NB: qtl::scanone groups phenos in batches based on missing data patterns.
+    scanmat <- qtl::scanone(perm.cross, pheno.col = pheno.col, method = "hk", 
                         addcovar = addcovar, intcovar = intcovar, ...)
 
     ## Reduce to high LOD scores.

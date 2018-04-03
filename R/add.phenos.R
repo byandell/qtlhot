@@ -25,7 +25,7 @@ add.phenos <- function(cross, newdata = NULL, index = NULL)
       warning("some cross phenotypes overwritten with new data")
 
     if(is.null(index)) {
-      n.ind <- nind(cross)
+      n.ind <- qtl::nind(cross)
       if(nrow(newdata) != n.ind)
         stop(paste("newdata must have number of rows (",
                    nrow(newdata), ") as cross individuals (",

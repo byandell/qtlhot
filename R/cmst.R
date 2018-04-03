@@ -44,9 +44,9 @@ CMSTtests <- function(cross,
                                  cross.type) {
     # Creates a design matrix
     le.mar <- length(chr)
-    n <- nind(cross)
+    n <- qtl::nind(cross)
     if(le.mar > 0) {
-      qtlo <- makeqtl(cross, chr, pos, what = "prob")
+      qtlo <- qtl::makeqtl(cross, chr, pos, what = "prob")
       XG <- HkDesignMatrix(qtlo, cross.type)
     }
     else {
@@ -131,13 +131,13 @@ CMSTtests <- function(cross,
 
   ParametricJointCMST <- function(Z, Cor.hat) {
     z <- min(Z[1, 2], Z[1, 3], Z[1, 4])
-    pval.1 <- 1 - pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[1]])
+    pval.1 <- 1 - mnormt::pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[1]])
     z <- min(- Z[1, 2], Z[2, 3], Z[2, 4])
-    pval.2 <- 1 - pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[2]])
+    pval.2 <- 1 - mnormt::pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[2]])
     z <- min(-Z[1, 3], -Z[2, 3], Z[3, 4])
-    pval.3 <- 1 - pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[3]])
+    pval.3 <- 1 - mnormt::pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[3]])
     z <- min(-Z[1, 4], -Z[2, 4], -Z[3, 4])
-    pval.4 <- 1 - pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[4]])
+    pval.4 <- 1 - mnormt::pmnorm(c(z, z, z), c(0, 0, 0), Cor.hat[[4]])
     c(pval.1, pval.2, pval.3, pval.4)
   }
 
@@ -164,7 +164,7 @@ CMSTtests <- function(cross,
   if (!is.null(to.drop)) {
     cross <- subset(cross, ind = -to.drop)
   }
-  n <- nind(cross)
+  n <- qtl::nind(cross)
   y1 <- cross$pheno[, pheno1]
   y2 <- cross$pheno[, pheno2]
 
@@ -233,9 +233,9 @@ CMSTtests <- function(cross,
     Sig.hat[[4]] <- S.hat[c(3, 5, 6), c(3, 5, 6)]
     Cor.hat <- vector(mode = "list", length = 4) 
     for (i in 1 : 4) {
-      tmp <- is.positive.definite(Sig.hat[[i]])
+      tmp <- corpcor::is.positive.definite(Sig.hat[[i]])
       if (!tmp) {
-        Sig.hat[[i]] <- make.positive.definite(Sig.hat[[i]])
+        Sig.hat[[i]] <- corpcor::make.positive.definite(Sig.hat[[i]])
       }
       Cor.hat[[i]] <- stats::cov2cor(Sig.hat[[i]])
       attr(Sig.hat[[i]], "is.positive.definite") <- tmp
@@ -350,9 +350,9 @@ CMSTtests <- function(cross,
     Sig.hat[[4]] <- S.hat[c(3, 5, 6), c(3, 5, 6)]
     Cor.hat <- vector(mode = "list", length = 4) 
     for (i in 1 : 4) {
-      tmp <- is.positive.definite(Sig.hat[[i]])
+      tmp <- corpcor::is.positive.definite(Sig.hat[[i]])
       if (!tmp) {
-        Sig.hat[[i]] <- make.positive.definite(Sig.hat[[i]])
+        Sig.hat[[i]] <- corpcor::make.positive.definite(Sig.hat[[i]])
       }
       Cor.hat[[i]] <- stats::cov2cor(Sig.hat[[i]])
       attr(Sig.hat[[i]], "is.positive.definite") <- tmp
@@ -922,8 +922,8 @@ FitAllTests <- function(cross, pheno1, pheno2, Q.chr, Q.pos, verbose = TRUE)
   out$pvals.cit <- matrix(NA, ntests, 2, dimnames = list(nms, c("pval.1", "pval.2")))
 
   for(k in 1 : ntests) {
-    cit.mar <- find.marker(cross, Q.chr, Q.pos)
-    LL <- pull.geno(cross)[, cit.mar]
+    cit.mar <- qtl::find.marker(cross, Q.chr, Q.pos)
+    LL <- qtl::pull.geno(cross)[, cit.mar]
     GG <- cross$pheno[, pheno1]
     TT <- cross$pheno[, pheno2[k]]
     aux2 <- try(CitTests(LL, GG, TT), silent = TRUE)
@@ -1109,7 +1109,7 @@ GetCommonQtls <- function(cross,
         aux6 <- which.max(ssJ[aux5, 3])
         Q.chr <- as.numeric(ssJ[aux5[aux6], 1])
         Q.pos <- ssJ[aux5[aux6], 2]
-        Q <- find.pseudomarker(cross, Q.chr, Q.pos, "prob")
+        Q <- qtl::find.pseudomarker(cross, Q.chr, Q.pos, "prob")
         Q <- data.frame(Q, Q.chr, Q.pos, stringsAsFactors = FALSE)
       }
     }
@@ -1121,20 +1121,20 @@ GetCommonQtls <- function(cross,
   if (!is.null(to.drop)) {
     cross <- subset(cross, ind = -to.drop)
   }
-  n <- nind(cross)
+  n <- qtl::nind(cross)
   y1 <- cross$pheno[, pheno1]
   y2 <- cross$pheno[, pheno2]
   addcov1.M <- CreateCovMatrix(cross, cov.names = addcov1)
   addcov2.M <- CreateCovMatrix(cross, cov.names = addcov2)
   intcov1.M <- CreateCovMatrix(cross, cov.names = intcov1)
   intcov2.M <- CreateCovMatrix(cross, cov.names = intcov2)
-  scan1 <- scanone(cross, pheno.col = find.pheno(cross, pheno1), 
+  scan1 <- qtl::scanone(cross, pheno.col = qtl::find.pheno(cross, pheno1), 
                    method = "hk", intcovar = intcov1.M,
                    addcovar = cbind(addcov1.M, intcov1.M))
-  scan2 <- scanone(cross, pheno.col = find.pheno(cross, pheno2), 
+  scan2 <- qtl::scanone(cross, pheno.col = qtl::find.pheno(cross, pheno2), 
                    method = "hk", intcovar = intcov2.M, 
                    addcovar = cbind(addcov2.M, intcov2.M))
-  scan2g1 <- scanone(cross, pheno.col = find.pheno(cross, pheno2), 
+  scan2g1 <- qtl::scanone(cross, pheno.col = qtl::find.pheno(cross, pheno2), 
                      method = "hk", intcovar = intcov2.M,
                      addcovar = cbind(addcov2.M, intcov2.M, y1))
   scanJ <- scan1
@@ -1653,7 +1653,7 @@ CreateTraitsLodInt <- function(scan, annot, traits, lod.thr, drop = 1.5)
       if(peak >= lod.thr){
         trait.index <- match(traits[i], nms)
         sscan <- scan[, c(1, 2, trait.index + 2)]
-        lod.interval <- lodint(sscan, chr = trait.chr, drop)
+        lod.interval <- qtl::lodint(sscan, chr = trait.chr, drop)
         lb <- lod.interval[1, 2]
         ub <- lod.interval[3, 2]
         out[i, 4] <- lb

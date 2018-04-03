@@ -130,7 +130,7 @@ highlod.thr <- function(highobj, lod.thr)
 ###################################################################################
 cat.scanone <- function(dirpath = ".", filenames = permfiles, chr.pos)
 {
-  ## Folder should contain scanone highlods data across all traits for ONE permutation
+  ## Folder should contain qtl::scanone highlods data across all traits for ONE permutation
   permfiles <- list.files(dirpath, paste("per.scan", "*", "RData", sep = "."))
 
   ## Make and remove per.scan.hl. Below use version from files.
@@ -147,7 +147,7 @@ cat.scanone <- function(dirpath = ".", filenames = permfiles, chr.pos)
 ###################################################################################
 sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
 {
-  ic <- getsex(cross)$sex
+  ic <- qtl::getsex(cross)$sex
   ## Drop sex if only one present.
   if(length(unique(ic)) == 1)
     ic <- NULL
@@ -169,8 +169,8 @@ sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
   
   list(addcovar = ac, intcovar = ic)
 }
-## Performs and saves scanone on permuted dataset
-scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
+## Performs and saves qtl::nind on permuted dataset
+scanone.permutations <- function(cross, pheno.col = seq(3, qtl::nphe(cross)),
                                  n.perm, seed=123456789, batch.effect = NULL,
                                  pheno.set = 1,
                                  lod.min, drop.lod = 1.5,
@@ -185,7 +185,7 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
   else
     covars <- list(addcovar = addcovar, intcovar = intcovar)
   
-  n.ind <- nind(cross)
+  n.ind <- qtl::nind(cross)
 
   perms <- matrix(NA, n.ind, n.perm)
 
@@ -194,7 +194,7 @@ scanone.permutations <- function(cross, pheno.col = seq(3, nphe(cross)),
     perms[,i] <- tmp <- sample(c(1:n.ind), n.ind, replace=FALSE)
     perm.cross$pheno <- cross$pheno[tmp,]
 
-    per.scan <- scanone(perm.cross, pheno.col=pheno.col, method="hk", 
+    per.scan <- qtl::scanone(perm.cross, pheno.col=pheno.col, method="hk", 
                         addcovar=covars$addcovar, intcovar=covars$intcovar, ...)
 
     per.scan.hl <- highlod(per.scan, lod.thr = lod.min, drop.lod = drop.lod,

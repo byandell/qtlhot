@@ -89,9 +89,9 @@ qtlhot.phase0 <- function(dirpath, init.seed = 92387475,
   
   set.seed(init.seed)
 
-  mymap <- sim.map(len = len, n.mar = n.mar, include.x = FALSE, eq.spacing = TRUE)
-  cross <- sim.cross(map = mymap, n.ind = n.ind, type = "bc")
-  cross <- calc.genoprob(cross, step=0)
+  mymap <- qtl::sim.map(len = len, n.mar = n.mar, include.x = FALSE, eq.spacing = TRUE)
+  cross <- qtl::sim.cross(map = mymap, n.ind = n.ind, type = "bc")
+  cross <- qtl::calc.genoprob(cross, step=0)
   
   ## Simulate new phenotypes.
   cross <- sim.null.pheno.data(cross, n.phe, latent.eff, res.var)
@@ -103,7 +103,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
                           params.file = "params.txt",
                           cross.file = "cross.RData",
                           cross.name = "cross",
-                          n.ind = nind(cross),
+                          n.ind = qtl::nind(cross),
                           lod.thrs = c(4.63,4.17,3.93,3.76,3.65,3.56,3.47,3.39,3.34,3.30),
                           alpha.levels = c(1:10) / 100, ## Nominal significance levels.
                           Nmax = 100, ## Maximum hotpsot size recorded.
@@ -111,7 +111,7 @@ qtlhot.phase1 <- function(dirpath, index = 0,
                           n.split = 100, ## Number of splits of permutations.
                           latent.eff = 1.5, ## Latent effect determines correlation among traits.
                           res.var = 1, ## Residual variance.
-                          n.phe = nphe(cross), ## Number of traits.
+                          n.phe = qtl::nphe(cross), ## Number of traits.
                           nruns = 1,
                           big = FALSE,
                           drop.lod = 1.5, ## LOD drop to keep.
@@ -157,9 +157,9 @@ qtlhot.phase1 <- function(dirpath, index = 0,
       
     if(cross.index > 0 & nruns > 1) {
       ## Keep markers but re-simulate genotypes each time.
-      mymap <- pull.map(cross)
-      cross <- sim.cross(map = mymap, n.ind = n.ind, type = class(cross)[1])
-      cross <- calc.genoprob(cross, step=0)
+      mymap <- qtl::pull.map(cross)
+      cross <- qtl::sim.cross(map = mymap, n.ind = n.ind, type = class(cross)[1])
+      cross <- qtl::calc.genoprob(cross, step=0)
       
       ## Simulate new phenotypes.
       cross <- sim.null.pheno.data(cross, n.phe, latent.eff, res.var)
@@ -194,7 +194,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
   ## PHASE 2: NL,N and WW permutations. 
   ##          Slow. Run on condor nodes. Sized by n.perm.
   ##
-  ## Steps for time calculations: n.perm * nind(cross) * nmar(cross) * nphe(cross)
+  ## Steps for time calculations: n.perm * qtl::nind(cross) * qtl::nmar(cross) * qtl::nphe(cross)
   ## Input files:
   ##       Phase1.RData: cross, n.phe, n.perm, lod.thrs, 
   ##
@@ -231,7 +231,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
     covars <- list(addcovar = addcovar, intcovar = intcovar)
   
   ## Following is in hotperm stuff.
-  ## filter.threshold is big loop. Have perm loop within it. n.phe*n.perm runs of scanone per dataset.
+  ## filter.threshold is big loop. Have perm loop within it. n.phe*n.perm runs of qtl::scanone per dataset.
   ## For simulation study, have many datasets!
 
   ## Creates max.N of size n.perm x n.lod and max.lod.quant of size n.perm x Nmax.
@@ -240,7 +240,7 @@ qtlhot.phase2 <- function(dirpath, index = NULL, ...,
   NLN <- hotperm(cross, Nmax, n.perm, alpha.levels, lod.thrs, drop.lod, verbose)
 
   mycat("scanone", verbose)
-  scanmat <- scanone(cross, pheno.col = pheno.col, method = "hk",
+  scanmat <- qtl::scanone(cross, pheno.col = pheno.col, method = "hk",
                      addcovar=covars$addcovar, intcovar=covars$intcovar, ...)
 
   ## Reduce to high LOD scores.

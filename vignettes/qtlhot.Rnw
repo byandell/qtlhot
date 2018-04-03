@@ -122,7 +122,7 @@ lod.thr <- lod.thrs[5]
 We perform QTL mapping analysis for 1,000 phenotypes using Haley-Knott regression, and keep only the \texttt{drop.lod} = 1.5 LOD support interval (Manichaikul et al. 2006) around significant peaks (above \texttt{lod.thr}) at each chromosome for each trait. LOD support intervals are the most commonly used interval estimate for the location of a QTL.
 
 <<>>=
-scan1 <- scanone(cross1, pheno.col = 1:1000, method = "hk")
+scan1 <- qtl::scanone(cross1, pheno.col = 1:1000, method = "hk")
 @
 
 The routine \texttt{highlod} just saves the LOD support intervals for significant peaks, which dramatically reduces the object size from the result of \texttt{scanone}. We can examine the maximum hotspot size for each possible single trait threshold using the \texttt{max} method for \texttt{highlod} objects. The first column gives the counts associated with QTL mapping threshold of \Sexpr{round(lod.thrs[1], 2)}, whereas the last one shows the counts based on the more liberal threshold \Sexpr{round(lod.thrs[10], 2)}. Note how the counts increase as the QTL mapping thresholds decrease.

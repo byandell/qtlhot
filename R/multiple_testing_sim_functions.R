@@ -31,8 +31,8 @@ MyMultipleTestingSim <- function(nSim,
                             rep(beta, n.pheno + 1), add.eff, dom.eff, 
                             sig2.1, sig2.2, eq.spacing, cross.type, 
                             normalize)
-    Cross <- calc.genoprob(Cross, step = 2)
-    scan <- scanone(Cross, pheno.col = 1:(n.pheno + 1), method = "hk")
+    Cross <- qtl::calc.genoprob(Cross, step = 2)
+    scan <- qtl::scanone(Cross, pheno.col = 1:(n.pheno + 1), method = "hk")
     su <- summary(scan[, 1:3], thr = thr)
     if (length(su[[1]]) > 0) {
       cat("sim ", k, "\n")
@@ -115,8 +115,8 @@ MyMultipleTestingSim2 <- function(nSim,
                            add.eff.1, dom.eff.1, add.eff.h, dom.eff.h, 
                            sig2.1, sig2.2, sig2.h, eq.spacing, cross.type, 
                            normalize)
-    Cross <- calc.genoprob(Cross, step = 0)
-    scan <- scanone(Cross, pheno.col = 1:(n.pheno + 1), method = "hk")
+    Cross <- qtl::calc.genoprob(Cross, step = 0)
+    scan <- qtl::scanone(Cross, pheno.col = 1:(n.pheno + 1), method = "hk")
     su <- summary(scan[, 1:3], thr = thr)
     if (length(su[[1]]) > 0) {
       cat("sim ", k, "\n")
@@ -162,8 +162,8 @@ SimCrossIndep <- function(n.ind, len, n.mar, beta, add.eff.1, dom.eff.1,
                           normalize = FALSE) {
   n.traits <- length(beta)
   beta <- matrix(rep(beta, each = n.ind), n.ind, n.traits)
-  Map <- sim.map(len, n.mar, eq.spacing = eq.spacing, include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  Map <- qtl::sim.map(len, n.mar, eq.spacing = eq.spacing, include.x = FALSE)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
   mygeno <- pull.geno(Cross)
   q1 <- mygeno[, "D1M51"]
   q2 <- mygeno[, "D1M52"]

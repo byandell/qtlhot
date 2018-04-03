@@ -55,9 +55,9 @@ mySimulations <- function(
       dom.eff1 <- stats::runif(1,dom.eff1.range[1],dom.eff1.range[2])
       sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
       sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
-      Cross <- sim.cross.1(n.ind, mu, beta21, add.eff1, dom.eff1, sig2.1, 
+      Cross <- qtl::sim.cross.1(n.ind, mu, beta21, add.eff1, dom.eff1, sig2.1, 
         sig2.2, eq.spacing, cross.type, normalize)
-      Cross <- calc.genoprob(Cross, step=2)
+      Cross <- qtl::calc.genoprob(Cross, step=2)
       cq <- get.common.qtls(Cross, "y1", "y2", thr, peak.dist)
       if(!is.na(cq[1])){
         print(k)
@@ -77,8 +77,8 @@ mySimulations <- function(
           pval.par.cmst.iu.AIC[k,] <- aux$pvals.par.cmst.iu.AIC
           pval.non.par.cmst.iu.AIC[k,] <- aux$pvals.non.par.cmst.iu.AIC
         }
-        cit.mar <- find.marker(Cross,cq[1,2],cq[1,3])
-        LL <- pull.geno(Cross)[,cit.mar]
+        cit.mar <- qtl::find.marker(Cross,cq[1,2],cq[1,3])
+        LL <- qtl::pull.geno(Cross)[,cit.mar]
         GG <- Cross$pheno[,1]
         TT <- Cross$pheno[,2]
         aux2 <- try(citTests(LL, GG, TT),silent=TRUE)
@@ -100,9 +100,9 @@ mySimulations <- function(
       sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
       sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
       sig2.h <- stats::runif(1,sig2.h.range[1],sig2.h.range[2])
-      Cross <- sim.cross.2(n.ind, mu, beta21, beta1h, beta2h, add.eff1, 
+      Cross <- qtl::sim.cross.2(n.ind, mu, beta21, beta1h, beta2h, add.eff1, 
         dom.eff1, sig2.1, sig2.2, sig2.h, eq.spacing, cross.type, normalize)
-      Cross <- calc.genoprob(Cross, step=2)
+      Cross <- qtl::calc.genoprob(Cross, step=2)
       cq <- get.common.qtls(Cross, "y1", "y2", thr, peak.dist)
       if(!is.na(cq[1])){
         print(k)
@@ -122,8 +122,8 @@ mySimulations <- function(
           pval.par.cmst.iu.AIC[k,] <- aux$pvals.par.cmst.iu.AIC
           pval.non.par.cmst.iu.AIC[k,] <- aux$pvals.non.par.cmst.iu.AIC
         }
-        cit.mar <- find.marker(Cross,cq[1,2],cq[1,3])
-        LL <- pull.geno(Cross)[,cit.mar]
+        cit.mar <- qtl::find.marker(Cross,cq[1,2],cq[1,3])
+        LL <- qtl::pull.geno(Cross)[,cit.mar]
         GG <- Cross$pheno[,1]
         TT <- Cross$pheno[,2]
         aux2 <- try(citTests(LL, GG, TT),silent=TRUE)
@@ -144,9 +144,9 @@ mySimulations <- function(
       dom.eff2 <- stats::runif(1,dom.eff2.range[1],dom.eff2.range[2])
       sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
       sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
-      Cross <- sim.cross.3(n.ind, mu, beta21, add.eff1, dom.eff1, add.eff2, 
+      Cross <- qtl::sim.cross.3(n.ind, mu, beta21, add.eff1, dom.eff1, add.eff2, 
         dom.eff2, sig2.1, sig2.2, eq.spacing, cross.type, normalize)
-      Cross <- calc.genoprob(Cross, step=2)
+      Cross <- qtl::calc.genoprob(Cross, step=2)
       cq <- get.common.qtls(Cross, "y1", "y2", thr, peak.dist)
       if(!is.na(cq[1])){
         print(k)
@@ -166,8 +166,8 @@ mySimulations <- function(
           pval.par.cmst.iu.AIC[k,] <- aux$pvals.par.cmst.iu.AIC
           pval.non.par.cmst.iu.AIC[k,] <- aux$pvals.non.par.cmst.iu.AIC
         }
-        cit.mar <- find.marker(Cross,cq[1,2],cq[1,3])
-        LL <- pull.geno(Cross)[,cit.mar]
+        cit.mar <- qtl::find.marker(Cross,cq[1,2],cq[1,3])
+        LL <- qtl::pull.geno(Cross)[,cit.mar]
         GG <- Cross$pheno[,1]
         TT <- Cross$pheno[,2]
         aux2 <- try(citTests(LL, GG, TT),silent=TRUE)
@@ -187,9 +187,9 @@ mySimulations <- function(
       dom.eff2 <- stats::runif(1,dom.eff2.range[1],dom.eff2.range[2])
       sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
       sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
-      Cross <- sim.cross.4(n.ind, mu, add.eff1, dom.eff1, add.eff2, 
+      Cross <- qtl::sim.cross.4(n.ind, mu, add.eff1, dom.eff1, add.eff2, 
         dom.eff2, sig2.1, sig2.2, eq.spacing, cross.type, normalize)
-      Cross <- calc.genoprob(Cross, step=2)
+      Cross <- qtl::calc.genoprob(Cross, step=2)
       cq <- get.common.qtls(Cross, "y1", "y2", thr, peak.dist)
       if(!is.na(cq[1])){
         print(k)
@@ -209,8 +209,8 @@ mySimulations <- function(
           pval.par.cmst.iu.AIC[k,] <- aux$pvals.par.cmst.iu.AIC
           pval.non.par.cmst.iu.AIC[k,] <- aux$pvals.non.par.cmst.iu.AIC
         }
-        cit.mar <- find.marker(Cross,cq[1,2],cq[1,3])
-        LL <- pull.geno(Cross)[,cit.mar]
+        cit.mar <- qtl::find.marker(Cross,cq[1,2],cq[1,3])
+        LL <- qtl::pull.geno(Cross)[,cit.mar]
         GG <- Cross$pheno[,1]
         TT <- Cross$pheno[,2]
         aux2 <- try(citTests(LL, GG, TT),silent=TRUE)
@@ -233,10 +233,10 @@ mySimulations <- function(
       sig2.1 <- stats::runif(1,sig2.1.range[1],sig2.1.range[2])
       sig2.2 <- stats::runif(1,sig2.2.range[1],sig2.2.range[2])
       sig2.h <- stats::runif(1,sig2.h.range[1],sig2.h.range[2])
-      Cross <- sim.cross.5(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2, 
+      Cross <- qtl::sim.cross.5(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2, 
         beta1h, beta2h, sig2.1, sig2.2, sig2.h, eq.spacing, cross.type,
         normalize)
-      Cross <- calc.genoprob(Cross, step=2)
+      Cross <- qtl::calc.genoprob(Cross, step=2)
       cq <- get.common.qtls(Cross, "y1", "y2", thr, peak.dist)
       if(!is.na(cq[1])){
         print(k)
@@ -256,8 +256,8 @@ mySimulations <- function(
           pval.par.cmst.iu.AIC[k,] <- aux$pvals.par.cmst.iu.AIC
           pval.non.par.cmst.iu.AIC[k,] <- aux$pvals.non.par.cmst.iu.AIC
         }
-        cit.mar <- find.marker(Cross,cq[1,2],cq[1,3])
-        LL <- pull.geno(Cross)[,cit.mar]
+        cit.mar <- qtl::find.marker(Cross,cq[1,2],cq[1,3])
+        LL <- qtl::pull.geno(Cross)[,cit.mar]
         GG <- Cross$pheno[,1]
         TT <- Cross$pheno[,2]
         aux2 <- try(citTests(LL, GG, TT),silent=TRUE)
@@ -287,9 +287,9 @@ SimCrossCausal <- function(n.ind, len, n.mar, beta, add.eff, dom.eff,
                            cross.type = c("bc", "f2"), normalize = FALSE) {
   n.traits <- length(beta)
   beta <- matrix(rep(beta, each = n.ind), n.ind, n.traits)
-  Map <- sim.map(len, n.mar, eq.spacing = eq.spacing, include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
-  mygeno <- pull.geno(Cross)
+  Map <- qtl::sim.map(len, n.mar, eq.spacing = eq.spacing, include.x = FALSE)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  mygeno <- qtl::pull.geno(Cross)
   q <- mygeno[, "D1M51"]
   
   cross.type <- match.arg(cross.type)
@@ -315,10 +315,10 @@ SimCrossCausal <- function(n.ind, len, n.mar, beta, add.eff, dom.eff,
 SimCross1 <- function(n.ind, mu, beta21, add.eff1, dom.eff1, 
                       sig2.1 = 1, sig2.2 = 1, eq.spacing = FALSE, 
                       cross.type = "f2", normalize = FALSE) {
-  Map <- sim.map(len = rep(100,3), n.mar = 101, eq.spacing = eq.spacing, 
+  Map <- qtl::sim.map(len = rep(100,3), n.mar = 101, eq.spacing = eq.spacing, 
                  include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
-  mygeno <- pull.geno(Cross)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  mygeno <- qtl::pull.geno(Cross)
   q <- mygeno[, "D1M51"]
   if (cross.type == "bc") {
     add.q <- q - 1.5
@@ -343,10 +343,10 @@ SimCross1 <- function(n.ind, mu, beta21, add.eff1, dom.eff1,
 SimCross2 <- function(n.ind, mu, beta21, beta1h, beta2h, add.eff1, dom.eff1, 
                       sig2.1 = 1, sig2.2 = 1, sig2.h = 1, eq.spacing = FALSE, 
                       cross.type = "f2", normalize = FALSE) {
-  Map <- sim.map(len = rep(100,3), n.mar = 101, eq.spacing = eq.spacing, 
+  Map <- qtl::sim.map(len = rep(100,3), n.mar = 101, eq.spacing = eq.spacing, 
                  include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
-  mygeno <- pull.geno(Cross)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  mygeno <- qtl::pull.geno(Cross)
   q <- mygeno[, "D1M80"]
   h <- mu + stats::rnorm(n.ind, 0, sqrt(sig2.h))
   if (cross.type == "bc") {
@@ -372,10 +372,10 @@ SimCross2 <- function(n.ind, mu, beta21, beta1h, beta2h, add.eff1, dom.eff1,
 SimCross3 <- function(n.ind, mu, beta21, add.eff1, dom.eff1, add.eff2,
                       dom.eff2, sig2.1 = 1, sig2.2 = 1, eq.spacing = FALSE, 
                       cross.type = "f2", normalize = FALSE) {
-  Map <- sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
+  Map <- qtl::sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
                  include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
-  mygeno <- pull.geno(Cross)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  mygeno <- qtl::pull.geno(Cross)
   q <- mygeno[, "D1M80"]
   if (cross.type == "bc") {
     add.q <- q - 1.5
@@ -402,10 +402,10 @@ SimCross3 <- function(n.ind, mu, beta21, add.eff1, dom.eff1, add.eff2,
 SimCross4 <- function(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2, 
                       sig2.1 = 1, sig2.2 = 1, eq.spacing = FALSE, 
                       cross.type = "f2", normalize = FALSE) {
-  Map <- sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
+  Map <- qtl::sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
                  include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
-  mygeno <- pull.geno(Cross)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  mygeno <- qtl::pull.geno(Cross)
   q <- mygeno[, "D1M80"]
   if (cross.type == "bc") {
     add.q <- q - 1.5
@@ -433,10 +433,10 @@ SimCross5 <- function(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2,
                       beta1h, beta2h, sig2.1 = 1, sig2.2 = 1, sig2.h = 1, 
                       eq.spacing = FALSE, cross.type = "f2", 
                       normalize = FALSE) {
-  Map <- sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
+  Map <- qtl::sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
                  include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
-  mygeno <- pull.geno(Cross)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  mygeno <- qtl::pull.geno(Cross)
   q <- mygeno[, "D1M80"]
   h <- mu + stats::rnorm(n.ind, 0, sqrt(sig2.h))
   if (cross.type == "bc") {
@@ -464,10 +464,10 @@ SimCross5 <- function(n.ind, mu, add.eff1, dom.eff1, add.eff2, dom.eff2,
 SimCross6 <- function(n.ind, mu, add.eff, dom.eff, beta1h, beta2h, 
                       sig2.1 = 1, sig2.2 = 1, sig2.h = 1, eq.spacing = FALSE, 
                       cross.type = "f2", normalize = FALSE) {
-  Map <- sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
+  Map <- qtl::sim.map(len = rep(100, 3), n.mar = 101, eq.spacing = eq.spacing, 
                  include.x = FALSE)
-  Cross <- sim.cross(map = Map, n.ind = n.ind, type = cross.type)
-  mygeno <- pull.geno(Cross)
+  Cross <- qtl::sim.cross(map = Map, n.ind = n.ind, type = cross.type)
+  mygeno <- qtl::pull.geno(Cross)
   q <- mygeno[, "D1M80"]
   if (cross.type == "bc") {
     add.q <- q - 1.5

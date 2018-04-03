@@ -24,8 +24,8 @@
 ## out of nSim simulations. (It also returns the method's thresholds).
 ## At each simulation iteration this function: (1) generates a null dataset 
 ## cross; (2) perform Haley-Knott mapping for all traits; (3) applies the LOD
-## drop interval computation to the scanone object; (4) determine the NL-, N-
-## and West/Wu approches thresholds using the scanone results from step 3; 
+## drop interval computation to the qtl::scanone object; (4) determine the NL-, N-
+## and West/Wu approches thresholds using the qtl::scanone results from step 3; 
 ## (5) for each of the three methods it computes the proportion of times out 
 ## of the nSim simulations we detected at least one false hotspot anywhere in
 ## the genome.  
@@ -116,7 +116,7 @@ filter.threshold <- function(cross, pheno.col, latent.eff, res.var,
                              verbose = FALSE, ...)
 {
   mycat("scanone", verbose)
-  scanmat <- scanone(cross, pheno.col = pheno.col, method = "hk", 
+  scanmat <- qtl::scanone(cross, pheno.col = pheno.col, method = "hk", 
                      addcovar = addcovar, intcovar = intcovar, ...)
 
   ## Reduce to high LOD scores.

@@ -26,15 +26,15 @@ sim.null.cross <- function(chr.len = rep(400,16), n.mar=185, n.ind = 112, type =
                            init.seed = 92387475)
 {
   set.seed(init.seed)
-  mymap <- sim.map(len = chr.len, n.mar = n.mar, include.x=FALSE, eq.spacing=TRUE)
-  scross <- sim.cross(map = mymap, n.ind = n.ind, type = type)
-  scross <- calc.genoprob(scross, step=0)
+  mymap <- qtl::sim.map(len = chr.len, n.mar = n.mar, include.x=FALSE, eq.spacing=TRUE)
+  scross <- qtl::sim.cross(map = mymap, n.ind = n.ind, type = type)
+  scross <- qtl::calc.genoprob(scross, step=0)
 
   sim.null.pheno.data(cross = scross, n.pheno = n.pheno, latent.eff = latent.eff, res.var = res.var)
 }
 sim.null.pheno.data <- function(cross, n.pheno, latent.eff, res.var)
 {
-  n <- nind(cross)
+  n <- qtl::nind(cross)
   latent <- stats::rnorm(n, 0, sqrt(res.var))
   ErrorM <- matrix(stats::rnorm(n * n.pheno, 0, sqrt(res.var)), n, n.pheno)
   pheno <- data.frame(latent*latent.eff + ErrorM)
@@ -63,7 +63,7 @@ include.hotspots <- function(cross,
     ## map <- attributes(cross$geno[[chr]]$prob)$map
     ## This can be simplified.
     map <- attributes(cross$geno[[chr]]$prob)$map
-    ## map <- pull.map(cross, chr)
+    ## map <- qtl::pull.map(cross, chr)
     q.nms <- names(map)
     map.pos <- as.numeric(map)
     tmp <- which.min(abs(map.pos-pos))
@@ -73,7 +73,7 @@ include.hotspots <- function(cross,
   }
   pull.prob <- function(cross)
   {
-    out <- vector(mode = "list", length = nchr(cross))
+    out <- vector(mode = "list", length = qtl::nchr(cross))
     names(out) <- names(cross$geno)
     for(i in names(out))
       out[[i]] <- cross$geno[[i]]$prob  
@@ -82,7 +82,7 @@ include.hotspots <- function(cross,
   get.qtl.eff <- function(n, lod, res.var, latent.eff, Q.eff)
   {
 ##    lod <- stats::runif(hsize, lod.range[1], lod.range[2])
-##    r2 <- 1 - 10 ^ (-2 * lod / nind(cross))
+##    r2 <- 1 - 10 ^ (-2 * lod / qtl::nind(cross))
 ##    beta <- sqrt(r2 * res.var * (1 + latent.eff ^ 2) / (Q.eff ^ 2 * (1 - r2) - res.var * r2))
     r2 <- 1 - 10^(-2*lod/n)
     sqrt(r2*(1 + latent.eff^2)/(Q.eff^2*(1 - r2) - r2))
@@ -92,11 +92,15 @@ include.hotspots <- function(cross,
   {
     M.pos <- get.closest.pos.nms(hpos, cross, hchr)[[1]]
     M.dummy <- hk.prob[[hchr]][, M.pos, 1] - hk.prob[[hchr]][, M.pos, 2]
-    M <- M.dummy * Q.eff + stats::rnorm(nind(cross), 0, sqrt(res.var))
+    M <- M.dummy * Q.eff + stats::rnorm(qtl::nind(cross), 0, sqrt(res.var))
 
     ## QTL effect
-    beta <- get.qtl.eff(n=nind(cross), lod=stats::runif(hsize, lod.range[1], 
-      lod.range[2]), res.var, latent.eff, Q.eff)
+    beta <- get.qtl.eff(n = qtl::nind(cross),
+                        lod = stats::runif(hsize, lod.range[1], 
+                                           lod.range[2]),
+                        res.var,
+                        latent.eff,
+                        Q.eff)
 
     for(j in seq(length(index)))
       cross$pheno[, index[j]] <- beta[j] * M + cross$pheno[, index[j]]

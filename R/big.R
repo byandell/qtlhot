@@ -103,7 +103,7 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
   eval(parse(file.path(dirpath, params.file)))
   
   ## Calculate genotype probabilities.
-  cross <- calc.genoprob(cross, step=0.5, error.prob = 0.002,
+  cross <- qtl::calc.genoprob(cross, step=0.5, error.prob = 0.002,
                          map.function = "c-f", stepwidth = "max")
   
   ## Subset to individuals with batch if used.
@@ -118,7 +118,7 @@ big.phase1 <- function(dirpath = ".", cross.index = 0, params.file,
     if(seed[1] > 0)
       set.seed(seed[1])
 
-    n.ind <- nind(cross)
+    n.ind <- qtl::nind(cross)
     seeds <- sample(c(98765:987654321), n.perm, replace = FALSE)
   }
   else
@@ -173,7 +173,7 @@ big.phase2 <- function(dirpath = ".", index, ...,
       set.seed(seed[1])
     if(verbose)
       cat("sample permutation", seed[1], "\n")
-    n.ind <- nind(cross)
+    n.ind <- qtl::nind(cross)
     perms <- sample(seq(n.ind), n.ind, replace = FALSE)
     cross$pheno <- cross$pheno[perms,]
 
@@ -207,7 +207,7 @@ do.big.phase2 <- function(dirpath, cross, covars, perms, index, trait.index,
            pheno.col = find.pheno(perm.cross, dimnames(trait.data)[[2]]))
     })
 
-    per.scan <- scanone(out$perm.cross, pheno.col = out$pheno.col, method = "hk", 
+    per.scan <- qtl::scanone(out$perm.cross, pheno.col = out$pheno.col, method = "hk", 
                         addcovar = covars$addcovar, intcovar = covars$intcovar, ...)
 
     per.scan.hl <- highlod(per.scan, lod.thr = lod.min, drop.lod = drop.lod,

@@ -6,16 +6,17 @@
 useDynLib(qtlhot, .registration = TRUE)
 export(add.phenos)
 
-import(qtl)
-import(corpcor)
-import(mnormt)
-import(lattice)
-
-importFrom(stats, quantile) ## needed for quantile S3 method
-importFrom("graphics", "abline", "image", "lines", "plot", "rug",
-             "segments", "text", "title")
-importFrom("stats", "approx", "median", "p.adjust", "rnorm", "window")
-importFrom("utils", "write.table")
+importFrom(graphics, abline, axis, image, lines, mtext, par, plot, points,
+           rug, segments, text, title)
+importFrom(stats, anova, approx, as.formula, cov, cov2cor, dnorm, formula,
+           lm, median, model.matrix, na.omit, p.adjust, pbinom, pf, pnorm,
+           qnorm, quantile, resid, rnorm, sd, window)
+importFrom(utils, write.table)
+importFrom(qtl, calc.genoprob, find.marker, find.pheno, find.pseudomarker,
+           lodint, nchr, nind, nphe, pull.geno, pull.map, scanone,
+           sim.cross, sim.map)
+importFrom(mnormt, pmnorm)
+importFrom(corpcor, is.positive.definite, make.positive.definite)
   
 export(highlod)
 export(pull.highlod)
@@ -32,7 +33,6 @@ S3method(plot, hotsize)
 S3method(summary, hotsize)
 S3method(print, hotsize)
 S3method(max, hotsize)
-S3method(parallel, qtlhot)
 
 export(big.phase0)
 export(qtlhot.phase0)
@@ -71,5 +71,6 @@ export(FitAllTests)
 export(JoinTestOutputs)
 export(PrecTpFpMatrix)
 export(p.adjust.np)
+export(parallel.qtlhot)
 
 ## export(mySimulations)
