@@ -77,7 +77,7 @@ slidingbar.plot <- function(x, ...)
 
   ## Add chr name
   graphics::mtext("Chromosome", 1, 2)
-  chr <- levels(x$chr)
+  chr <- unique(x$chr)
   
   n.mar <- table(x$chr)
   wh <- c(0.5, cumsum(n.mar) + 0.5)

@@ -156,7 +156,7 @@ sexbatch.covar <- function(cross, batch.effect, verbose = FALSE)
     batch <- cross$pheno[,batch.effect, drop = FALSE]
     tmp <- stats::formula(paste("~ factor(", batch.effect, ")"))
     if(verbose)
-      cat("sexbatch.covar", names(tmp), levels(factor(batch[[1]])), "\n")
+      cat("sexbatch.covar", names(tmp), unique(factor(batch[[1]])), "\n")
     if(verbose)
       cat("sexbatch.covar", dim(batch), "\n")
     batch <- stats::model.matrix(tmp,batch)[,-1, drop = FALSE]

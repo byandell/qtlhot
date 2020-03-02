@@ -131,7 +131,7 @@ plot.hotsize <- function(x, ylab = "counts", quant.axis = pretty(x$max.N),
                          title = "", ...)
 {
   if(by.chr) {
-    for(i in levels(x$chr)) {
+    for(i in unique(x$chr)) {
       tmp <- x$chr == i
       if(any(tmp))
         graphics::plot(x[tmp,], ylab, col = col,
@@ -188,7 +188,7 @@ smooth.neqtl <- function(highobj, chr.pos, lod.thr = 0, window = 5)
 {
   chr <- chr.pos$chr
   pos <- chr.pos$pos
-  chr.names <- levels(chr.pos$chr)
+  chr.names <- unique(chr.pos$chr)
 
   max.hl <- make.maxlod(highobj, chr.pos)
   maxlod.thr.pos <- max.hl$pos
@@ -206,7 +206,7 @@ smooth.neqtl <- function(highobj, chr.pos, lod.thr = 0, window = 5)
 make.maxlod <- function(highobj, chr.pos)
 {
   ## find high LOD and position per chromosome.
-  chr.names <- levels(chr.pos$chr)
+  chr.names <- unique(chr.pos$chr)
 
   tmpfn <- function(x) {
     if(is.null(x))

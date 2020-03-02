@@ -946,7 +946,7 @@ CitTests <- function(LL, GG, TT)
   names(dat_f) <- c("L", "G", "T")
   Lf <- as.factor(dat_f$L)
   dat_f$L <- as.integer(Lf) - 1
-  llevels <- as.integer(levels(as.factor(dat_f$L)))
+  llevels <- as.integer(unique(as.factor(dat_f$L)))
   dfL <- length(llevels) - 1
   pvec <- rep(NA, 4)
 
@@ -1708,7 +1708,7 @@ GetCandReg <- function(highobj, annot, traits)
 GetCoMappingTraits <- function(highobj, cand.reg)
 {
   chr.pos <- highobj$chr.pos
-  chrs <- levels(chr.pos$chr)
+  chrs <- unique(chr.pos$chr)
   chr <- ordered(cand.reg$peak.chr, chrs)
   phys <- cbind(phenos = match(as.character(cand.reg[,1]), highobj$names),
                 chr = unclass(chr), pos = cand.reg$peak.pos)
